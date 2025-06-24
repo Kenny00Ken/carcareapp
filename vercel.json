@@ -43,6 +43,15 @@
       ]
     },
     {
+      "source": "/dashboard/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
       "source": "/api/(.*)",
       "headers": [
         {
@@ -81,19 +90,6 @@
     {
       "source": "/api/health",
       "destination": "/api/health"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/dashboard/(.*)",
-      "headers": {
-        "Cache-Control": "no-cache, no-store, must-revalidate"
-      },
-      "continue": true
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
     }
   ],
   "crons": [],
