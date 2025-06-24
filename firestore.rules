@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read and write their own user document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Cars - owners can CRUD their own cars, mechanics can read for requests
+    match /cars/{carId} {
+      allow read, write: if request.auth != null && 
+        (resource.data.owner_id == request.auth.uid || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'Mechanic');
+    }
+    
+    // Requests - owners can CRUD their requests, mechanics can read/update
+    match /requests/{requestId} {
+      allow read, write: if request.auth != null && 
+        (resource.data.owner_id == request.auth.uid || 
+         resource.data.mechanic_id == request.auth.uid ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'Mechanic');
+    }
+    
+    // Diagnoses - mechanics can CRUD their diagnoses, owners can read their car's diagnoses
+    match /diagnoses/{diagnosisId} {
+      allow read, write: if request.auth != null && 
+        (resource.data.mechanic_id == request.auth.uid ||
+         get(/databases/$(database)/documents/requests/$(resource.data.request_id)).data.owner_id == request.auth.uid);
+    }
+    
+    // Parts - dealers can CRUD their parts, mechanics can read all parts
+    match /parts/{partId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        (resource.data.dealer_id == request.auth.uid ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'Dealer');
+    }
+    
+    // Transactions - involved parties can read/write
+    match /transactions/{transactionId} {
+      allow read, write: if request.auth != null && 
+        (resource.data.buyer_id == request.auth.uid || 
+         resource.data.mechanic_id == request.auth.uid ||
+         get(/databases/$(database)/documents/parts/$(resource.data.part_id)).data.dealer_id == request.auth.uid);
+    }
+    
+    // Notifications - users can read their own notifications
+    match /notifications/{notificationId} {
+      allow read, write: if request.auth != null && 
+        resource.data.user_id == request.auth.uid;
+    }
+    
+    // Allow all authenticated users to read and write (for development only)
+    // Remove this rule in production and use the specific rules above
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+} 
