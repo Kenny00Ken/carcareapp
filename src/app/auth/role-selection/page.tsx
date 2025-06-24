@@ -34,7 +34,7 @@ export default function RoleSelectionPage() {
       redirectToDashboard(router, user.role)
     }
   }, [user, firebaseUser, router])
-
+  //chekin
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role)
   }
