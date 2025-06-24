@@ -26,56 +26,72 @@ import { useAuthRedirect } from '@/hooks/useAuthRedirect'
 
 const { Title, Paragraph, Text } = Typography
 
-// Typing animation component
+// Professional typing animation component
 const TypingText: React.FC<{ 
   texts: string[], 
   speed?: number, 
   pauseDuration?: number,
+  deleteSpeed?: number,
   className?: string 
 }> = ({ 
   texts, 
-  speed = 100, 
+  speed = 150, 
   pauseDuration = 2000,
+  deleteSpeed = 75,
   className = "" 
 }) => {
   const [currentTextIndex, setCurrentTextIndex] = useState(0)
   const [currentText, setCurrentText] = useState('')
   const [isTyping, setIsTyping] = useState(true)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [showCursor, setShowCursor] = useState(true)
 
   useEffect(() => {
     let timeout: NodeJS.Timeout
 
-    if (isTyping) {
+    if (isDeleting) {
+      // Deleting characters
+      if (currentText.length > 0) {
+        timeout = setTimeout(() => {
+          setCurrentText(currentText.slice(0, -1))
+        }, deleteSpeed)
+      } else {
+        setIsDeleting(false)
+        setCurrentTextIndex((prev) => (prev + 1) % texts.length)
+      }
+    } else if (isTyping) {
+      // Typing characters
       if (currentText.length < texts[currentTextIndex].length) {
         timeout = setTimeout(() => {
           setCurrentText(texts[currentTextIndex].slice(0, currentText.length + 1))
         }, speed)
       } else {
+        // Finished typing, wait then start deleting
         setIsTyping(false)
         timeout = setTimeout(() => {
-          setIsTyping(true)
-          setCurrentText('')
-          setCurrentTextIndex((prev) => (prev + 1) % texts.length)
+          setIsDeleting(true)
         }, pauseDuration)
       }
+    } else {
+      // Start typing next word
+      setIsTyping(true)
     }
 
     return () => clearTimeout(timeout)
-  }, [currentText, currentTextIndex, isTyping, texts, speed, pauseDuration])
+  }, [currentText, currentTextIndex, isTyping, isDeleting, texts, speed, pauseDuration, deleteSpeed])
 
   // Cursor blinking effect
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setShowCursor(prev => !prev)
-    }, 500)
+    }, 530)
     return () => clearInterval(cursorInterval)
   }, [])
 
   return (
     <span className={className}>
       {currentText}
-      <span className={`inline-block w-0.5 h-8 ml-1 bg-current transition-opacity duration-100 ${showCursor ? 'opacity-100' : 'opacity-0'}`} />
+      <span className={`inline-block w-1 h-16 ml-2 bg-gradient-to-b from-blue-600 to-purple-600 transition-opacity duration-200 ${showCursor ? 'opacity-100' : 'opacity-0'}`} />
     </span>
   )
 }
@@ -163,53 +179,104 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900 overflow-hidden">
-      {/* Add custom CSS for animations */}
+      {/* Enhanced custom CSS for animations */}
       <style jsx>{`
         @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
+          0%, 100% { 
+            transform: translateY(0px) rotate(0deg); 
+            filter: blur(0px);
+          }
+          50% { 
+            transform: translateY(-20px) rotate(180deg); 
+            filter: blur(1px);
+          }
         }
         @keyframes fadeInUp {
           from {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(40px) scale(0.95);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
           }
         }
         @keyframes slideInLeft {
           from {
             opacity: 0;
-            transform: translateX(-50px);
+            transform: translateX(-60px) scale(0.9);
           }
           to {
             opacity: 1;
-            transform: translateX(0);
+            transform: translateX(0) scale(1);
           }
         }
         @keyframes slideInRight {
           from {
             opacity: 0;
-            transform: translateX(50px);
+            transform: translateX(60px) scale(0.9);
           }
           to {
             opacity: 1;
-            transform: translateX(0);
+            transform: translateX(0) scale(1);
+          }
+        }
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+          }
+        }
+        @keyframes shimmer {
+          0% {
+            background-position: -200px 0;
+          }
+          100% {
+            background-position: calc(200px + 100%) 0;
           }
         }
         .animate-float {
-          animation: float 6s ease-in-out infinite;
+          animation: float 8s ease-in-out infinite;
         }
         .animate-fadeInUp {
-          animation: fadeInUp 0.8s ease-out;
+          animation: fadeInUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .animate-slideInLeft {
-          animation: slideInLeft 0.8s ease-out;
+          animation: slideInLeft 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .animate-slideInRight {
-          animation: slideInRight 0.8s ease-out;
+          animation: slideInRight 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .animate-pulse-slow {
+          animation: pulse 3s ease-in-out infinite;
+        }
+        .text-shimmer {
+          background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
+          background-size: 200px 100%;
+          animation: shimmer 3s ease-in-out infinite;
+          -webkit-background-clip: text;
+          background-clip: text;
+        }
+        .button-hover-effect {
+          position: relative;
+          overflow: hidden;
+        }
+        .button-hover-effect::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+          transition: left 0.5s;
+        }
+        .button-hover-effect:hover::before {
+          left: 100%;
         }
       `}</style>
 
@@ -279,23 +346,34 @@ export const LandingPage: React.FC = () => {
 
       {/* Hero Section */}
       <main className="relative">
-        {/* Background decorations */}
+        {/* Enhanced Background decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-20 h-20 bg-blue-200 dark:bg-blue-800 rounded-full opacity-20 animate-float"></div>
-          <div className="absolute top-40 right-20 w-16 h-16 bg-purple-200 dark:bg-purple-800 rounded-full opacity-20 animate-float" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute bottom-40 left-20 w-12 h-12 bg-green-200 dark:bg-green-800 rounded-full opacity-20 animate-float" style={{ animationDelay: '4s' }}></div>
+          {/* Floating geometric shapes */}
+          <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 dark:from-blue-600 dark:to-blue-800 rounded-full opacity-20 animate-float blur-sm"></div>
+          <div className="absolute top-40 right-20 w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 dark:from-purple-600 dark:to-purple-800 rounded-full opacity-20 animate-float blur-sm" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute bottom-40 left-20 w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 dark:from-green-600 dark:to-green-800 rounded-full opacity-20 animate-float blur-sm" style={{ animationDelay: '4s' }}></div>
+          
+          {/* Additional decorative elements */}
+          <div className="absolute top-60 left-1/4 w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 dark:from-yellow-500 dark:to-orange-600 rounded-full opacity-15 animate-float" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-80 right-1/3 w-14 h-14 bg-gradient-to-br from-pink-400 to-rose-500 dark:from-pink-500 dark:to-rose-600 rounded-full opacity-15 animate-float" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute bottom-60 right-10 w-10 h-10 bg-gradient-to-br from-indigo-400 to-blue-500 dark:from-indigo-500 dark:to-blue-600 rounded-full opacity-15 animate-float" style={{ animationDelay: '5s' }}></div>
+          
+          {/* Subtle grid pattern */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/5 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           {/* Hero Content */}
           <div className="text-center mb-20">
             <div className="animate-fadeInUp">
-              <Title level={1} className="!text-5xl md:!text-7xl !mb-8 !leading-tight">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800">
+              <Title level={1} className="!text-6xl md:!text-8xl !mb-12 !leading-tight !font-bold">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-800 drop-shadow-sm">
                   <TypingText 
-                    texts={['Connect.', 'Diagnose.', 'Repair.']}
-                    speed={120}
+                    texts={['Connect', 'Diagnose', 'Fix']}
+                    speed={100}
                     pauseDuration={2500}
+                    deleteSpeed={60}
                     className="inline-block"
                   />
                 </span>
@@ -303,9 +381,11 @@ export const LandingPage: React.FC = () => {
             </div>
             
             <div className="animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
-              <Paragraph className="!text-xl md:!text-2xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto !mb-12 !leading-relaxed">
-                The ultimate platform connecting car owners, mechanics, and dealers in one seamless ecosystem 
-                for automotive diagnostics, parts, and maintenance.
+              <Paragraph className="!text-xl md:!text-2xl text-gray-600 dark:text-gray-400 max-w-5xl mx-auto !mb-16 !leading-relaxed font-medium">
+                Transform your automotive experience with our revolutionary platform that seamlessly connects 
+                <span className="text-blue-600 font-semibold"> car owners</span>, 
+                <span className="text-green-600 font-semibold"> expert mechanics</span>, and 
+                <span className="text-purple-600 font-semibold"> trusted dealers</span> in one intelligent ecosystem.
               </Paragraph>
             </div>
             
@@ -344,25 +424,28 @@ export const LandingPage: React.FC = () => {
                       size="large"
                       icon={<CarOutlined />}
                       onClick={() => setAuthModalVisible(true)}
-                      className="!h-14 !px-10 !text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-blue-600 to-blue-700 border-none"
+                      className="!h-16 !px-12 !text-xl font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 bg-gradient-to-r from-blue-600 to-blue-700 border-none rounded-2xl relative overflow-hidden group"
                     >
-                      Join as Car Owner
+                      <span className="relative z-10">Join as Car Owner</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-800 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
                     </Button>
                     <Button
                       size="large"
                       icon={<ToolOutlined />}
                       onClick={() => setAuthModalVisible(true)}
-                      className="!h-14 !px-10 !text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="!h-16 !px-12 !text-xl font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 bg-gradient-to-r from-green-600 to-green-700 text-white border-none rounded-2xl relative overflow-hidden group"
                     >
-                      Join as Mechanic
+                      <span className="relative z-10">Join as Mechanic</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-green-700 to-green-800 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
                     </Button>
                     <Button
                       size="large"
                       icon={<ShopOutlined />}
                       onClick={() => setAuthModalVisible(true)}
-                      className="!h-14 !px-10 !text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="!h-16 !px-12 !text-xl font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 bg-gradient-to-r from-purple-600 to-purple-700 text-white border-none rounded-2xl relative overflow-hidden group"
                     >
-                      Join as Dealer
+                      <span className="relative z-10">Join as Dealer</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-700 to-purple-800 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
                     </Button>
                   </>
                 )}
