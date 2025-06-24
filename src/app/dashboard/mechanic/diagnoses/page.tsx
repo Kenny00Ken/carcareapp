@@ -87,7 +87,8 @@ export default function MechanicDiagnosesPage() {
         parts_needed: partsNeeded,
         follow_up_required: values.follow_up_required || false,
         follow_up_notes: values.follow_up_notes,
-        resolution_time: values.resolution_time
+        resolution_time: values.resolution_time,
+        created_at: new Date().toISOString()
       }
 
       if (isEditing && selectedDiagnosis) {
