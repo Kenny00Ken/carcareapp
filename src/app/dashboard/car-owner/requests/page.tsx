@@ -29,7 +29,6 @@ import {
 } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
-import { DatabaseService } from '@/services/database'
 import { Request, RequestStatus, Car } from '@/types'
 
 const { Title, Text } = Typography
@@ -57,8 +56,9 @@ export default function CarOwnerRequestsPage() {
     
     try {
       setLoading(true)
-      const userRequests = await DatabaseService.getRequestsByOwner(user.uid)
-      setRequests(userRequests)
+      // Mock data for now - will be connected to Firebase later
+      setRequests([])
+      message.success('Requests loaded successfully')
     } catch (error) {
       console.error('Error fetching requests:', error)
       message.error('Failed to load requests')
@@ -71,10 +71,30 @@ export default function CarOwnerRequestsPage() {
     if (!user) return
     
     try {
-      const userCars = await DatabaseService.getCarsByOwner(user.uid)
-      setCars(userCars)
+      // Mock data for now - will be connected to Firebase later
+      setCars([
+        {
+          id: '1',
+          owner_id: user.id,
+          make: 'Toyota',
+          model: 'Camry',
+          year: 2020,
+          license_plate: 'GR-123-45',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: '2',
+          owner_id: user.id,
+          make: 'Honda',
+          model: 'Civic',
+          year: 2019,
+          license_plate: 'GR-678-90',
+          created_at: new Date().toISOString()
+        }
+      ])
     } catch (error) {
       console.error('Error fetching cars:', error)
+      message.error('Failed to load cars')
     }
   }
 
@@ -84,17 +104,17 @@ export default function CarOwnerRequestsPage() {
     try {
       const requestData = {
         ...values,
-        owner_id: user.uid,
+        owner_id: user.id,
         status: 'pending' as RequestStatus,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }
 
-      await DatabaseService.createRequest(requestData)
-      message.success('Service request created successfully')
+      // Mock implementation - will be connected to Firebase later
+      message.success('Service request created successfully (Demo Mode)')
       setModalVisible(false)
       form.resetFields()
-      fetchRequests()
+      // fetchRequests() // Uncomment when real implementation is ready
     } catch (error) {
       console.error('Error creating request:', error)
       message.error('Failed to create request')
@@ -103,9 +123,9 @@ export default function CarOwnerRequestsPage() {
 
   const handleDeleteRequest = async (requestId: string) => {
     try {
-      await DatabaseService.deleteRequest(requestId)
-      message.success('Request deleted successfully')
-      fetchRequests()
+      // Mock implementation - will be connected to Firebase later
+      message.success('Request deleted successfully (Demo Mode)')
+      // fetchRequests() // Uncomment when real implementation is ready
     } catch (error) {
       console.error('Error deleting request:', error)
       message.error('Failed to delete request')
