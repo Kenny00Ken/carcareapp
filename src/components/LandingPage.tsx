@@ -7,14 +7,11 @@ import {
   CarOutlined, 
   ToolOutlined, 
   ShopOutlined, 
-  GoogleOutlined,
-  PhoneOutlined,
   BulbOutlined,
   MoonOutlined,
   UserOutlined,
   LogoutOutlined,
   SettingOutlined,
-  RightOutlined,
   CheckCircleOutlined,
   StarFilled,
   ArrowRightOutlined
@@ -26,7 +23,7 @@ import { useAuthRedirect } from '@/hooks/useAuthRedirect'
 
 const { Title, Paragraph, Text } = Typography
 
-// Professional typing animation component
+// Enhanced typing animation component with continuous loop
 const TypingText: React.FC<{ 
   texts: string[], 
   speed?: number, 
@@ -50,48 +47,67 @@ const TypingText: React.FC<{
     let timeout: NodeJS.Timeout
 
     if (isDeleting) {
-      // Deleting characters
+      // Deleting characters with variable speed for dramatic effect
       if (currentText.length > 0) {
+        const dynamicDeleteSpeed = currentText.length > 10 ? deleteSpeed / 2 : deleteSpeed
         timeout = setTimeout(() => {
           setCurrentText(currentText.slice(0, -1))
-        }, deleteSpeed)
+        }, dynamicDeleteSpeed)
       } else {
         setIsDeleting(false)
         setCurrentTextIndex((prev) => (prev + 1) % texts.length)
+        setIsTyping(true)
       }
     } else if (isTyping) {
-      // Typing characters
+      // Typing characters with dynamic speed
       if (currentText.length < texts[currentTextIndex].length) {
+        const nextChar = texts[currentTextIndex][currentText.length]
+        const dynamicSpeed = nextChar === ' ' || nextChar === '•' ? speed * 2 : speed
         timeout = setTimeout(() => {
           setCurrentText(texts[currentTextIndex].slice(0, currentText.length + 1))
-        }, speed)
+        }, dynamicSpeed)
       } else {
-        // Finished typing, wait then start deleting
+        // Finished typing, wait then start deleting (ensure continuous loop)
         setIsTyping(false)
         timeout = setTimeout(() => {
           setIsDeleting(true)
         }, pauseDuration)
       }
-    } else {
-      // Start typing next word
-      setIsTyping(true)
     }
 
     return () => clearTimeout(timeout)
   }, [currentText, currentTextIndex, isTyping, isDeleting, texts, speed, pauseDuration, deleteSpeed])
 
-  // Cursor blinking effect
+  // Enhanced cursor blinking effect
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setShowCursor(prev => !prev)
-    }, 530)
+    }, 500)
     return () => clearInterval(cursorInterval)
   }, [])
 
+  // Split text to handle bullet points styling
+  const renderText = (text: string) => {
+    return text.split('•').map((part, index) => (
+      <span key={index}>
+        {index > 0 && <span className="text-purple-400 mx-2 animate-pulse">•</span>}
+        <span className={index === 0 ? 'text-blue-600' : index === 1 ? 'text-green-600' : 'text-purple-600'}>
+          {part.trim()}
+        </span>
+      </span>
+    ))
+  }
+
   return (
     <span className={className}>
-      {currentText}
-      <span className={`inline-block w-1 h-16 ml-2 bg-gradient-to-b from-blue-600 to-purple-600 transition-opacity duration-200 ${showCursor ? 'opacity-100' : 'opacity-0'}`} />
+      <span className="inline-block min-h-[1.2em]">
+        {renderText(currentText)}
+      </span>
+      <span 
+        className={`inline-block w-1 ml-2 bg-gradient-to-b from-blue-500 via-purple-500 to-blue-600 transition-all duration-300 ${
+          showCursor ? 'opacity-100 h-16 shadow-lg shadow-blue-500/50' : 'opacity-30 h-14'
+        } ${isTyping ? 'animate-pulse' : ''}`} 
+      />
     </span>
   )
 }
@@ -119,7 +135,7 @@ export const LandingPage: React.FC = () => {
   const [authModalVisible, setAuthModalVisible] = useState(false)
   
   // Use the auth redirect hook to handle navigation
-  const { isAuthenticated, hasProfile, hasRole } = useAuthRedirect({
+  useAuthRedirect({
     redirectOnAuth: true
   })
 
@@ -370,10 +386,10 @@ export const LandingPage: React.FC = () => {
               <Title level={1} className="!text-6xl md:!text-8xl !mb-12 !leading-tight !font-bold">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-800 drop-shadow-sm">
                   <TypingText 
-                    texts={['Connect', 'Diagnose', 'Fix']}
-                    speed={100}
-                    pauseDuration={2500}
-                    deleteSpeed={60}
+                    texts={['Connect', 'Connect • Diagnose', 'Connect • Diagnose • Fix']}
+                    speed={80}
+                    pauseDuration={3000}
+                    deleteSpeed={50}
                     className="inline-block"
                   />
                 </span>
