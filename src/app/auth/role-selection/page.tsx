@@ -2,14 +2,21 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Card, Button, Typography, Row, Col, Form, Input, Space } from 'antd'
-import { CarOutlined, ToolOutlined, ShopOutlined, UserOutlined, PhoneOutlined, EnvironmentOutlined } from '@ant-design/icons'
+import { Card, Button, Typography, Row, Col, Form, Input, Space, Avatar, message } from 'antd'
+import { CarOutlined, ToolOutlined, ShopOutlined, UserOutlined, PhoneOutlined, EnvironmentOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import { useAuth } from '@/contexts/AuthContext'
 import { UserRole } from '@/types'
 import { redirectToDashboard } from '@/utils/navigation'
 import { useAuthRedirect } from '@/hooks/useAuthRedirect'
 
 const { Title, Paragraph } = Typography
+
+interface FormValues {
+  name: string
+  phone: string
+  address: string
+  specialization?: string
+}
 
 export default function RoleSelectionPage() {
   const { user, firebaseUser, updateUserProfile } = useAuth()
@@ -39,32 +46,33 @@ export default function RoleSelectionPage() {
     setSelectedRole(role)
   }
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: FormValues) => {
     if (!selectedRole || !firebaseUser) {
       console.error('Missing selectedRole or firebaseUser')
       return
     }
 
-    setLoading(true)
     try {
-      console.log('Submitting role selection:', selectedRole, values)
+      setLoading(true)
       
       await updateUserProfile({
-        role: selectedRole,
         name: values.name,
-        phone: firebaseUser.phoneNumber || values.phone,
-        email: firebaseUser.email || values.email,
+        phone: values.phone,
         address: values.address,
-        created_at: new Date().toISOString(),
+        role: selectedRole,
+        email: firebaseUser.email || ''
       })
-
-      console.log('Profile updated successfully, redirecting immediately...')
-
-      // Immediate redirect to dashboard
-      redirectToDashboard(router, selectedRole)
       
+      // Navigate to appropriate dashboard
+      const dashboardRoutes = {
+        CarOwner: '/dashboard/car-owner',
+        Mechanic: '/dashboard/mechanic', 
+        Dealer: '/dashboard/dealer'
+      }
+      router.push(dashboardRoutes[selectedRole])
     } catch (error) {
       console.error('Error updating profile:', error)
+    } finally {
       setLoading(false)
     }
   }
@@ -98,9 +106,9 @@ export default function RoleSelectionPage() {
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center mb-12">
           <Title level={1} className="!mb-4">Choose Your Role</Title>
-          <Paragraph className="!text-lg text-gray-600 dark:text-gray-300">
-            Select how you'd like to use Car Care Connect
-          </Paragraph>
+          <Typography.Text className="text-gray-600">
+            Let&apos;s get you set up with the right access level for your automotive needs.
+          </Typography.Text>
         </div>
 
         {!selectedRole ? (

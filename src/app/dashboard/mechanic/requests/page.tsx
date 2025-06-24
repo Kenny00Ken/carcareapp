@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { 
   Card, 
   Table, 
@@ -35,7 +35,7 @@ import {
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { DatabaseService } from '@/services/database'
-import { Request, RequestStatus, Diagnosis } from '@/types'
+import { Request, RequestStatus } from '@/types'
 
 const { Title, Text, Paragraph } = Typography
 const { TabPane } = Tabs
@@ -103,14 +103,7 @@ export default function MechanicRequestsPage() {
   const [creatingDiagnosis, setCreatingDiagnosis] = useState(false)
   const [diagnosisForm] = Form.useForm<DiagnosisFormValues>()
   
-  useEffect(() => {
-    if (user) {
-      loadData()
-      setupRealtimeSubscriptions()
-    }
-  }, [user])
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!user) return
     
     try {
@@ -130,9 +123,9 @@ export default function MechanicRequestsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
 
-  const setupRealtimeSubscriptions = () => {
+  const setupRealtimeSubscriptions = useCallback(() => {
     if (!user) return
 
     // Subscribe to available requests
@@ -150,7 +143,14 @@ export default function MechanicRequestsPage() {
       unsubscribeAvailable()
       unsubscribeMy()
     }
-  }
+  }, [user])
+  
+  useEffect(() => {
+    if (user) {
+      loadData()
+      setupRealtimeSubscriptions()
+    }
+  }, [user, loadData, setupRealtimeSubscriptions])
 
   const handleClaimRequest = async (requestId: string) => {
     if (!user) return
@@ -190,12 +190,15 @@ export default function MechanicRequestsPage() {
         request_id: selectedRequest.id,
         mechanic_id: user.id,
         title: values.title,
-        description: values.description,
+        details: values.description,
         severity: values.severity,
         estimated_cost: values.estimated_cost,
-        recommended_parts: values.recommended_parts,
-        next_steps: values.next_steps
-      }
+        parts_needed: values.recommended_parts || '',
+        next_steps: values.next_steps,
+        follow_up_required: values.severity === 'high' || values.severity === 'critical',
+        status: 'pending',
+        created_at: new Date().toISOString()
+      } as any
 
       await DatabaseService.createDiagnosis(diagnosisData)
       message.success('Diagnosis created successfully!')

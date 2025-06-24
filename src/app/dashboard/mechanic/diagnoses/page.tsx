@@ -91,8 +91,8 @@ export default function MechanicDiagnosesPage() {
     setSubmitting(true)
     try {
       // Calculate total parts cost
-      const totalPartsCost = partsNeeded.reduce(
-        (total, part) => total + (part.estimated_price * part.quantity), 
+            const totalPartsCost = partsNeeded.reduce(
+        (total, part) => total + ((part.estimated_price || 0) * part.quantity),
         0
       )
 

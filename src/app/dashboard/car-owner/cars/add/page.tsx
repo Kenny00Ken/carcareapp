@@ -60,7 +60,7 @@ export default function AddCarPage() {
         Object.entries(carData).filter(([_, value]) => value !== undefined)
       )
 
-      const carId = await DatabaseService.createCar(cleanedCarData)
+      const carId = await DatabaseService.createCar(cleanedCarData as any)
       
       message.success('Car added successfully!')
       router.push('/dashboard/car-owner/cars')
