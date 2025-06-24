@@ -76,7 +76,12 @@ export default function DealerDashboard() {
             DatabaseService.getUser(transaction.mechanic_id),
             transaction.request_id ? DatabaseService.getRequest(transaction.request_id) : null
           ])
-          return { ...transaction, part, mechanic, request }
+          return { 
+            ...transaction, 
+            part: part || undefined, 
+            mechanic: mechanic || undefined, 
+            request: request || undefined 
+          }
         })
       )
       setRecentTransactions(enrichedTransactions)
