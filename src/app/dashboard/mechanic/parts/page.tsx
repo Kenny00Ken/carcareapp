@@ -188,10 +188,10 @@ export default function MechanicPartsPage() {
       render: (compatibility: string[]) => (
         <div className="space-y-1">
           {compatibility?.slice(0, 2).map((comp, index) => (
-            <Tag key={index} size="small">{comp}</Tag>
+            <Tag key={index}>{comp}</Tag>
           ))}
           {compatibility?.length > 2 && (
-            <Tag size="small">+{compatibility.length - 2} more</Tag>
+            <Tag>+{compatibility.length - 2} more</Tag>
           )}
         </div>
       )

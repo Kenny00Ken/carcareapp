@@ -161,9 +161,9 @@ export default function NotificationsPage() {
                         <span className={!notification.read ? 'font-semibold' : 'font-medium'}>
                           {notification.title}
                         </span>
-                        <Tag color={getNotificationColor(notification.type)} size="small">
-                          {notification.type.replace('_', ' ').toUpperCase()}
-                        </Tag>
+                                    <Tag color={getNotificationColor(notification.type)}>
+              {notification.type.replace('_', ' ').toUpperCase()}
+            </Tag>
                         {!notification.read && (
                           <Badge color="blue" />
                         )}

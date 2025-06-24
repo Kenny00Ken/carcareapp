@@ -222,7 +222,7 @@ export default function DealerTransactionsPage() {
             {record.request?.car?.make} {record.request?.car?.model}
           </div>
           {record.request?.urgency && (
-            <Tag size="small" color={getPriorityColor(record.request.urgency)}>
+            <Tag color={getPriorityColor(record.request.urgency)}>
               {record.request.urgency.toUpperCase()}
             </Tag>
           )}
