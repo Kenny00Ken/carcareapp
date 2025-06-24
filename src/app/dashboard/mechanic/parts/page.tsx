@@ -111,7 +111,9 @@ export default function MechanicPartsPage() {
         unit_price: selectedPart.price,
         total_amount: selectedPart.price * values.quantity,
         status: 'pending' as TransactionStatus,
-        notes: values.notes
+        notes: values.notes,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       }
 
       await DatabaseService.createTransaction(transactionData)

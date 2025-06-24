@@ -31,7 +31,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { DatabaseService } from '@/services/database'
 import { MaintenanceRecord, Request, ActivityLog } from '@/types'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 
 const { RangePicker } = DatePicker
 const { Option } = Select
@@ -332,7 +332,7 @@ export default function MechanicHistoryPage() {
             <Col>
               <RangePicker
                 value={dateRange}
-                onChange={setDateRange}
+                onChange={(dates) => setDateRange(dates as [Dayjs, Dayjs] | null)}
                 format="MMM DD, YYYY"
               />
             </Col>

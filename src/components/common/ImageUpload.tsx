@@ -126,7 +126,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           <Button 
             icon={<UploadOutlined />} 
             loading={uploading}
-            disabled={disabled || (value && maxCount === 1)}
+            disabled={disabled || (!!value && maxCount === 1)}
           >
             {uploading ? `Uploading... ${progress}%` : buttonText}
           </Button>

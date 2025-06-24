@@ -101,7 +101,7 @@ export default function ProfilePage() {
                 </div>
                 
                 <ImageUpload
-                  value={profileImage}
+                  value={profileImage || undefined}
                   onChange={handleImageUpload}
                   folder={`users/${user.id}/profile`}
                   buttonText="Change Photo"

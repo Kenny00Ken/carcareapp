@@ -83,7 +83,7 @@ export default function MechanicDashboard() {
           DatabaseService.getCar(request.car_id),
           DatabaseService.getUser(request.owner_id)
         ])
-        return { ...request, car, owner }
+        return { ...request, car: car || undefined, owner: owner || undefined }
       })
     )
     setAvailableRequests(enrichedRequests)

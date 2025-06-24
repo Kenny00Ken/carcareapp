@@ -14,7 +14,7 @@ import {
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/services/firebase'
 import { User, UserRole } from '@/types'
-import { App } from 'antd'
+import { App, message } from 'antd'
 
 interface AuthContextType {
   user: User | null
