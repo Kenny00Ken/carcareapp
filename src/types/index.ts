@@ -10,6 +10,7 @@ export interface User {
   profile_image?: string
   rating?: number
   total_reviews?: number
+  fcm_token?: string
   created_at: string
   updated_at?: string
 }

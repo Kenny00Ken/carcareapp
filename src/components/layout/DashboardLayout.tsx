@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Layout, Menu, Avatar, Dropdown, Button, Badge, Typography } from 'antd'
 import { useRouter } from 'next/navigation'
 import {
@@ -21,6 +21,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { UserRole } from '@/types'
+import { DatabaseService } from '@/services/database'
 
 const { Header, Sider, Content } = Layout
 const { Title } = Typography
@@ -38,6 +39,16 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const { theme, toggleTheme } = useTheme()
   const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
+  const [notificationCount, setNotificationCount] = useState(0)
+
+  useEffect(() => {
+    if (user?.id) {
+      const unsubscribe = DatabaseService.subscribeToUserNotifications(user.id, (notifications) => {
+        setNotificationCount(notifications.length)
+      })
+      return unsubscribe
+    }
+  }, [user])
 
   const getRoleIcon = (role: UserRole) => {
     switch (role) {
@@ -230,7 +241,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               onClick={toggleTheme}
             />
             
-            <Badge count={0} showZero={false}>
+            <Badge count={notificationCount} showZero={false}>
               <Button
                 type="text"
                 icon={<BellOutlined />}

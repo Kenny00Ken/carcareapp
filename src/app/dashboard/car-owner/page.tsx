@@ -46,6 +46,44 @@ export default function CarOwnerDashboard() {
     }
   }, [user])
 
+  useEffect(() => {
+    // Subscribe to real-time car updates
+    if (user?.id) {
+      const unsubscribe = DatabaseService.subscribeToUserCars?.(user.id, (updatedCars) => {
+        setCars(updatedCars)
+        // Update stats when cars change
+        setStats(prevStats => ({
+          ...prevStats,
+          totalCars: updatedCars.length
+        }))
+      }) || (() => {})
+      return unsubscribe
+    }
+  }, [user])
+
+  useEffect(() => {
+    // Subscribe to real-time request updates
+    if (user?.id) {
+      const unsubscribe = DatabaseService.subscribeToUserRequests(user.id, (updatedRequests) => {
+        setRecentRequests(updatedRequests.slice(0, 5))
+        
+        // Calculate real-time statistics
+        const activeRequests = updatedRequests.filter(r => 
+          ['pending', 'claimed', 'diagnosed', 'in_progress', 'parts_requested'].includes(r.status)
+        ).length
+
+        const completedRequests = updatedRequests.filter(r => r.status === 'completed').length
+
+        setStats(prevStats => ({
+          ...prevStats,
+          activeRequests,
+          completedRequests
+        }))
+      })
+      return unsubscribe
+    }
+  }, [user])
+
   const loadDashboardData = async () => {
     if (!user?.id) return
 

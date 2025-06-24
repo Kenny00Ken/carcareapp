@@ -15,6 +15,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/services/firebase'
 import { User, UserRole } from '@/types'
 import { App, message } from 'antd'
+import { FCMService, registerServiceWorker } from '@/services/fcm'
 
 interface AuthContextType {
   user: User | null
@@ -46,6 +47,42 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null)
   const [loading, setLoading] = useState(true)
+
+  // Initialize FCM for authenticated user
+  const initializeFCMForUser = async (userData: User) => {
+    try {
+      // Register service worker
+      await registerServiceWorker()
+      
+      // Initialize FCM
+      await FCMService.initialize()
+      
+      // Get and update FCM token
+      const token = await FCMService.getToken(userData.id)
+      if (token && (!userData.fcm_token || userData.fcm_token !== token)) {
+        // Update user with new FCM token if it changed
+        await setDoc(doc(db, 'users', userData.id), {
+          fcm_token: token,
+          updated_at: new Date().toISOString()
+        }, { merge: true })
+      }
+
+      // Subscribe to FCM messages
+      FCMService.subscribeToMessages((payload) => {
+        console.log('FCM message received:', payload)
+        
+        // Handle notification based on type
+        if (payload.data?.action === 'view_requests') {
+          // Could trigger a UI update or refresh
+          window.dispatchEvent(new CustomEvent('fcmNotificationReceived', {
+            detail: payload
+          }))
+        }
+      })
+    } catch (error) {
+      console.error('Error initializing FCM:', error)
+    }
+  }
   
   // Get message context safely
   let messageApi: any = null
@@ -74,6 +111,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const userData = { id: firebaseUser.uid, ...userDoc.data() } as User
             console.log('User document found:', userData)
             setUser(userData)
+            
+            // Initialize FCM for authenticated user
+            await initializeFCMForUser(userData)
           } else {
             console.log('No user document found - new user needs role selection')
             // New user - needs to complete profile setup

@@ -157,6 +157,12 @@ export class DatabaseService {
   static async claimRequest(requestId: string, mechanicId: string): Promise<void> {
     const batch = writeBatch(db)
     
+    // Get original request for notifications
+    const originalRequest = await this.getRequest(requestId)
+    if (!originalRequest) {
+      throw new Error('Request not found')
+    }
+    
     // Update request
     const requestRef = doc(db, 'requests', requestId)
     batch.update(requestRef, {
@@ -175,7 +181,44 @@ export class DatabaseService {
       timestamp: Timestamp.now().toDate().toISOString()
     })
 
+    // Create notification for car owner
+    const notificationRef = doc(collection(db, 'notifications'))
+    batch.set(notificationRef, {
+      user_id: originalRequest.owner_id,
+      title: 'Service Request Claimed',
+      message: 'A mechanic has claimed your service request and will contact you soon.',
+      type: 'request_update',
+      read: false,
+      timestamp: Timestamp.now().toDate().toISOString(),
+      data: {
+        request_id: requestId,
+        status: 'claimed'
+      }
+    })
+
     await batch.commit()
+
+    // Send FCM notification to car owner
+    try {
+      const [mechanic, car] = await Promise.all([
+        this.getUser(mechanicId),
+        originalRequest.car_id ? this.getCar(originalRequest.car_id) : null
+      ])
+
+      const carInfo = car ? `${car.make} ${car.model}` : 'your vehicle'
+      
+      // Dynamically import FCMService to avoid circular dependency
+      const { FCMService } = await import('./fcm')
+      await FCMService.sendStatusUpdateToOwner(originalRequest.owner_id, {
+        requestId,
+        status: 'claimed',
+        carInfo,
+        mechanicName: mechanic?.name,
+        message: `${mechanic?.name || 'A mechanic'} has claimed your ${carInfo} service request`
+      })
+    } catch (error) {
+      console.error('Error sending claim notification:', error)
+    }
   }
 
   static async getRequest(requestId: string): Promise<Request | null> {
@@ -189,6 +232,12 @@ export class DatabaseService {
   static async updateRequest(requestId: string, requestData: Partial<Request>, userId?: string): Promise<void> {
     const batch = writeBatch(db)
     
+    // Get original request to send notifications
+    const originalRequest = await this.getRequest(requestId)
+    if (!originalRequest) {
+      throw new Error('Request not found')
+    }
+
     // Update request
     const requestRef = doc(db, 'requests', requestId)
     batch.update(requestRef, {
@@ -207,9 +256,51 @@ export class DatabaseService {
         metadata: requestData,
         timestamp: Timestamp.now().toDate().toISOString()
       })
+
+      // Create notification for car owner about status update
+      if (userId !== originalRequest.owner_id) {
+        const notificationRef = doc(collection(db, 'notifications'))
+        batch.set(notificationRef, {
+          user_id: originalRequest.owner_id,
+          title: 'Service Request Update',
+          message: `Your service request status has been updated to: ${requestData.status?.replace('_', ' ').toUpperCase()}`,
+          type: 'request_update',
+          read: false,
+          timestamp: Timestamp.now().toDate().toISOString(),
+          data: {
+            request_id: requestId,
+            status: requestData.status,
+            mechanic_name: userId ? (await this.getUser(userId))?.name : undefined
+          }
+        })
+      }
     }
 
     await batch.commit()
+
+    // Send FCM notification for status updates
+    if (requestData.status && userId && userId !== originalRequest.owner_id) {
+      try {
+        const [car, mechanic] = await Promise.all([
+          originalRequest.car_id ? this.getCar(originalRequest.car_id) : null,
+          userId ? this.getUser(userId) : null
+        ])
+
+        const carInfo = car ? `${car.make} ${car.model}` : 'Your vehicle'
+        
+        // Dynamically import FCMService to avoid circular dependency
+        const { FCMService } = await import('./fcm')
+        await FCMService.sendStatusUpdateToOwner(originalRequest.owner_id, {
+          requestId,
+          status: requestData.status,
+          carInfo,
+          mechanicName: mechanic?.name,
+          message: `${carInfo} service status: ${requestData.status.replace('_', ' ').toUpperCase()}`
+        })
+      } catch (error) {
+        console.error('Error sending status update notification:', error)
+      }
+    }
   }
 
   private static getActivityTypeFromStatus(status: string): ActivityType {
@@ -769,6 +860,19 @@ export class DatabaseService {
     return onSnapshot(q, (querySnapshot) => {
       const notifications = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as NotificationData))
       callback(notifications)
+    })
+  }
+
+  static subscribeToUserCars(userId: string, callback: (cars: Car[]) => void) {
+    const q = query(
+      collection(db, 'cars'),
+      where('owner_id', '==', userId),
+      orderBy('created_at', 'desc')
+    )
+    
+    return onSnapshot(q, (querySnapshot) => {
+      const cars = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Car))
+      callback(cars)
     })
   }
 

@@ -42,6 +42,31 @@ export default function NotificationsPage() {
     }
   }, [user])
 
+  useEffect(() => {
+    // Subscribe to real-time notifications
+    if (user?.id) {
+      const unsubscribe = DatabaseService.subscribeToUserNotifications(user.id, (realtimeNotifications) => {
+        // Get all notifications (not just unread) for the page
+        loadNotifications()
+      })
+      return unsubscribe
+    }
+  }, [user])
+
+  useEffect(() => {
+    // Listen for FCM notifications
+    const handleFCMNotification = (event: CustomEvent) => {
+      console.log('FCM notification received on notifications page:', event.detail)
+      // Refresh notifications when FCM message is received
+      loadNotifications()
+    }
+
+    window.addEventListener('fcmNotificationReceived', handleFCMNotification as EventListener)
+    return () => {
+      window.removeEventListener('fcmNotificationReceived', handleFCMNotification as EventListener)
+    }
+  }, [])
+
   const loadNotifications = async () => {
     if (!user) return
     
@@ -67,6 +92,28 @@ export default function NotificationsPage() {
       console.error('Error marking notification as read:', error)
     } finally {
       setMarkingRead(null)
+    }
+  }
+
+  const handleNotificationClick = async (notification: NotificationData) => {
+    // Mark as read first
+    if (!notification.read) {
+      await handleMarkAsRead(notification.id)
+    }
+
+    // Navigate based on notification type and data
+    if (notification.data?.action === 'view_requests') {
+      window.location.href = '/dashboard/mechanic/requests'
+    } else if (notification.data?.action === 'view_request' && notification.data?.request_id) {
+      if (user?.role === 'CarOwner') {
+        window.location.href = `/dashboard/car-owner/requests`
+      } else {
+        window.location.href = `/dashboard/mechanic/requests`
+      }
+    } else if (notification.data?.action === 'view_diagnosis' && notification.data?.request_id) {
+      window.location.href = `/dashboard/car-owner/requests`
+    } else if (notification.data?.action === 'view_chat' && notification.data?.request_id) {
+      window.location.href = `/dashboard/car-owner/requests/${notification.data.request_id}/chat`
     }
   }
 
@@ -135,7 +182,7 @@ export default function NotificationsPage() {
               renderItem={(notification) => (
                 <List.Item
                   key={notification.id}
-                  className={`${!notification.read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''} hover:bg-gray-50 transition-colors`}
+                  className={`${!notification.read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''} hover:bg-gray-50 transition-colors cursor-pointer`}
                   actions={[
                     !notification.read && (
                       <Button
@@ -143,12 +190,16 @@ export default function NotificationsPage() {
                         size="small"
                         icon={<CheckOutlined />}
                         loading={markingRead === notification.id}
-                        onClick={() => handleMarkAsRead(notification.id)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleMarkAsRead(notification.id)
+                        }}
                       >
                         Mark as read
                       </Button>
                     )
                   ].filter(Boolean)}
+                  onClick={() => handleNotificationClick(notification)}
                 >
                   <List.Item.Meta
                     avatar={

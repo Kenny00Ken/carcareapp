@@ -30,6 +30,8 @@ import {
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { Request, RequestStatus, Car } from '@/types'
+import { DatabaseService } from '@/services/database'
+import { FCMService } from '@/services/fcm'
 
 const { Title, Text } = Typography
 const { TextArea } = Input
@@ -51,13 +53,24 @@ export default function CarOwnerRequestsPage() {
     }
   }, [user])
 
+  useEffect(() => {
+    // Subscribe to real-time request updates
+    if (user?.id) {
+      const unsubscribe = DatabaseService.subscribeToUserRequests(user.id, (updatedRequests) => {
+        setRequests(updatedRequests)
+        setLoading(false)
+      })
+      return unsubscribe
+    }
+  }, [user])
+
   const fetchRequests = async () => {
     if (!user) return
     
     try {
       setLoading(true)
-      // Mock data for now - will be connected to Firebase later
-      setRequests([])
+      const userRequests = await DatabaseService.getRequestsByOwner(user.id)
+      setRequests(userRequests)
       message.success('Requests loaded successfully')
     } catch (error) {
       console.error('Error fetching requests:', error)
@@ -71,27 +84,8 @@ export default function CarOwnerRequestsPage() {
     if (!user) return
     
     try {
-      // Mock data for now - will be connected to Firebase later
-      setCars([
-        {
-          id: '1',
-          owner_id: user.id,
-          make: 'Toyota',
-          model: 'Camry',
-          year: 2020,
-          license_plate: 'GR-123-45',
-          created_at: new Date().toISOString()
-        },
-        {
-          id: '2',
-          owner_id: user.id,
-          make: 'Honda',
-          model: 'Civic',
-          year: 2019,
-          license_plate: 'GR-678-90',
-          created_at: new Date().toISOString()
-        }
-      ])
+      const userCars = await DatabaseService.getCarsByOwner(user.id)
+      setCars(userCars)
     } catch (error) {
       console.error('Error fetching cars:', error)
       message.error('Failed to load cars')
@@ -102,6 +96,12 @@ export default function CarOwnerRequestsPage() {
     if (!user) return
 
     try {
+      const selectedCar = cars.find(car => car.id === values.car_id)
+      if (!selectedCar) {
+        message.error('Selected car not found')
+        return
+      }
+
       const requestData = {
         ...values,
         owner_id: user.id,
@@ -110,11 +110,33 @@ export default function CarOwnerRequestsPage() {
         updated_at: new Date().toISOString()
       }
 
-      // Mock implementation - will be connected to Firebase later
-      message.success('Service request created successfully (Demo Mode)')
+      // Create request in database
+      const requestId = await DatabaseService.createRequest(requestData)
+      
+      // Send notifications to available mechanics
+      try {
+        const availableMechanics = await DatabaseService.getUsersByRole('Mechanic')
+        const carInfo = `${selectedCar.make} ${selectedCar.model} (${selectedCar.year})`
+        
+        // Send notification to all available mechanics
+        for (const mechanic of availableMechanics) {
+          await FCMService.sendRequestNotificationToMechanic(mechanic.id, {
+            requestId,
+            title: values.title,
+            carInfo,
+            urgency: values.urgency,
+            location: values.location
+          })
+        }
+      } catch (notificationError) {
+        console.error('Error sending notifications:', notificationError)
+        // Don't fail the request creation if notifications fail
+      }
+
+      message.success('Service request created successfully!')
       setModalVisible(false)
       form.resetFields()
-      // fetchRequests() // Uncomment when real implementation is ready
+      fetchRequests() // Refresh the list
     } catch (error) {
       console.error('Error creating request:', error)
       message.error('Failed to create request')
@@ -123,9 +145,9 @@ export default function CarOwnerRequestsPage() {
 
   const handleDeleteRequest = async (requestId: string) => {
     try {
-      // Mock implementation - will be connected to Firebase later
-      message.success('Request deleted successfully (Demo Mode)')
-      // fetchRequests() // Uncomment when real implementation is ready
+      await DatabaseService.deleteRequest(requestId)
+      message.success('Request deleted successfully')
+      fetchRequests() // Refresh the list
     } catch (error) {
       console.error('Error deleting request:', error)
       message.error('Failed to delete request')
