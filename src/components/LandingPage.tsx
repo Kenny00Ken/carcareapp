@@ -477,8 +477,6 @@ export const LandingPage: React.FC = () => {
             <span>© 2024 Car Care Connect</span>
             <span>•</span>
             <span>All rights reserved</span>
-            <span>•</span>
-            <span>Made with ❤️ in Ghana</span>
           </div>
         </div>
       </footer>
