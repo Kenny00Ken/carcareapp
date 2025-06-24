@@ -8,6 +8,8 @@ export interface User {
   email?: string
   address?: string
   profile_image?: string
+  rating?: number
+  total_reviews?: number
   created_at: string
   updated_at?: string
 }
