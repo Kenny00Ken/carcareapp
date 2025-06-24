@@ -105,6 +105,7 @@ export default function MechanicDiagnosesPage() {
             title: 'Diagnosis Available',
             message: `A diagnosis has been submitted for your service request: ${request.title}`,
             type: 'info',
+            timestamp: new Date().toISOString(),
             read: false,
             data: { 
               request_id: request.id, 

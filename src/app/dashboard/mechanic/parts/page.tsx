@@ -123,6 +123,7 @@ export default function MechanicPartsPage() {
         title: 'New Parts Request',
         message: `A mechanic has requested ${values.quantity}x ${selectedPart.name}`,
         type: 'info',
+        timestamp: new Date().toISOString(),
         read: false,
         data: { 
           part_id: selectedPart.id,

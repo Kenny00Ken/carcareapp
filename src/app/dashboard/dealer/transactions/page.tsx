@@ -119,6 +119,7 @@ export default function DealerTransactionsPage() {
           title: 'Parts Request Approved',
           message: `Your request for ${transaction.part?.name} has been approved`,
           type: 'success',
+          timestamp: new Date().toISOString(),
           read: false,
           data: { 
             transaction_id: transactionId,
@@ -153,6 +154,7 @@ export default function DealerTransactionsPage() {
           title: 'Parts Request Rejected',
           message: `Your request for ${transaction.part?.name} has been rejected`,
           type: 'warning',
+          timestamp: new Date().toISOString(),
           read: false,
           data: { 
             transaction_id: transactionId,
