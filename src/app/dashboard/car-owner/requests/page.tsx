@@ -13,19 +13,16 @@ import {
   Select,
   message,
   Typography,
-  Badge,
   Row,
   Col,
-  Spin,
   Empty
 } from 'antd'
 import {
   PlusOutlined,
   EyeOutlined,
-  EditOutlined,
   DeleteOutlined,
   MessageOutlined,
-  ClockCircleOutlined
+  CarOutlined
 } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
@@ -35,6 +32,15 @@ import { FCMService } from '@/services/fcm'
 
 const { Title, Text } = Typography
 const { TextArea } = Input
+
+// Define form values interface
+interface CreateRequestFormValues {
+  car_id: string
+  title: string
+  description: string
+  urgency: 'low' | 'medium' | 'high'
+  location: string
+}
 
 export default function CarOwnerRequestsPage() {
   const { user } = useAuth()
@@ -64,6 +70,17 @@ export default function CarOwnerRequestsPage() {
     }
   }, [user])
 
+  useEffect(() => {
+    // Subscribe to real-time car updates
+    if (user?.id) {
+      const unsubscribe = DatabaseService.subscribeToUserCars(user.id, (updatedCars) => {
+        setCars(updatedCars)
+        console.log('Cars updated in real-time:', updatedCars.length, 'cars')
+      })
+      return unsubscribe
+    }
+  }, [user])
+
   const fetchRequests = async () => {
     if (!user) return
     
@@ -71,7 +88,7 @@ export default function CarOwnerRequestsPage() {
       setLoading(true)
       const userRequests = await DatabaseService.getRequestsByOwner(user.id)
       setRequests(userRequests)
-      message.success('Requests loaded successfully')
+      // Removed success message - loading data shouldn't show notifications
     } catch (error) {
       console.error('Error fetching requests:', error)
       message.error('Failed to load requests')
@@ -86,13 +103,17 @@ export default function CarOwnerRequestsPage() {
     try {
       const userCars = await DatabaseService.getCarsByOwner(user.id)
       setCars(userCars)
+      
+      // Log for debugging
+      console.log('User cars loaded:', userCars.length, 'cars for user:', user.id)
     } catch (error) {
       console.error('Error fetching cars:', error)
       message.error('Failed to load cars')
+      setCars([]) // Ensure cars is empty on error
     }
   }
 
-  const handleCreateRequest = async (values: any) => {
+  const handleCreateRequest = async (values: CreateRequestFormValues) => {
     if (!user) return
 
     try {
@@ -136,7 +157,7 @@ export default function CarOwnerRequestsPage() {
       message.success('Service request created successfully!')
       setModalVisible(false)
       form.resetFields()
-      fetchRequests() // Refresh the list
+      // Removed fetchRequests() call - real-time subscription will handle the update
     } catch (error) {
       console.error('Error creating request:', error)
       message.error('Failed to create request')
@@ -147,7 +168,7 @@ export default function CarOwnerRequestsPage() {
     try {
       await DatabaseService.deleteRequest(requestId)
       message.success('Request deleted successfully')
-      fetchRequests() // Refresh the list
+      // Removed fetchRequests() call - real-time subscription will handle the update
     } catch (error) {
       console.error('Error deleting request:', error)
       message.error('Failed to delete request')
@@ -281,7 +302,21 @@ export default function CarOwnerRequestsPage() {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => setModalVisible(true)}
+            onClick={() => {
+              if (cars.length === 0) {
+                Modal.confirm({
+                  title: 'No Vehicles Found',
+                  content: 'You need to add at least one vehicle before creating a service request. Would you like to add a vehicle now?',
+                  okText: 'Add Vehicle',
+                  cancelText: 'Cancel',
+                  onOk: () => {
+                    window.location.href = '/dashboard/car-owner/cars/add'
+                  }
+                })
+                return
+              }
+              setModalVisible(true)
+            }}
           >
             New Request
           </Button>
@@ -314,31 +349,73 @@ export default function CarOwnerRequestsPage() {
         <Modal
           title="Create Service Request"
           open={modalVisible}
-          onOk={() => form.submit()}
+          onOk={() => {
+            if (cars.length === 0) {
+              message.warning('Please add a vehicle first before creating a request')
+              return
+            }
+            form.submit()
+          }}
           onCancel={() => {
             setModalVisible(false)
             form.resetFields()
           }}
           width={600}
         >
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleCreateRequest}
-          >
-            <Form.Item
-              name="car_id"
-              label="Select Car"
-              rules={[{ required: true, message: 'Please select a car' }]}
+          {cars.length === 0 ? (
+            <div className="text-center py-8">
+              <CarOutlined className="text-6xl text-gray-400 mb-4" />
+              <Title level={4}>No Vehicles Added</Title>
+              <Text className="text-gray-600 mb-6 block">
+                You need to add at least one vehicle before creating a service request.
+              </Text>
+              <Button 
+                type="primary" 
+                size="large"
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  setModalVisible(false)
+                  window.location.href = '/dashboard/car-owner/cars/add'
+                }}
+              >
+                Add Your First Vehicle
+              </Button>
+            </div>
+          ) : (
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={handleCreateRequest}
             >
-              <Select placeholder="Choose your car">
-                {cars.map(car => (
-                  <Select.Option key={car.id} value={car.id}>
-                    {car.make} {car.model} ({car.year}) - {car.license_plate}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
+              <Form.Item
+                name="car_id"
+                label={`Select Vehicle (${cars.length} available)`}
+                rules={[{ required: true, message: 'Please select a vehicle' }]}
+              >
+                <Select 
+                  placeholder="Choose your vehicle"
+                  showSearch
+                  filterOption={(input, option) => {
+                    if (!option || !option.children) return false
+                    return String(option.children).toLowerCase().includes(input.toLowerCase())
+                  }}
+                >
+                  {cars.map(car => (
+                    <Select.Option key={car.id} value={car.id}>
+                      <div className="flex justify-between items-center">
+                        <span>
+                          <strong>{car.make} {car.model}</strong> ({car.year})
+                        </span>
+                        {car.license_plate && (
+                          <span className="text-gray-500 text-sm">
+                            {car.license_plate}
+                          </span>
+                        )}
+                      </div>
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
 
             <Form.Item
               name="title"
@@ -384,6 +461,7 @@ export default function CarOwnerRequestsPage() {
               </Col>
             </Row>
           </Form>
+          )}
         </Modal>
 
         {/* View Request Modal */}

@@ -23,7 +23,7 @@ import { useAuthRedirect } from '@/hooks/useAuthRedirect'
 
 const { Title, Paragraph, Text } = Typography
 
-// Enhanced typing animation component with continuous loop
+// Professional typing animation component with smooth continuous loop
 const TypingText: React.FC<{ 
   texts: string[], 
   speed?: number, 
@@ -32,9 +32,9 @@ const TypingText: React.FC<{
   className?: string 
 }> = ({ 
   texts, 
-  speed = 150, 
-  pauseDuration = 2000,
-  deleteSpeed = 75,
+  speed = 120, 
+  pauseDuration = 2500,
+  deleteSpeed = 60,
   className = "" 
 }) => {
   const [currentTextIndex, setCurrentTextIndex] = useState(0)
@@ -42,14 +42,15 @@ const TypingText: React.FC<{
   const [isTyping, setIsTyping] = useState(true)
   const [isDeleting, setIsDeleting] = useState(false)
   const [showCursor, setShowCursor] = useState(true)
+  const [isComplete, setIsComplete] = useState(false)
 
   useEffect(() => {
     let timeout: NodeJS.Timeout
 
     if (isDeleting) {
-      // Deleting characters with variable speed for dramatic effect
+      // Smooth character deletion
       if (currentText.length > 0) {
-        const dynamicDeleteSpeed = currentText.length > 10 ? deleteSpeed / 2 : deleteSpeed
+        const dynamicDeleteSpeed = currentText.length > 8 ? deleteSpeed : deleteSpeed * 1.2
         timeout = setTimeout(() => {
           setCurrentText(currentText.slice(0, -1))
         }, dynamicDeleteSpeed)
@@ -57,41 +58,73 @@ const TypingText: React.FC<{
         setIsDeleting(false)
         setCurrentTextIndex((prev) => (prev + 1) % texts.length)
         setIsTyping(true)
+        setIsComplete(false)
       }
     } else if (isTyping) {
-      // Typing characters with dynamic speed
+      // Professional typing with variable speeds
       if (currentText.length < texts[currentTextIndex].length) {
         const nextChar = texts[currentTextIndex][currentText.length]
-        const dynamicSpeed = nextChar === ' ' || nextChar === '•' ? speed * 2 : speed
+        let dynamicSpeed = speed
+        
+        // Slower for special characters and spaces
+        if (nextChar === '•' || nextChar === ' ') {
+          dynamicSpeed = speed * 1.8
+        } else if (nextChar === nextChar.toUpperCase() && nextChar !== nextChar.toLowerCase()) {
+          dynamicSpeed = speed * 1.2
+        }
+        
         timeout = setTimeout(() => {
           setCurrentText(texts[currentTextIndex].slice(0, currentText.length + 1))
         }, dynamicSpeed)
       } else {
-        // Finished typing, wait then start deleting (ensure continuous loop)
+        // Completed current text
         setIsTyping(false)
+        setIsComplete(true)
+        
+        const pauseTime = currentText.includes('•') ? pauseDuration * 1.2 : pauseDuration
         timeout = setTimeout(() => {
           setIsDeleting(true)
-        }, pauseDuration)
+          setIsComplete(false)
+        }, pauseTime)
       }
     }
 
     return () => clearTimeout(timeout)
   }, [currentText, currentTextIndex, isTyping, isDeleting, texts, speed, pauseDuration, deleteSpeed])
 
-  // Enhanced cursor blinking effect
+  // Professional cursor animation
   useEffect(() => {
+    const blinkSpeed = isComplete ? 300 : isTyping ? 600 : 400
     const cursorInterval = setInterval(() => {
       setShowCursor(prev => !prev)
-    }, 500)
+    }, blinkSpeed)
     return () => clearInterval(cursorInterval)
-  }, [])
+  }, [isTyping, isComplete])
 
-  // Split text to handle bullet points styling
+  // Enhanced text rendering with professional styling
   const renderText = (text: string) => {
-    return text.split('•').map((part, index) => (
-      <span key={index}>
-        {index > 0 && <span className="text-purple-400 mx-2 animate-pulse">•</span>}
-        <span className={index === 0 ? 'text-blue-600' : index === 1 ? 'text-green-600' : 'text-purple-600'}>
+    const parts = text.split('•')
+    return parts.map((part, index) => (
+      <span key={index} className="inline-block">
+        {index > 0 && (
+          <span className="text-purple-400 mx-3 text-4xl md:text-6xl font-bold animate-pulse-slow transform transition-all duration-300 drop-shadow-lg">
+            •
+          </span>
+        )}
+        <span 
+          className={`
+            font-extrabold tracking-tight transition-all duration-500 transform drop-shadow-md
+            ${index === 0 ? 'text-blue-600 hover:text-blue-700' : 
+              index === 1 ? 'text-green-600 hover:text-green-700' : 
+              'text-purple-600 hover:text-purple-700'}
+            ${isComplete && index === parts.length - 1 ? 'animate-pulse' : ''}
+          `}
+          style={{
+            textShadow: index === 0 ? '0 0 20px rgba(37, 99, 235, 0.3)' :
+                       index === 1 ? '0 0 20px rgba(34, 197, 94, 0.3)' :
+                       '0 0 20px rgba(147, 51, 234, 0.3)'
+          }}
+        >
           {part.trim()}
         </span>
       </span>
@@ -99,16 +132,38 @@ const TypingText: React.FC<{
   }
 
   return (
-    <span className={className}>
-      <span className="inline-block min-h-[1.2em]">
-        {renderText(currentText)}
-      </span>
-      <span 
-        className={`inline-block w-1 ml-2 bg-gradient-to-b from-blue-500 via-purple-500 to-blue-600 transition-all duration-300 ${
-          showCursor ? 'opacity-100 h-16 shadow-lg shadow-blue-500/50' : 'opacity-30 h-14'
-        } ${isTyping ? 'animate-pulse' : ''}`} 
-      />
-    </span>
+    <div className={`${className} relative`}>
+      <div className="inline-block min-h-[1.2em] relative">
+        <span className="inline-block transform transition-all duration-300">
+          {renderText(currentText)}
+        </span>
+        
+        {/* Professional animated cursor */}
+        <span 
+          className={`
+            inline-block w-1.5 ml-3 bg-gradient-to-b from-blue-400 via-purple-500 to-blue-600 
+            rounded-full transition-all duration-300 shadow-lg
+            ${showCursor ? 
+              'opacity-100 h-16 md:h-20 shadow-blue-400/50 scale-110' : 
+              'opacity-30 h-14 md:h-18 scale-95'
+            }
+            ${isTyping ? 'animate-pulse' : ''}
+            ${isComplete ? 'animate-bounce' : ''}
+          `}
+          style={{
+            boxShadow: showCursor ? '0 0 15px rgba(59, 130, 246, 0.6), 0 0 30px rgba(147, 51, 234, 0.4)' : 'none'
+          }}
+        />
+        
+        {/* Subtle background glow */}
+        <div className={`
+          absolute inset-0 blur-sm opacity-20 transition-opacity duration-1000 pointer-events-none
+          ${isComplete ? 'opacity-30' : 'opacity-10'}
+        `}>
+          {renderText(currentText)}
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -247,12 +302,30 @@ export const LandingPage: React.FC = () => {
             transform: scale(1.05);
           }
         }
+        @keyframes pulseSlow {
+          0%, 100% {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+          }
+          50% {
+            opacity: 0.7;
+            transform: scale(1.15) rotate(2deg);
+          }
+        }
         @keyframes shimmer {
           0% {
             background-position: -200px 0;
           }
           100% {
             background-position: calc(200px + 100%) 0;
+          }
+        }
+        @keyframes glow {
+          0%, 100% {
+            text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+          }
+          50% {
+            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
           }
         }
         .animate-float {
@@ -268,7 +341,7 @@ export const LandingPage: React.FC = () => {
           animation: slideInRight 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .animate-pulse-slow {
-          animation: pulse 3s ease-in-out infinite;
+          animation: pulseSlow 4s ease-in-out infinite;
         }
         .text-shimmer {
           background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
@@ -387,9 +460,9 @@ export const LandingPage: React.FC = () => {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-800 drop-shadow-sm">
                   <TypingText 
                     texts={['Connect', 'Connect • Diagnose', 'Connect • Diagnose • Fix']}
-                    speed={80}
-                    pauseDuration={3000}
-                    deleteSpeed={50}
+                    speed={100}
+                    pauseDuration={3500}
+                    deleteSpeed={55}
                     className="inline-block"
                   />
                 </span>

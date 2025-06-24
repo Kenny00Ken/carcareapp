@@ -22,6 +22,7 @@ export interface Car {
   model: string
   year: number
   image_url?: string
+  image_urls?: string[] // Array of image URLs for multiple car photos
   color?: string
   license_plate?: string
   vin?: string

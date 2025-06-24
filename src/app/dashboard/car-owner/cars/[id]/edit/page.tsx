@@ -16,6 +16,7 @@ import {
 } from 'antd'
 import { CarOutlined, SaveOutlined, LeftOutlined } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
+import { MultipleImageUpload } from '@/components/common/MultipleImageUpload'
 import { useAuth } from '@/contexts/AuthContext'
 import { DatabaseService } from '@/services/database'
 import { Car } from '@/types'
@@ -30,6 +31,7 @@ export default function EditCarPage() {
   const [loading, setLoading] = useState(false)
   const [car, setCar] = useState<Car | null>(null)
   const [form] = Form.useForm()
+  const [carImages, setCarImages] = useState<string[]>([])
 
   const carId = params.id as string
 
@@ -45,6 +47,20 @@ export default function EditCarPage() {
       const carData = await DatabaseService.getCar(carId)
       if (carData && carData.owner_id === user!.id) {
         setCar(carData)
+        // Initialize images from car data
+        const existingImages = []
+        if (carData.image_url) {
+          existingImages.push(carData.image_url)
+        }
+        if (carData.image_urls && Array.isArray(carData.image_urls)) {
+          // Merge and remove duplicates
+          const allImages = [...existingImages, ...carData.image_urls]
+          const uniqueImages = Array.from(new Set(allImages))
+          setCarImages(uniqueImages)
+        } else {
+          setCarImages(existingImages)
+        }
+        
         form.setFieldsValue({
           ...carData,
           purchase_date: carData.purchase_date ? dayjs(carData.purchase_date) : null
@@ -66,10 +82,17 @@ export default function EditCarPage() {
     try {
       const updateData = {
         ...values,
-        purchase_date: values.purchase_date ? values.purchase_date.format('YYYY-MM-DD') : null
+        purchase_date: values.purchase_date ? values.purchase_date.format('YYYY-MM-DD') : null,
+        image_url: carImages[0] || null, // Primary image
+        image_urls: carImages, // All images
       }
       
-      await DatabaseService.updateCar(carId, updateData)
+      // Filter out undefined values to prevent Firestore errors
+      const cleanedUpdateData = Object.fromEntries(
+        Object.entries(updateData).filter(([_, value]) => value !== undefined)
+      )
+      
+      await DatabaseService.updateCar(carId, cleanedUpdateData)
       message.success('Car updated successfully!')
       router.push('/dashboard/car-owner/cars')
     } catch (error) {
@@ -78,6 +101,10 @@ export default function EditCarPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleImagesChange = (urls: string[]) => {
+    setCarImages(urls)
   }
 
   const handleBack = () => {
@@ -209,6 +236,21 @@ export default function EditCarPage() {
               <Input.TextArea
                 rows={4}
                 placeholder="Any additional notes about your vehicle..."
+              />
+            </Form.Item>
+
+            {/* Car Images */}
+            <Form.Item
+              label="Car Photos"
+              extra="Update photos of your car. The first image will be the primary photo displayed to mechanics."
+            >
+              <MultipleImageUpload
+                value={carImages}
+                onChange={handleImagesChange}
+                folder="cars"
+                maxCount={5}
+                buttonText="Update Car Photos"
+                className="w-full"
               />
             </Form.Item>
 

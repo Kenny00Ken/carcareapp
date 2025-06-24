@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Card, Form, Input, Button, Select, InputNumber, Row, Col, Typography, Space, message, Divider } from 'antd'
 import { CarOutlined, SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
-import { ImageUpload } from '@/components/common/ImageUpload'
+import { MultipleImageUpload } from '@/components/common/MultipleImageUpload'
 import { useAuth } from '@/contexts/AuthContext'
 import { DatabaseService } from '@/services/database'
 import { useRouter } from 'next/navigation'
@@ -17,7 +17,7 @@ export default function AddCarPage() {
   const router = useRouter()
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
-  const [carImage, setCarImage] = useState<string | undefined>(undefined)
+  const [carImages, setCarImages] = useState<string[]>([])
 
   const currentYear = new Date().getFullYear()
 
@@ -43,8 +43,9 @@ export default function AddCarPage() {
         make: values.make,
         model: values.model,
         year: values.year,
-        image_url: carImage,
-        // Additional fields that could be added later - filter out undefined values
+        image_url: carImages[0] || null, // Primary image
+        image_urls: carImages, // All images
+        // Additional fields - only include if they have values
         ...(values.color && { color: values.color }),
         ...(values.license_plate && { license_plate: values.license_plate }),
         ...(values.vin && { vin: values.vin }),
@@ -54,7 +55,12 @@ export default function AddCarPage() {
         ...(values.notes && { notes: values.notes }),
       }
 
-      const carId = await DatabaseService.createCar(carData)
+      // Filter out undefined values to prevent Firestore errors
+      const cleanedCarData = Object.fromEntries(
+        Object.entries(carData).filter(([_, value]) => value !== undefined)
+      )
+
+      const carId = await DatabaseService.createCar(cleanedCarData)
       
       message.success('Car added successfully!')
       router.push('/dashboard/car-owner/cars')
@@ -66,8 +72,8 @@ export default function AddCarPage() {
     }
   }
 
-  const handleImageUpload = (url: string | null) => {
-    setCarImage(url || undefined)
+  const handleImagesChange = (urls: string[]) => {
+    setCarImages(urls)
   }
 
   if (!user) {
@@ -270,20 +276,21 @@ export default function AddCarPage() {
               </Row>
             </div>
 
-            {/* Car Image */}
+            {/* Car Images */}
             <div>
-              <Title level={4}>Car Photo</Title>
+              <Title level={4}>Car Photos</Title>
               <Divider />
               
               <Form.Item
-                label="Upload car photo (optional)"
-                extra="Supported formats: JPEG, PNG, WebP • Max size: 5MB"
+                label="Upload car photos (optional)"
+                extra="Add multiple photos of your car to help mechanics better understand its condition. First image will be the primary photo."
               >
-                <ImageUpload
-                  value={carImage}
-                  onChange={handleImageUpload}
+                <MultipleImageUpload
+                  value={carImages}
+                  onChange={handleImagesChange}
                   folder="cars"
-                  buttonText="Upload Car Photo"
+                  maxCount={5}
+                  buttonText="Add Car Photos"
                   className="w-full"
                 />
               </Form.Item>

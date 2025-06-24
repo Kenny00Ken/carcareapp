@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Card, Button, Typography, Descriptions, message, Spin, Empty } from 'antd'
-import { EditOutlined, ArrowLeftOutlined, CarOutlined } from '@ant-design/icons'
+import { Card, Button, Typography, Descriptions, message, Spin, Empty, Image, Row, Col } from 'antd'
+import { EditOutlined, ArrowLeftOutlined, CarOutlined, PictureOutlined } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { DatabaseService } from '@/services/database'
@@ -160,6 +160,77 @@ export default function CarDetailPage() {
             </Descriptions.Item>
           </Descriptions>
         </Card>
+
+        {/* Car Images Gallery */}
+        {(() => {
+          const images = []
+          if (car.image_url) images.push(car.image_url)
+          if (car.image_urls && Array.isArray(car.image_urls)) {
+            const allImages = [...images, ...car.image_urls]
+            const uniqueImages = Array.from(new Set(allImages))
+            return uniqueImages.length > 0 ? (
+              <Card
+                title={
+                  <div className="flex items-center">
+                    <PictureOutlined className="mr-2" />
+                    Car Photos ({uniqueImages.length})
+                  </div>
+                }
+              >
+                <Row gutter={[16, 16]}>
+                  {uniqueImages.map((imageUrl, index) => (
+                    <Col key={index} xs={24} sm={12} md={8} lg={6}>
+                      <div className="relative">
+                        {index === 0 && (
+                          <div className="absolute top-2 left-2 z-10">
+                            <div className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                              Primary
+                            </div>
+                          </div>
+                        )}
+                        <Image
+                          width="100%"
+                          height={200}
+                          src={imageUrl}
+                          alt={`${car.make} ${car.model} - Image ${index + 1}`}
+                          className="object-cover rounded-lg"
+                          style={{ objectFit: 'cover' }}
+                        />
+                      </div>
+                    </Col>
+                  ))}
+                </Row>
+                <div className="mt-4 text-center">
+                  <Text type="secondary" className="text-sm">
+                    Click on any image to view in full size
+                  </Text>
+                </div>
+              </Card>
+            ) : (
+              <Card
+                title={
+                  <div className="flex items-center">
+                    <PictureOutlined className="mr-2" />
+                    Car Photos
+                  </div>
+                }
+              >
+                <Empty 
+                  description="No photos available"
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                >
+                  <Button 
+                    type="primary" 
+                    onClick={() => router.push(`/dashboard/car-owner/cars/${carId}/edit`)}
+                  >
+                    Add Photos
+                  </Button>
+                </Empty>
+              </Card>
+            )
+          }
+          return null
+        })()}
       </div>
     </DashboardLayout>
   )

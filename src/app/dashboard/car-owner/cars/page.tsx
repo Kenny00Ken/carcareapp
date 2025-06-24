@@ -59,24 +59,41 @@ export default function CarsPage() {
       dataIndex: 'image_url',
       key: 'image',
       width: 100,
-      render: (imageUrl: string, record: Car) => (
-        <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-          {imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt={`${record.make} ${record.model}`}
-              width={64}
-              height={64}
-              className="object-cover"
-              preview={false}
-            />
-          ) : (
-            <div className="text-gray-400 text-xs text-center">
-              No Image
-            </div>
-          )}
-        </div>
-      ),
+      render: (imageUrl: string, record: Car) => {
+        // Get primary image from image_url or first from image_urls array
+        let primaryImage = imageUrl
+        if (!primaryImage && record.image_urls && Array.isArray(record.image_urls) && record.image_urls.length > 0) {
+          primaryImage = record.image_urls[0]
+        }
+        
+        const totalImages = record.image_urls ? record.image_urls.length : (imageUrl ? 1 : 0)
+        
+        return (
+          <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+            {primaryImage ? (
+              <>
+                <Image
+                  src={primaryImage}
+                  alt={`${record.make} ${record.model}`}
+                  width={64}
+                  height={64}
+                  className="object-cover"
+                  preview={false}
+                />
+                {totalImages > 1 && (
+                  <div className="absolute bottom-0 right-0 bg-blue-500 text-white text-xs px-1 rounded-tl">
+                    +{totalImages - 1}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-gray-400 text-xs text-center">
+                No Image
+              </div>
+            )}
+          </div>
+        )
+      },
     },
     {
       title: 'Make & Model',

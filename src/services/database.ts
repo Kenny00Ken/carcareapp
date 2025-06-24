@@ -42,7 +42,7 @@ export class DatabaseService {
     activityType: ActivityType,
     description: string,
     requestId?: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<string> {
     const docRef = await addDoc(collection(db, 'activity_logs'), {
       user_id: userId,
@@ -133,11 +133,12 @@ export class DatabaseService {
     
     // Create request
     const requestRef = doc(collection(db, 'requests'))
-    batch.set(requestRef, {
+    const finalRequestData = {
       ...requestData,
       created_at: Timestamp.now().toDate().toISOString(),
       updated_at: Timestamp.now().toDate().toISOString()
-    })
+    }
+    batch.set(requestRef, finalRequestData)
 
     // Log activity
     const activityRef = doc(collection(db, 'activity_logs'))
@@ -149,6 +150,39 @@ export class DatabaseService {
       metadata: { urgency: requestData.urgency },
       timestamp: Timestamp.now().toDate().toISOString()
     })
+
+    // Get all mechanics to send notifications
+    try {
+      const mechanicsQuery = query(
+        collection(db, 'users'),
+        where('role', '==', 'Mechanic')
+      )
+      const mechanicsSnapshot = await getDocs(mechanicsQuery)
+      
+      // Create database notifications for all mechanics
+      mechanicsSnapshot.docs.forEach(mechanicDoc => {
+        const mechanicData = mechanicDoc.data() as User
+        const notificationRef = doc(collection(db, 'notifications'))
+        batch.set(notificationRef, {
+          user_id: mechanicData.id,
+          title: 'New Service Request Available',
+          message: `${requestData.title} - ${requestData.urgency.toUpperCase()} priority in ${requestData.location}`,
+          type: 'request_update',
+          read: false,
+          timestamp: Timestamp.now().toDate().toISOString(),
+          data: {
+            request_id: requestRef.id,
+            car_info: requestData.title,
+            urgency: requestData.urgency,
+            location: requestData.location,
+            action: 'view_requests'
+          }
+        })
+      })
+    } catch (error) {
+      console.error('Error creating mechanic notifications:', error)
+      // Don't fail request creation if notifications fail
+    }
 
     await batch.commit()
     return requestRef.id
@@ -476,11 +510,17 @@ export class DatabaseService {
   static async getDiagnosesByMechanic(mechanicId: string): Promise<Diagnosis[]> {
     const q = query(
       collection(db, 'diagnoses'), 
-      where('mechanic_id', '==', mechanicId),
-      orderBy('created_at', 'desc')
+      where('mechanic_id', '==', mechanicId)
     )
     const querySnapshot = await getDocs(q)
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Diagnosis))
+    const diagnoses = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Diagnosis))
+    
+    // Sort in memory to avoid index requirement
+    return diagnoses.sort((a, b) => {
+      const aTime = new Date(a.created_at || 0).getTime()
+      const bTime = new Date(b.created_at || 0).getTime()
+      return bTime - aTime // desc order
+    })
   }
 
   // Parts Management
@@ -702,21 +742,33 @@ export class DatabaseService {
   static async getMaintenanceRecordsByMechanic(mechanicId: string): Promise<MaintenanceRecord[]> {
     const q = query(
       collection(db, 'maintenance_records'),
-      where('mechanic_id', '==', mechanicId),
-      orderBy('maintenance_date', 'desc')
+      where('mechanic_id', '==', mechanicId)
     )
     const querySnapshot = await getDocs(q)
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MaintenanceRecord))
+    const records = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MaintenanceRecord))
+    
+    // Sort in memory to avoid index requirement
+    return records.sort((a, b) => {
+      const aTime = new Date(a.maintenance_date || 0).getTime()
+      const bTime = new Date(b.maintenance_date || 0).getTime()
+      return bTime - aTime // desc order
+    })
   }
 
   static async getMaintenanceRecordsByCar(carId: string): Promise<MaintenanceRecord[]> {
     const q = query(
       collection(db, 'maintenance_records'),
-      where('car_id', '==', carId),
-      orderBy('maintenance_date', 'desc')
+      where('car_id', '==', carId)
     )
     const querySnapshot = await getDocs(q)
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MaintenanceRecord))
+    const records = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MaintenanceRecord))
+    
+    // Sort in memory to avoid index requirement
+    return records.sort((a, b) => {
+      const aTime = new Date(a.maintenance_date || 0).getTime()
+      const bTime = new Date(b.maintenance_date || 0).getTime()
+      return bTime - aTime // desc order
+    })
   }
 
   // Statistics
@@ -784,11 +836,17 @@ export class DatabaseService {
   static async getNotificationsByUser(userId: string): Promise<NotificationData[]> {
     const q = query(
       collection(db, 'notifications'),
-      where('user_id', '==', userId),
-      orderBy('timestamp', 'desc')
+      where('user_id', '==', userId)
     )
     const querySnapshot = await getDocs(q)
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as NotificationData))
+    const notifications = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as NotificationData))
+    
+    // Sort in memory to avoid index requirement
+    return notifications.sort((a, b) => {
+      const aTime = new Date(a.timestamp || 0).getTime()
+      const bTime = new Date(b.timestamp || 0).getTime()
+      return bTime - aTime // desc order
+    })
   }
 
   static async markNotificationAsRead(notificationId: string): Promise<void> {
@@ -799,39 +857,54 @@ export class DatabaseService {
   static subscribeToUserRequests(userId: string, callback: (requests: Request[]) => void) {
     const q = query(
       collection(db, 'requests'),
-      where('owner_id', '==', userId),
-      orderBy('created_at', 'desc')
+      where('owner_id', '==', userId)
     )
     
     return onSnapshot(q, (querySnapshot) => {
       const requests = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Request))
-      callback(requests)
+      // Sort in memory to avoid index requirement
+      const sortedRequests = requests.sort((a, b) => {
+        const aTime = new Date(a.created_at || 0).getTime()
+        const bTime = new Date(b.created_at || 0).getTime()
+        return bTime - aTime // desc order
+      })
+      callback(sortedRequests)
     })
   }
 
   static subscribeToMechanicRequests(mechanicId: string, callback: (requests: Request[]) => void) {
     const q = query(
       collection(db, 'requests'),
-      where('mechanic_id', '==', mechanicId),
-      orderBy('created_at', 'desc')
+      where('mechanic_id', '==', mechanicId)
     )
     
     return onSnapshot(q, (querySnapshot) => {
       const requests = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Request))
-      callback(requests)
+      // Sort in memory to avoid index requirement  
+      const sortedRequests = requests.sort((a, b) => {
+        const aTime = new Date(a.created_at || 0).getTime()
+        const bTime = new Date(b.created_at || 0).getTime()
+        return bTime - aTime // desc order
+      })
+      callback(sortedRequests)
     })
   }
 
   static subscribeToAvailableRequests(callback: (requests: Request[]) => void) {
     const q = query(
       collection(db, 'requests'),
-      where('status', '==', 'pending'),
-      orderBy('created_at', 'desc')
+      where('status', '==', 'pending')
     )
     
     return onSnapshot(q, (querySnapshot) => {
       const requests = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Request))
-      callback(requests)
+      // Sort in memory to avoid index requirement
+      const sortedRequests = requests.sort((a, b) => {
+        const aTime = new Date(a.created_at || 0).getTime()
+        const bTime = new Date(b.created_at || 0).getTime()
+        return bTime - aTime // desc order
+      })
+      callback(sortedRequests)
     })
   }
 
@@ -839,13 +912,18 @@ export class DatabaseService {
     const q = query(
       collection(db, 'transactions'),
       where('dealer_id', '==', dealerId),
-      where('status', '==', 'pending'),
-      orderBy('created_at', 'desc')
+      where('status', '==', 'pending')
     )
     
     return onSnapshot(q, (querySnapshot) => {
       const transactions = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction))
-      callback(transactions)
+      // Sort in memory to avoid index requirement
+      const sortedTransactions = transactions.sort((a, b) => {
+        const aTime = new Date(a.created_at || 0).getTime()
+        const bTime = new Date(b.created_at || 0).getTime()
+        return bTime - aTime // desc order
+      })
+      callback(sortedTransactions)
     })
   }
 
@@ -853,26 +931,36 @@ export class DatabaseService {
     const q = query(
       collection(db, 'notifications'),
       where('user_id', '==', userId),
-      where('read', '==', false),
-      orderBy('timestamp', 'desc')
+      where('read', '==', false)
     )
     
     return onSnapshot(q, (querySnapshot) => {
       const notifications = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as NotificationData))
-      callback(notifications)
+      // Sort in memory to avoid index requirement
+      const sortedNotifications = notifications.sort((a, b) => {
+        const aTime = new Date(a.timestamp || 0).getTime()
+        const bTime = new Date(b.timestamp || 0).getTime()
+        return bTime - aTime // desc order
+      })
+      callback(sortedNotifications)
     })
   }
 
   static subscribeToUserCars(userId: string, callback: (cars: Car[]) => void) {
     const q = query(
       collection(db, 'cars'),
-      where('owner_id', '==', userId),
-      orderBy('created_at', 'desc')
+      where('owner_id', '==', userId)
     )
     
     return onSnapshot(q, (querySnapshot) => {
       const cars = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Car))
-      callback(cars)
+      // Sort in memory to avoid index requirement
+      const sortedCars = cars.sort((a, b) => {
+        const aTime = new Date(a.created_at || 0).getTime()
+        const bTime = new Date(b.created_at || 0).getTime()
+        return bTime - aTime // desc order
+      })
+      callback(sortedCars)
     })
   }
 
@@ -938,7 +1026,7 @@ export class DatabaseService {
     }
     
     const querySnapshot = await getDocs(q)
-    let mechanics = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MechanicAvailability))
+    const mechanics = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MechanicAvailability))
     
     // Get mechanic details and stats
     const mechanicsWithDetails = await Promise.all(
