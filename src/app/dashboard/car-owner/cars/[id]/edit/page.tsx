@@ -12,9 +12,11 @@ import {
   Row, 
   Col,
   InputNumber,
-  DatePicker
+  DatePicker,
+  Spin,
+  Upload
 } from 'antd'
-import { CarOutlined, SaveOutlined, LeftOutlined } from '@ant-design/icons'
+import { CarOutlined, SaveOutlined, LeftOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { MultipleImageUpload } from '@/components/common/MultipleImageUpload'
 import { useAuth } from '@/contexts/AuthContext'
@@ -63,7 +65,7 @@ export default function EditCarPage() {
         
         form.setFieldsValue({
           ...carData,
-          purchase_date: carData.purchase_date ? dayjs(carData.purchase_date) : null
+          purchase_date: carData.purchase_date ? dayjs(carData.purchase_date as string) : null
         })
       } else {
         message.error('Car not found or access denied')
@@ -77,12 +79,12 @@ export default function EditCarPage() {
     }
   }
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: Record<string, unknown>) => {
     setLoading(true)
     try {
       const updateData = {
         ...values,
-        purchase_date: values.purchase_date ? values.purchase_date.format('YYYY-MM-DD') : null,
+        purchase_date: values.purchase_date ? (values.purchase_date as any).format('YYYY-MM-DD') : null,
         image_url: carImages[0] || null, // Primary image
         image_urls: carImages, // All images
       }
@@ -109,6 +111,10 @@ export default function EditCarPage() {
 
   const handleBack = () => {
     router.push('/dashboard/car-owner/cars')
+  }
+
+  const handleImageUpload = (uploadedUrls: string[], _primaryIndex: number) => {
+    // Implementation of handleImageUpload
   }
 
   if (!car) {

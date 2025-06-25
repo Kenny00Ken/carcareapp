@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
-import { Upload, Button, Image, Progress, Space, Typography, Card, Row, Col, Modal, message } from 'antd'
+import { Upload, Button, Image, Progress, Space, Typography, Card, Row, Col, Modal, message, Tooltip } from 'antd'
 import { 
   UploadOutlined, 
   DeleteOutlined, 
@@ -18,9 +18,12 @@ const { Text, Title } = Typography
 
 interface ImageItem {
   id: string
+  uid: string
   url: string
   name: string
-  isPrimary?: boolean
+  isPrimary: boolean
+  file?: File
+  status?: 'uploading' | 'done' | 'error'
 }
 
 interface MultipleImageUploadProps {
@@ -64,6 +67,7 @@ export const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
   // Convert URLs to ImageItems
   const images: ImageItem[] = value.map((url, index) => ({
     id: `img-${index}`,
+    uid: `img-${index}`,
     url,
     name: `Car Image ${index + 1}`,
     isPrimary: index === 0

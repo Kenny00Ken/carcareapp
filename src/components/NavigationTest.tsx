@@ -9,7 +9,7 @@ import { getDashboardRoute } from '@/utils/navigation'
 const { Title, Text } = Typography
 
 export const NavigationTest: React.FC = () => {
-  const { user, firebaseUser, loading } = useAuth()
+  const { user, loading, firebaseUser } = useAuth()
   const router = useRouter()
 
   const getNavigationStatus = () => {

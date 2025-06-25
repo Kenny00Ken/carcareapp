@@ -21,17 +21,14 @@ export interface Car {
   make: string
   model: string
   year: number
-  image_url?: string
-  image_urls?: string[] // Array of image URLs for multiple car photos
-  color?: string
-  license_plate?: string
+  color: string
+  license_plate: string
   vin?: string
-  mileage?: number
-  engine_type?: string
-  transmission?: string
-  purchase_date?: string
-  notes?: string
+  image_url?: string
+  image_urls?: string[]
   created_at: string
+  updated_at: string
+  [key: string]: unknown
 }
 
 export type RequestStatus = 'pending' | 'claimed' | 'diagnosed' | 'quoted' | 'approved' | 'in_progress' | 'parts_requested' | 'parts_received' | 'completed' | 'cancelled'
@@ -65,21 +62,25 @@ export interface Diagnosis {
   id: string
   request_id: string
   mechanic_id: string
-  title: string
-  details: string
-  severity: SeverityLevel
-  status: DiagnosisStatus
-  estimated_cost?: number
-  parts_needed: PartNeeded[]
+  title?: string
+  details?: string
+  issue_description: string
+  recommended_solution: string
+  estimated_cost: number
+  parts_needed: string[] | PartNeeded[]
+  labor_hours: number
   labor_cost?: number
-  image_urls?: string[]
-  resolution_time?: string
-  follow_up_required: boolean
+  urgency_level: 'low' | 'medium' | 'high'
+  severity?: SeverityLevel
+  status?: DiagnosisStatus
+  follow_up_required?: boolean
   follow_up_notes?: string
+  resolution_time?: string
+  image_urls?: string[]
+  photos?: string[]
   created_at: string
-  updated_at?: string
-  request?: Request
-  mechanic?: User
+  updated_at: string
+  [key: string]: unknown
 }
 
 export interface PartNeeded {
@@ -255,4 +256,20 @@ export interface ChatMessage {
   message: string
   timestamp: string
   read_by: string[]
+}
+
+export interface ServiceRequest {
+  id: string
+  car_owner_id: string
+  car_id: string
+  mechanic_id?: string
+  description: string
+  urgency: 'low' | 'medium' | 'high'
+  location: string
+  status: RequestStatus
+  created_at: string
+  updated_at: string
+  estimated_cost?: number
+  actual_cost?: number
+  [key: string]: unknown
 } 

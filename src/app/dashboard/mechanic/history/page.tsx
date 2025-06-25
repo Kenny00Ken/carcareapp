@@ -8,14 +8,18 @@ import {
   Tag, 
   Space, 
   Modal, 
-  DatePicker, 
-  Select,
+  DatePicker,
   Row,
   Col,
   Statistic,
   Timeline,
   Input,
-  message
+  Select,
+  message,
+  Typography,
+  Descriptions,
+  Avatar,
+  Empty
 } from 'antd'
 import { 
   HistoryOutlined, 
@@ -25,7 +29,8 @@ import {
   DollarOutlined,
   CalendarOutlined,
   SearchOutlined,
-  FileTextOutlined
+  FileTextOutlined,
+  UserOutlined
 } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
@@ -39,7 +44,7 @@ const { Search } = Input
 
 export default function MechanicHistoryPage() {
   const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [maintenanceRecords, setMaintenanceRecords] = useState<MaintenanceRecord[]>([])
   const [completedRequests, setCompletedRequests] = useState<Request[]>([])
   const [selectedRecord, setSelectedRecord] = useState<MaintenanceRecord | null>(null)
@@ -50,6 +55,8 @@ export default function MechanicHistoryPage() {
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('')
+  const [requests, setRequests] = useState<Request[]>([])
+  const [detailsModalVisible, setDetailsModalVisible] = useState(false)
 
   // Statistics
   const [stats, setStats] = useState({

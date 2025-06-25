@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Card, Row, Col, Statistic, Typography, Button, Table, Tag, Space } from 'antd'
+import { Card, Row, Col, Statistic, Typography, Button, Table, message, Avatar, Tag, Space, Modal, Form, Input, Select, InputNumber } from 'antd'
 import { 
   ShopOutlined, 
   DollarOutlined, 
@@ -11,7 +11,10 @@ import {
   PlusOutlined,
   BarChartOutlined,
   WarningOutlined,
-  FileTextOutlined
+  FileTextOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined
 } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'

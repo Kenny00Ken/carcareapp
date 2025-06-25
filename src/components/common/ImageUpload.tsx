@@ -110,7 +110,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     disabled: disabled || uploading,
     maxCount,
     fileList,
-    beforeUpload: (file) => {
+    beforeUpload: (file: File): boolean => {
       handleUpload(file)
       return false // Prevent default upload
     },

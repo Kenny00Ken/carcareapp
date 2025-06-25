@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Card, Form, Input, Button, Avatar, Upload, Row, Col, Typography, Space, Divider, message } from 'antd'
-import { UserOutlined, PhoneOutlined, MailOutlined, EnvironmentOutlined, CameraOutlined } from '@ant-design/icons'
+import { Card, Form, Input, Button, Select, Avatar, Upload, Row, Col, Typography, Space, Divider, message } from 'antd'
+import { UserOutlined, PhoneOutlined, MailOutlined, EnvironmentOutlined, CameraOutlined, SaveOutlined } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { ImageUpload } from '@/components/common/ImageUpload'
@@ -28,7 +28,7 @@ export default function ProfilePage() {
     }
   }, [user, firebaseUser, form])
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: Record<string, unknown>) => {
     if (!user) return
 
     setLoading(true)

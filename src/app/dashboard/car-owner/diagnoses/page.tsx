@@ -140,12 +140,12 @@ export default function CarOwnerDiagnosesPage() {
   }
 
   // Filter diagnoses based on search and filters
-  const filteredDiagnoses = diagnoses.filter(diagnosis => {
-    const matchesSearch = !searchTerm || 
-      diagnosis.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      diagnosis.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      diagnosis.car?.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      diagnosis.car?.model.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredDiagnoses = diagnoses.filter(diagnosis => {
+    const matchesSearch = !searchTerm ||
+      (diagnosis.title as string)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (diagnosis.details as string)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      diagnosis.car?.make?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      diagnosis.car?.model?.toLowerCase().includes(searchTerm.toLowerCase())
 
     const matchesStatus = statusFilter === 'all' || diagnosis.status === statusFilter
     const matchesSeverity = severityFilter === 'all' || diagnosis.severity === severityFilter
@@ -189,16 +189,16 @@ export default function CarOwnerDiagnosesPage() {
       key: 'diagnosis',
       render: (record: DiagnosisWithDetails) => (
         <div>
-          <div className="font-medium">{record.title}</div>
+          <div className="font-medium">{record.title as string}</div>
           <div className="text-sm text-gray-500 truncate max-w-xs">
-            {record.details}
+            {record.details as string}
           </div>
           <div className="flex items-center space-x-2 mt-1">
-            <Tag color={getSeverityColor(record.severity)}>
-              {record.severity?.toUpperCase()}
+            <Tag color={getSeverityColor(record.severity as string)}>
+              {(record.severity as string)?.toUpperCase()}
             </Tag>
-            <Tag color={getStatusColor(record.status)}>
-              {record.status?.toUpperCase()}
+            <Tag color={getStatusColor(record.status as string)}>
+              {(record.status as string)?.toUpperCase()}
             </Tag>
           </div>
         </div>
@@ -224,7 +224,7 @@ export default function CarOwnerDiagnosesPage() {
           </div>
           {record.resolution_time && (
             <div className="text-sm text-gray-500">
-              {record.resolution_time}
+              {record.resolution_time as string}
             </div>
           )}
         </div>
@@ -425,11 +425,11 @@ export default function CarOwnerDiagnosesPage() {
                   {selectedDiagnosis.mechanic_name}
                 </Descriptions.Item>
                 <Descriptions.Item label="Title" span={3}>
-                  {selectedDiagnosis.title}
+                  {selectedDiagnosis.title as string}
                 </Descriptions.Item>
                 <Descriptions.Item label="Status">
-                  <Tag color={getStatusColor(selectedDiagnosis.status)}>
-                    {selectedDiagnosis.status?.toUpperCase()}
+                  <Tag color={getStatusColor(selectedDiagnosis.status as string)}>
+                    {(selectedDiagnosis.status as string)?.toUpperCase()}
                   </Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Severity">

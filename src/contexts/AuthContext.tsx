@@ -9,13 +9,15 @@ import {
   signOut,
   onAuthStateChanged,
   RecaptchaVerifier,
-  ConfirmationResult
+  ConfirmationResult,
+  
 } from 'firebase/auth'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/services/firebase'
 import { User, UserRole } from '@/types'
 import { App, message } from 'antd'
 import { FCMService, registerServiceWorker } from '@/services/fcm'
+
 
 interface AuthContextType {
   user: User | null
@@ -261,6 +263,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       throw error
     }
   }
+
+
 
   const value: AuthContextType = {
     user,

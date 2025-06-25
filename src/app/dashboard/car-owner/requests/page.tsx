@@ -54,8 +54,8 @@ export default function CarOwnerRequestsPage() {
 
   useEffect(() => {
     if (user) {
-      fetchRequests()
       fetchCars()
+      fetchRequests()
     }
   }, [user])
 

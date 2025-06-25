@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Card, List, Typography, Empty, Button, Badge, Space, Tag, Divider } from 'antd'
+import { Card, List, Typography, Empty, Button, Badge, Space, Tag, Divider, message, Avatar } from 'antd'
 import { BellOutlined, CheckOutlined, MessageOutlined, CarOutlined, ToolOutlined, ShoppingOutlined } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'

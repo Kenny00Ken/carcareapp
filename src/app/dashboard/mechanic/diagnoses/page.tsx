@@ -23,7 +23,8 @@ import {
   Empty,
   Descriptions,
   Steps,
-  Tooltip
+  Tooltip,
+  Avatar
 } from 'antd'
 import { 
   FileTextOutlined, 
@@ -159,7 +160,22 @@ export default function MechanicDiagnosesPage() {
   const handleEdit = (diagnosis: Diagnosis) => {
     setSelectedDiagnosis(diagnosis)
     setIsEditing(true)
-    setPartsNeeded(diagnosis.parts_needed || [])
+    
+    // Convert parts_needed to PartNeeded[] format if it's string[]
+    const parts = diagnosis.parts_needed || []
+    const convertedParts: PartNeeded[] = parts.map(part => {
+      if (typeof part === 'string') {
+        return {
+          name: part,
+          quantity: 1,
+          estimated_price: 0,
+          status: 'needed' as const
+        }
+      }
+      return part
+    })
+    setPartsNeeded(convertedParts)
+    
     form.setFieldsValue({
       request_id: diagnosis.request_id,
       title: diagnosis.title,

@@ -35,7 +35,7 @@ import {
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { DatabaseService } from '@/services/database'
-import { Request, RequestStatus } from '@/types'
+import { Request, RequestStatus, Car, User } from '@/types'
 
 const { Title, Text, Paragraph } = Typography
 const { TabPane } = Tabs
@@ -49,6 +49,19 @@ interface DiagnosisFormValues {
   estimated_cost: number
   recommended_parts: string
   next_steps: string
+}
+
+interface ServiceRequest {
+  id: string
+  car_owner_id: string
+  car_id: string
+  description: string
+  urgency: 'low' | 'medium' | 'high'
+  status: 'pending' | 'claimed' | 'in_progress' | 'completed'
+  created_at: string
+  mechanic_id?: string
+  car?: Car
+  owner?: User
 }
 
 // Helper function to get status color

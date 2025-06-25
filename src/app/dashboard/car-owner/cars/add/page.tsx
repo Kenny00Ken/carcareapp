@@ -30,7 +30,7 @@ export default function AddCarPage() {
     'Buick', 'GMC', 'Jeep', 'Ram', 'Dodge', 'Chrysler', 'Other'
   ].sort()
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: Record<string, unknown>) => {
     if (!user) {
       message.error('You must be logged in to add a car')
       return
@@ -74,6 +74,28 @@ export default function AddCarPage() {
 
   const handleImagesChange = (urls: string[]) => {
     setCarImages(urls)
+  }
+
+  const handleImageUpload = (uploadedUrls: string[], primaryIndex: number) => {
+    console.log('Image upload completed:', { uploadedUrls, primaryIndex })
+    
+    // Store the uploaded URLs and primary index
+    const primaryUrl = uploadedUrls[primaryIndex] || uploadedUrls[0]
+    
+    // Set both single image URL (for backward compatibility) and multiple URLs
+    form.setFieldsValue({
+      image_url: primaryUrl,
+      image_urls: uploadedUrls
+    })
+  }
+
+  const onFinish = async (values: Record<string, unknown>) => {
+    // ... existing code ...
+  }
+
+  const getFormFieldValue = (field: string): string => {
+    const value = form.getFieldValue(field)
+    return value || ''
   }
 
   if (!user) {

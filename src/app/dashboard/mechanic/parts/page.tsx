@@ -17,7 +17,10 @@ import {
   Col,
   Image,
   Tabs,
-  Badge
+  Badge,
+  Typography,
+  Avatar,
+  Empty
 } from 'antd'
 import { 
   SearchOutlined, 

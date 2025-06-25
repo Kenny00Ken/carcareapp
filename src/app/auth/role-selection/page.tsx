@@ -42,8 +42,8 @@ export default function RoleSelectionPage() {
     }
   }, [user, firebaseUser, router])
   //chekin
-  const handleRoleSelect = (role: UserRole) => {
-    setSelectedRole(role)
+  const handleRoleSelect = async (role: string, location?: string) => {
+    setSelectedRole(role as UserRole)
   }
 
   const handleSubmit = async (values: FormValues) => {
@@ -107,7 +107,7 @@ export default function RoleSelectionPage() {
         <div className="text-center mb-12">
           <Title level={1} className="!mb-4">Choose Your Role</Title>
           <Typography.Text className="text-gray-600">
-            Let&apos;s get you set up with the right access level for your automotive needs.
+            That&apos;s all the details we need for now. Let&apos;s get you connected to the automotive community in Ghana!
           </Typography.Text>
         </div>
 

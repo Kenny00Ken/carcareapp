@@ -139,14 +139,14 @@ export default function CarDetailPage() {
               <Text>{car.mileage ? `${car.mileage.toLocaleString()} km` : 'Not specified'}</Text>
             </Descriptions.Item>
             <Descriptions.Item label="Engine Type">
-              <Text>{car.engine_type || 'Not specified'}</Text>
+              <Text>{(car.engine_type as string) || 'Not specified'}</Text>
             </Descriptions.Item>
             <Descriptions.Item label="Transmission" span={2}>
-              <Text>{car.transmission || 'Not specified'}</Text>
+              <Text>{(car.transmission as string) || 'Not specified'}</Text>
             </Descriptions.Item>
             {car.notes && (
               <Descriptions.Item label="Notes" span={2}>
-                <Text>{car.notes}</Text>
+                <Text>{car.notes as string}</Text>
               </Descriptions.Item>
             )}
             <Descriptions.Item label="Added" span={2}>

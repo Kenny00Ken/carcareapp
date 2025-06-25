@@ -461,7 +461,7 @@ export class DatabaseService {
     })
 
     // Update request status
-    const requestRef = doc(db, 'requests', diagnosisData.request_id)
+    const requestRef = doc(db, 'requests', diagnosisData.request_id as string)
     batch.update(requestRef, {
       status: 'diagnosed',
       updated_at: Timestamp.now().toDate().toISOString()
@@ -470,8 +470,8 @@ export class DatabaseService {
     // Log activity
     const activityRef = doc(collection(db, 'activity_logs'))
     batch.set(activityRef, {
-      request_id: diagnosisData.request_id,
-      user_id: diagnosisData.mechanic_id,
+      request_id: diagnosisData.request_id as string,
+      user_id: diagnosisData.mechanic_id as string,
       activity_type: 'diagnosis_submitted',
       description: `Diagnosis submitted: ${diagnosisData.title}`,
       metadata: { severity: diagnosisData.severity, estimated_cost: diagnosisData.estimated_cost },

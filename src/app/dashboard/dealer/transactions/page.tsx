@@ -18,7 +18,8 @@ import {
   Col,
   Statistic,
   Timeline,
-  Select
+  Select,
+  Typography
 } from 'antd'
 import { 
   ShoppingOutlined, 
@@ -28,20 +29,23 @@ import {
   ClockCircleOutlined,
   DollarOutlined,
   UserOutlined,
-  PhoneOutlined
+  PhoneOutlined,
+  EditOutlined,
+  DeleteOutlined
 } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { DatabaseService } from '@/services/database'
 import { Transaction, TransactionStatus } from '@/types'
 import dayjs from 'dayjs'
+import Image from 'next/image'
 
 const { TabPane } = Tabs
 const { TextArea } = Input
 
 export default function DealerTransactionsPage() {
   const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
   const [viewModalVisible, setViewModalVisible] = useState(false)
@@ -49,6 +53,7 @@ export default function DealerTransactionsPage() {
   const [rejectionModalVisible, setRejectionModalVisible] = useState(false)
   const [approvalType, setApprovalType] = useState<'approve' | 'reject'>('approve')
   const [form] = Form.useForm()
+  const [editModalVisible, setEditModalVisible] = useState(false)
 
   // Statistics
   const [stats, setStats] = useState({
@@ -492,10 +497,12 @@ export default function DealerTransactionsPage() {
                     </Col>
                     {selectedTransaction.part?.image_url && (
                       <Col span={8}>
-                        <img
+                        <Image
                           src={selectedTransaction.part.image_url}
                           alt={selectedTransaction.part.name}
-                          className="w-full h-24 object-cover rounded"
+                          width={40}
+                          height={40}
+                          className="rounded"
                         />
                       </Col>
                     )}

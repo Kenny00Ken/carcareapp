@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Modal, Tabs, Form, Input, Button, message, Divider } from 'antd'
+import { Modal, Tabs, Form, Input, Button, message, Divider, Typography } from 'antd'
 import { 
   UserOutlined, 
   PhoneOutlined, 
