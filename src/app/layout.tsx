@@ -6,7 +6,7 @@ import { Providers } from '@/contexts/Providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Car Care Connect',
+  title: 'Auto Care',
   description: 'Connecting Car Owners, Mechanics, and Dealers in one ecosystem',
 }
 

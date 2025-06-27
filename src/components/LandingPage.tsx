@@ -14,12 +14,20 @@ import {
   SettingOutlined,
   CheckCircleOutlined,
   StarFilled,
-  ArrowRightOutlined
+  ArrowRightOutlined,
+  FacebookOutlined,
+  TwitterOutlined,
+  InstagramOutlined,
+  LinkedinOutlined,
+  YoutubeOutlined
 } from '@ant-design/icons'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { AuthModal } from './auth/AuthModal'
 import { useAuthRedirect } from '@/hooks/useAuthRedirect'
+import GlassCard from '@/components/ui/glass-card'
+import { LampContainer } from '@/components/ui/lamp-demo'
+import { motion } from 'framer-motion'
 
 const { Title, Paragraph, Text } = Typography
 
@@ -191,7 +199,8 @@ export const LandingPage: React.FC = () => {
   
   // Use the auth redirect hook to handle navigation
   useAuthRedirect({
-    redirectOnAuth: true
+    redirectOnAuth: false, // Allow viewing landing page even when authenticated
+    redirectOnSignOut: true // Redirect to landing page on sign-out
   })
 
   // User menu items for dropdown
@@ -242,159 +251,39 @@ export const LandingPage: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
-          <Text className="text-gray-600 dark:text-gray-300">Loading Car Care Connect...</Text>
+          <Text className="text-gray-600 dark:text-gray-300">Loading Auto Care...</Text>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900 overflow-hidden">
-      {/* Enhanced custom CSS for animations */}
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { 
-            transform: translateY(0px) rotate(0deg); 
-            filter: blur(0px);
-          }
-          50% { 
-            transform: translateY(-20px) rotate(180deg); 
-            filter: blur(1px);
-          }
-        }
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(40px) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-        @keyframes slideInLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-60px) scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0) scale(1);
-          }
-        }
-        @keyframes slideInRight {
-          from {
-            opacity: 0;
-            transform: translateX(60px) scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0) scale(1);
-          }
-        }
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.8;
-            transform: scale(1.05);
-          }
-        }
-        @keyframes pulseSlow {
-          0%, 100% {
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-          }
-          50% {
-            opacity: 0.7;
-            transform: scale(1.15) rotate(2deg);
-          }
-        }
-        @keyframes shimmer {
-          0% {
-            background-position: -200px 0;
-          }
-          100% {
-            background-position: calc(200px + 100%) 0;
-          }
-        }
-        @keyframes glow {
-          0%, 100% {
-            text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
-          }
-          50% {
-            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
-          }
-        }
-        .animate-float {
-          animation: float 8s ease-in-out infinite;
-        }
-        .animate-fadeInUp {
-          animation: fadeInUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        .animate-slideInLeft {
-          animation: slideInLeft 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        .animate-slideInRight {
-          animation: slideInRight 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        .animate-pulse-slow {
-          animation: pulseSlow 4s ease-in-out infinite;
-        }
-        .text-shimmer {
-          background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
-          background-size: 200px 100%;
-          animation: shimmer 3s ease-in-out infinite;
-          -webkit-background-clip: text;
-          background-clip: text;
-        }
-        .button-hover-effect {
-          position: relative;
-          overflow: hidden;
-        }
-        .button-hover-effect::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-          transition: left 0.5s;
-        }
-        .button-hover-effect:hover::before {
-          left: 100%;
-        }
-      `}</style>
+    <div className="min-h-screen bg-background dark:bg-slate-950 theme-transition overflow-hidden">
+
 
       {/* Header */}
-      <header className="relative z-10 backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-b border-gray-200/50 dark:border-gray-700/50">
+      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/90 dark:bg-slate-950/80 border-b border-gray-200 dark:border-white/10 theme-transition">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3 animate-slideInLeft">
-              <div className="relative">
-                <CarOutlined className="text-3xl text-blue-600 animate-pulse" />
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
-              </div>
-              <Title level={2} className="!mb-0 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                Car Care Connect
+            <div className="flex items-center space-x-3">
+              <CarOutlined className="text-2xl text-brand-500" />
+              <Title level={3} className="!mb-0 text-text-primary dark:!text-white !text-lg font-bold theme-transition">
+                Auto Care
               </Title>
             </div>
             
-            <div className="flex items-center space-x-4 animate-slideInRight">
+            <div className="flex items-center space-x-4">
               <Button
                 type="text"
                 icon={theme === 'light' ? <MoonOutlined /> : <BulbOutlined />}
                 onClick={toggleTheme}
-                className="!border-none hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="!border-none text-text-secondary dark:text-slate-400 hover:text-text-primary dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 theme-transition !w-10 !h-10 !p-0 rounded-lg"
               />
               
               {firebaseUser ? (
                 <div className="flex items-center space-x-3">
                   {user && (
-                    <span className="text-sm text-gray-600 dark:text-gray-300 hidden md:block">
+                    <span className="text-sm text-text-secondary dark:text-slate-300 hidden md:block theme-transition">
                       Welcome, {user.name || firebaseUser.displayName || 'User'}
                     </span>
                   )}
@@ -403,15 +292,15 @@ export const LandingPage: React.FC = () => {
                     placement="bottomRight"
                     trigger={['click']}
                   >
-                    <div className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-xl transition-all duration-200 transform hover:scale-105">
+                    <div className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 px-3 py-2 rounded-lg transition-all duration-200 theme-transition">
                       <Avatar 
                         icon={<UserOutlined />} 
                         src={firebaseUser.photoURL}
-                        size="default"
-                        className="border-2 border-blue-200"
+                        size="small"
+                        className="border border-brand-400"
                       />
                       {user && (
-                        <span className="font-medium hidden sm:block">
+                        <span className="font-medium hidden sm:block text-text-primary dark:text-white theme-transition">
                           {user.name || firebaseUser.displayName || 'User'}
                         </span>
                       )}
@@ -421,9 +310,8 @@ export const LandingPage: React.FC = () => {
               ) : (
                 <Button
                   type="primary"
-                  size="large"
                   onClick={() => setAuthModalVisible(true)}
-                  className="shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 bg-gradient-to-r from-blue-600 to-purple-600 border-none"
+                  className="!h-10 !px-6 !text-sm font-medium bg-brand-500 hover:bg-brand-600 border-none rounded-lg transition-all duration-200 transform hover:scale-105 shadow-soft hover:shadow-medium"
                 >
                   Get Started
                 </Button>
@@ -435,29 +323,22 @@ export const LandingPage: React.FC = () => {
 
       {/* Hero Section */}
       <main className="relative">
-        {/* Enhanced Background decorations */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Floating geometric shapes */}
-          <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 dark:from-blue-600 dark:to-blue-800 rounded-full opacity-20 animate-float blur-sm"></div>
-          <div className="absolute top-40 right-20 w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 dark:from-purple-600 dark:to-purple-800 rounded-full opacity-20 animate-float blur-sm" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute bottom-40 left-20 w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 dark:from-green-600 dark:to-green-800 rounded-full opacity-20 animate-float blur-sm" style={{ animationDelay: '4s' }}></div>
-          
-          {/* Additional decorative elements */}
-          <div className="absolute top-60 left-1/4 w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 dark:from-yellow-500 dark:to-orange-600 rounded-full opacity-15 animate-float" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-80 right-1/3 w-14 h-14 bg-gradient-to-br from-pink-400 to-rose-500 dark:from-pink-500 dark:to-rose-600 rounded-full opacity-15 animate-float" style={{ animationDelay: '3s' }}></div>
-          <div className="absolute bottom-60 right-10 w-10 h-10 bg-gradient-to-br from-indigo-400 to-blue-500 dark:from-indigo-500 dark:to-blue-600 rounded-full opacity-15 animate-float" style={{ animationDelay: '5s' }}></div>
-          
-          {/* Subtle grid pattern */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/5 to-transparent"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent"></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          {/* Hero Content */}
-          <div className="text-center mb-20">
-            <div className="animate-fadeInUp">
-              <Title level={1} className="!text-6xl md:!text-8xl !mb-12 !leading-tight !font-bold">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-800 drop-shadow-sm">
+        {/* Light Theme Hero */}
+        <div className="hidden dark:block">
+          <LampContainer className="pt-20">
+            {/* Dark Theme Hero Content */}
+            <motion.div
+              initial={{ opacity: 0.5, y: 100 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{
+                delay: 0.3,
+                duration: 0.8,
+                ease: "easeInOut",
+              }}
+              className="text-center max-w-4xl mx-auto"
+            >
+              <Title level={1} className="!text-5xl md:!text-7xl !mb-8 !leading-tight !font-bold text-shadow-lg">
+                <span className="text-transparent bg-clip-text bg-gradient-to-br from-slate-200 to-slate-400">
                   <TypingText 
                     texts={['Connect', 'Connect • Diagnose', 'Connect • Diagnose • Fix']}
                     speed={100}
@@ -467,19 +348,31 @@ export const LandingPage: React.FC = () => {
                   />
                 </span>
               </Title>
-            </div>
-            
-            <div className="animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
-              <Paragraph className="!text-xl md:!text-2xl text-gray-600 dark:text-gray-400 max-w-5xl mx-auto !mb-16 !leading-relaxed font-medium">
-                Transform your automotive experience with our revolutionary platform that seamlessly connects 
-                <span className="text-blue-600 font-semibold"> car owners</span>, 
-                <span className="text-green-600 font-semibold"> expert mechanics</span>, and 
-                <span className="text-purple-600 font-semibold"> trusted dealers</span> in one intelligent ecosystem.
-              </Paragraph>
-            </div>
-            
-            <div className="animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
-              <Space size="large" wrap>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: 0.6,
+                  duration: 0.6,
+                  ease: "easeInOut",
+                }}
+              >
+                <Paragraph className="!text-lg md:!text-xl text-slate-300 max-w-3xl mx-auto !mb-12 !leading-relaxed">
+                  Ghana's premier automotive platform connecting car owners with trusted mechanics and reliable parts dealers
+                </Paragraph>
+              </motion.div>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: 0.9,
+                  duration: 0.6,
+                  ease: "easeInOut",
+                }}
+                className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+              >
                 {firebaseUser ? (
                   user ? (
                     <Button
@@ -492,7 +385,7 @@ export const LandingPage: React.FC = () => {
                                              '/dashboard/dealer'
                         router.push(dashboardPath)
                       }}
-                      className="!h-14 !px-10 !text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-blue-600 to-purple-600 border-none"
+                      className="!h-12 !px-8 !text-base font-medium shadow-glow hover:shadow-glow-lg transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl"
                     >
                       Go to Dashboard <ArrowRightOutlined />
                     </Button>
@@ -501,7 +394,7 @@ export const LandingPage: React.FC = () => {
                       type="primary"
                       size="large"
                       onClick={() => router.push('/auth/role-selection')}
-                      className="!h-14 !px-10 !text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-blue-600 to-purple-600 border-none"
+                      className="!h-12 !px-8 !text-base font-medium shadow-glow hover:shadow-glow-lg transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl"
                     >
                       Complete Your Profile <ArrowRightOutlined />
                     </Button>
@@ -511,144 +404,305 @@ export const LandingPage: React.FC = () => {
                     <Button
                       type="primary"
                       size="large"
-                      icon={<CarOutlined />}
                       onClick={() => setAuthModalVisible(true)}
-                      className="!h-16 !px-12 !text-xl font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 bg-gradient-to-r from-blue-600 to-blue-700 border-none rounded-2xl relative overflow-hidden group"
+                      className="!h-12 !px-8 !text-base font-medium shadow-glow hover:shadow-glow-lg transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl"
                     >
-                      <span className="relative z-10">Join as Car Owner</span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-800 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+                      Get Started <ArrowRightOutlined />
                     </Button>
                     <Button
                       size="large"
-                      icon={<ToolOutlined />}
                       onClick={() => setAuthModalVisible(true)}
-                      className="!h-16 !px-12 !text-xl font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 bg-gradient-to-r from-green-600 to-green-700 text-white border-none rounded-2xl relative overflow-hidden group"
+                      className="!h-12 !px-8 !text-base font-medium text-slate-300 hover:text-white border-slate-600 hover:border-slate-400 bg-transparent hover:bg-slate-800/30 rounded-xl transition-all duration-300"
                     >
-                      <span className="relative z-10">Join as Mechanic</span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-green-700 to-green-800 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-                    </Button>
-                    <Button
-                      size="large"
-                      icon={<ShopOutlined />}
-                      onClick={() => setAuthModalVisible(true)}
-                      className="!h-16 !px-12 !text-xl font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 bg-gradient-to-r from-purple-600 to-purple-700 text-white border-none rounded-2xl relative overflow-hidden group"
-                    >
-                      <span className="relative z-10">Join as Dealer</span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-700 to-purple-800 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+                      Learn More
                     </Button>
                   </>
                 )}
-              </Space>
-            </div>
+              </motion.div>
+            </motion.div>
+          </LampContainer>
+        </div>
+
+        {/* Light Theme Hero */}
+        <div className="dark:hidden min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+          {/* Light theme background decorations */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-br from-brand-100 to-brand-200 rounded-full opacity-60 animate-float blur-sm"></div>
+            <div className="absolute top-40 right-20 w-16 h-16 bg-gradient-to-br from-secondary-100 to-secondary-200 rounded-full opacity-60 animate-float blur-sm" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute bottom-40 left-20 w-12 h-12 bg-gradient-to-br from-accent-100 to-accent-200 rounded-full opacity-60 animate-float blur-sm" style={{ animationDelay: '4s' }}></div>
           </div>
 
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              delay: 0.3,
+              duration: 0.8,
+              ease: "easeInOut",
+            }}
+            className="text-center max-w-4xl mx-auto px-4 relative z-10"
+          >
+            <Title level={1} className="!text-5xl md:!text-7xl !mb-8 !leading-tight !font-bold">
+              <span className="text-transparent bg-clip-text bg-gradient-to-br from-brand-600 via-brand-700 to-brand-800">
+                <TypingText 
+                  texts={['Connect', 'Connect • Diagnose', 'Connect • Diagnose • Fix']}
+                  speed={100}
+                  pauseDuration={3500}
+                  deleteSpeed={55}
+                  className="inline-block"
+                />
+              </span>
+            </Title>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                delay: 0.6,
+                duration: 0.6,
+                ease: "easeInOut",
+              }}
+            >
+              <Paragraph className="!text-lg md:!text-xl text-text-secondary max-w-3xl mx-auto !mb-12 !leading-relaxed">
+                Ghana's premier automotive platform connecting car owners with trusted mechanics and reliable parts dealers
+              </Paragraph>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                delay: 0.9,
+                duration: 0.6,
+                ease: "easeInOut",
+              }}
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            >
+              {firebaseUser ? (
+                user ? (
+                  <Button
+                    type="primary"
+                    size="large"
+                    icon={getRoleIcon(user.role)}
+                    onClick={() => {
+                      const dashboardPath = user.role === 'CarOwner' ? '/dashboard/car-owner' :
+                                           user.role === 'Mechanic' ? '/dashboard/mechanic' :
+                                           '/dashboard/dealer'
+                      router.push(dashboardPath)
+                    }}
+                    className="!h-12 !px-8 !text-base font-medium shadow-medium hover:shadow-hard transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl"
+                  >
+                    Go to Dashboard <ArrowRightOutlined />
+                  </Button>
+                ) : (
+                  <Button
+                    type="primary"
+                    size="large"
+                    onClick={() => router.push('/auth/role-selection')}
+                    className="!h-12 !px-8 !text-base font-medium shadow-medium hover:shadow-hard transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl"
+                  >
+                    Complete Your Profile <ArrowRightOutlined />
+                  </Button>
+                )
+              ) : (
+                <>
+                  <Button
+                    type="primary"
+                    size="large"
+                    onClick={() => setAuthModalVisible(true)}
+                    className="!h-12 !px-8 !text-base font-medium shadow-medium hover:shadow-hard transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl"
+                  >
+                    Get Started <ArrowRightOutlined />
+                  </Button>
+                  <Button
+                    size="large"
+                    onClick={() => setAuthModalVisible(true)}
+                    className="!h-12 !px-8 !text-base font-medium text-text-secondary hover:text-text-primary border-gray-300 hover:border-brand-400 bg-transparent hover:bg-brand-50 rounded-xl transition-all duration-300"
+                  >
+                    Learn More
+                  </Button>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 dark:-mt-20 relative z-10">
+
           {/* Features Section */}
-          <Row gutter={[32, 32]} className="mb-20">
-            <Col xs={24} md={8}>
-              <FloatingCard delay={0}>
-                <Card className="!h-full text-center hover:shadow-2xl transition-all duration-300 transform hover:scale-105 !border-2 hover:!border-blue-200 dark:hover:!border-blue-700 !rounded-2xl">
-                  <div className="relative mb-6">
-                    <CarOutlined className="text-6xl text-blue-600 mb-4" />
-                    <div className="absolute -top-2 -right-2 w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
-                  </div>
-                  <Title level={3} className="!mb-4">For Car Owners</Title>
-                  <Paragraph className="text-gray-600 dark:text-gray-300 !mb-6">
-                    Submit repair requests, track diagnostics, and manage your vehicle maintenance history all in one place.
-                  </Paragraph>
-                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-                    <CheckCircleOutlined className="text-green-500" />
-                    <span>Smart Mechanic Search</span>
-                  </div>
-                </Card>
-              </FloatingCard>
-            </Col>
-            <Col xs={24} md={8}>
-              <FloatingCard delay={1}>
-                <Card className="!h-full text-center hover:shadow-2xl transition-all duration-300 transform hover:scale-105 !border-2 hover:!border-green-200 dark:hover:!border-green-700 !rounded-2xl">
-                  <div className="relative mb-6">
-                    <ToolOutlined className="text-6xl text-green-600 mb-4" />
-                    <div className="absolute -top-2 -right-2 w-4 h-4 bg-blue-400 rounded-full animate-pulse"></div>
-                  </div>
-                  <Title level={3} className="!mb-4">For Mechanics</Title>
-                  <Paragraph className="text-gray-600 dark:text-gray-300 !mb-6">
-                    Claim requests, provide detailed diagnoses, and connect with reliable parts dealers seamlessly.
-                  </Paragraph>
-                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-                    <CheckCircleOutlined className="text-green-500" />
-                    <span>Availability Management</span>
-                  </div>
-                </Card>
-              </FloatingCard>
-            </Col>
-            <Col xs={24} md={8}>
-              <FloatingCard delay={2}>
-                <Card className="!h-full text-center hover:shadow-2xl transition-all duration-300 transform hover:scale-105 !border-2 hover:!border-purple-200 dark:hover:!border-purple-700 !rounded-2xl">
-                  <div className="relative mb-6">
-                    <ShopOutlined className="text-6xl text-purple-600 mb-4" />
-                    <div className="absolute -top-2 -right-2 w-4 h-4 bg-orange-400 rounded-full animate-pulse"></div>
-                  </div>
-                  <Title level={3} className="!mb-4">For Dealers</Title>
-                  <Paragraph className="text-gray-600 dark:text-gray-300 !mb-6">
-                    List your parts inventory, manage transactions, and grow your business with direct mechanic connections.
-                  </Paragraph>
-                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-                    <CheckCircleOutlined className="text-green-500" />
-                    <span>Inventory Management</span>
-                  </div>
-                </Card>
-              </FloatingCard>
-            </Col>
-          </Row>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="group"
+            >
+              <div className="bg-white dark:bg-white/10 backdrop-blur-sm border border-gray-200 dark:border-white/20 rounded-2xl p-8 text-center hover:shadow-medium dark:hover:bg-white/15 transition-all duration-300 transform hover:-translate-y-2 shadow-soft hover:shadow-glow theme-transition">
+                <div className="w-16 h-16 bg-brand-100 dark:bg-brand-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-brand-200 dark:group-hover:bg-brand-500/30 transition-colors theme-transition">
+                  <CarOutlined className="text-3xl text-brand-600 dark:text-brand-400 group-hover:text-brand-700 dark:group-hover:text-brand-300 theme-transition" />
+                </div>
+                <Title level={3} className="text-text-primary dark:!text-white !mb-4 !text-xl theme-transition">Car Owners</Title>
+                <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-6 !text-sm !leading-relaxed theme-transition">
+                  Submit repair requests and track maintenance history
+                </Paragraph>
+                <Button
+                  type="link"
+                  onClick={() => setAuthModalVisible(true)}
+                  className="!text-brand-600 dark:!text-brand-400 hover:!text-brand-700 dark:hover:!text-brand-300 !p-0 !h-auto theme-transition"
+                >
+                  Get Started <ArrowRightOutlined className="ml-1" />
+                </Button>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="group"
+            >
+              <div className="bg-white dark:bg-white/10 backdrop-blur-sm border border-gray-200 dark:border-white/20 rounded-2xl p-8 text-center hover:shadow-medium dark:hover:bg-white/15 transition-all duration-300 transform hover:-translate-y-2 shadow-soft hover:shadow-glow theme-transition">
+                <div className="w-16 h-16 bg-secondary-100 dark:bg-secondary-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-secondary-200 dark:group-hover:bg-secondary-500/30 transition-colors theme-transition">
+                  <ToolOutlined className="text-3xl text-secondary-600 dark:text-secondary-400 group-hover:text-secondary-700 dark:group-hover:text-secondary-300 theme-transition" />
+                </div>
+                <Title level={3} className="text-text-primary dark:!text-white !mb-4 !text-xl theme-transition">Mechanics</Title>
+                <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-6 !text-sm !leading-relaxed theme-transition">
+                  Claim requests and provide professional diagnoses
+                </Paragraph>
+                <Button
+                  type="link"
+                  onClick={() => setAuthModalVisible(true)}
+                  className="!text-secondary-600 dark:!text-secondary-400 hover:!text-secondary-700 dark:hover:!text-secondary-300 !p-0 !h-auto theme-transition"
+                >
+                  Join Now <ArrowRightOutlined className="ml-1" />
+                </Button>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+              className="group"
+            >
+              <div className="bg-white dark:bg-white/10 backdrop-blur-sm border border-gray-200 dark:border-white/20 rounded-2xl p-8 text-center hover:shadow-medium dark:hover:bg-white/15 transition-all duration-300 transform hover:-translate-y-2 shadow-soft hover:shadow-glow theme-transition">
+                <div className="w-16 h-16 bg-accent-100 dark:bg-accent-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-accent-200 dark:group-hover:bg-accent-500/30 transition-colors theme-transition">
+                  <ShopOutlined className="text-3xl text-accent-600 dark:text-accent-400 group-hover:text-accent-700 dark:group-hover:text-accent-300 theme-transition" />
+                </div>
+                <Title level={3} className="text-text-primary dark:!text-white !mb-4 !text-xl theme-transition">Parts Dealers</Title>
+                <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-6 !text-sm !leading-relaxed theme-transition">
+                  List inventory and connect with mechanics
+                </Paragraph>
+                <Button
+                  type="link"
+                  onClick={() => setAuthModalVisible(true)}
+                  className="!text-accent-600 dark:!text-accent-400 hover:!text-accent-700 dark:hover:!text-accent-300 !p-0 !h-auto theme-transition"
+                >
+                  Start Selling <ArrowRightOutlined className="ml-1" />
+                </Button>
+              </div>
+            </motion.div>
+          </div>
 
           {/* Stats Section */}
-          <Card className="text-center !bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 !border-none text-white mb-20 !rounded-3xl shadow-2xl">
-            <Row gutter={[32, 32]} align="middle">
-              <Col xs={24} sm={8}>
-                <div className="animate-fadeInUp">
-                  <Title level={1} className="!text-white !mb-2 !text-5xl">10K+</Title>
-                  <Paragraph className="!text-blue-100 !mb-0 !text-lg">Active Users</Paragraph>
-                  <div className="flex justify-center mt-2">
-                    {[...Array(5)].map((_, i) => (
-                      <StarFilled key={i} className="text-yellow-400 text-sm" />
-                    ))}
-                  </div>
-                </div>
-              </Col>
-              <Col xs={24} sm={8}>
-                <div className="animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-                  <Title level={1} className="!text-white !mb-2 !text-5xl">5K+</Title>
-                  <Paragraph className="!text-blue-100 !mb-0 !text-lg">Repairs Completed</Paragraph>
-                  <Text className="!text-blue-200 text-sm">All currencies in GHS</Text>
-                </div>
-              </Col>
-              <Col xs={24} sm={8}>
-                <div className="animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
-                  <Title level={1} className="!text-white !mb-2 !text-5xl">1K+</Title>
-                  <Paragraph className="!text-blue-100 !mb-0 !text-lg">Parts Available</Paragraph>
-                  <Text className="!text-blue-200 text-sm">Real-time inventory</Text>
-                </div>
-              </Col>
-            </Row>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-20"
+          >
+            <div className="bg-gradient-to-br from-brand-50 to-brand-100 dark:bg-white/5 backdrop-blur-sm border border-brand-200 dark:border-white/10 rounded-3xl p-8 md:p-12 theme-transition">
+              <Title level={2} className="text-text-primary dark:!text-white !mb-8 !text-2xl md:!text-3xl theme-transition">
+                Trusted by automotive professionals across Ghana
+              </Title>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2, duration: 0.5 }}
+                  className="text-center"
+                >
+                  <Title level={1} className="!text-brand-600 dark:!text-brand-400 !mb-2 !text-4xl md:!text-5xl font-bold theme-transition">10K+</Title>
+                  <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-0 !text-base theme-transition">Active Users</Paragraph>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
+                  className="text-center"
+                >
+                  <Title level={1} className="!text-secondary-600 dark:!text-secondary-400 !mb-2 !text-4xl md:!text-5xl font-bold theme-transition">5K+</Title>
+                  <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-0 !text-base theme-transition">Repairs Completed</Paragraph>
+                  <Text className="text-text-tertiary dark:!text-slate-400 text-sm theme-transition">All currencies in GHS</Text>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.6, duration: 0.5 }}
+                  className="text-center"
+                >
+                  <Title level={1} className="!text-accent-600 dark:!text-accent-400 !mb-2 !text-4xl md:!text-5xl font-bold theme-transition">1K+</Title>
+                  <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-0 !text-base theme-transition">Parts Available</Paragraph>
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 to-purple-900/20"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <div className="flex items-center justify-center space-x-3 mb-6">
-            <CarOutlined className="text-3xl text-blue-400" />
-            <Title level={2} className="!text-white !mb-0">Car Care Connect</Title>
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+      <footer className="bg-gray-50 dark:bg-slate-950/90 backdrop-blur-sm border-t border-gray-200 dark:border-white/10 py-12 theme-transition">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="flex items-center justify-center space-x-3 mb-4">
+            <CarOutlined className="text-2xl text-brand-500" />
+            <Title level={3} className="text-text-primary dark:!text-white !mb-0 !text-xl theme-transition">Auto Care</Title>
           </div>
-          <Paragraph className="!text-gray-300 !text-lg !mb-8">
-            Connecting automotive professionals across Ghana. All transactions in GHS.
+          
+          <Paragraph className="text-text-secondary dark:!text-slate-400 !text-base !mb-6 theme-transition">
+            Connecting automotive professionals across Ghana
           </Paragraph>
-          <div className="flex justify-center items-center space-x-2 text-sm text-gray-400">
-            <span>© 2024 Car Care Connect</span>
-            <span>•</span>
-            <span>All rights reserved</span>
+          
+          {/* Social Media Icons */}
+          <div className="flex items-center justify-center space-x-4 mb-6">
+            <a 
+              href="#" 
+              className="w-10 h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+              aria-label="Facebook"
+            >
+              <FacebookOutlined className="text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+            </a>
+            <a 
+              href="#" 
+              className="w-10 h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+              aria-label="Twitter"
+            >
+              <TwitterOutlined className="text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+            </a>
+            <a 
+              href="#" 
+              className="w-10 h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+              aria-label="Instagram"
+            >
+              <InstagramOutlined className="text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+            </a>
+            <a 
+              href="#" 
+              className="w-10 h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+              aria-label="LinkedIn"
+            >
+              <LinkedinOutlined className="text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+            </a>
+            <a 
+              href="#" 
+              className="w-10 h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+              aria-label="YouTube"
+            >
+              <YoutubeOutlined className="text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+            </a>
+          </div>
+          
+          <div className="text-sm text-text-tertiary dark:text-slate-500 theme-transition">
+            © 2024 Auto Care • All rights reserved
           </div>
         </div>
       </footer>

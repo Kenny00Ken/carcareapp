@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { redirectToDashboard, redirectToRoleSelection } from '@/utils/navigation'
@@ -7,20 +7,36 @@ interface UseAuthRedirectOptions {
   redirectOnAuth?: boolean
   allowedRoles?: string[]
   redirectTo?: string
+  redirectOnSignOut?: boolean
 }
 
 export const useAuthRedirect = (options: UseAuthRedirectOptions = {}) => {
   const { 
     redirectOnAuth = true,
     allowedRoles = [],
-    redirectTo 
+    redirectTo,
+    redirectOnSignOut = true
   } = options
   
   const { user, firebaseUser, loading } = useAuth()
   const router = useRouter()
+  
+  // Track previous authentication state to detect sign-out
+  const prevFirebaseUser = useRef(firebaseUser)
 
   useEffect(() => {
     if (loading) return
+
+    // Detect sign-out: user was authenticated before but now isn't
+    if (redirectOnSignOut && prevFirebaseUser.current && !firebaseUser) {
+      console.log('User signed out, redirecting to landing page')
+      router.replace('/')
+      prevFirebaseUser.current = firebaseUser
+      return
+    }
+
+    // Update previous user reference
+    prevFirebaseUser.current = firebaseUser
 
     // If user is authenticated and we should redirect
     if (redirectOnAuth && firebaseUser) {
