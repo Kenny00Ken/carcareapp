@@ -117,11 +117,14 @@ export default function MechanicDashboard() {
             Owner: {record.owner?.name || 'Unknown'}
           </div>
           <div className="flex flex-wrap gap-1 sm:hidden">
-            <Tag color={{
-              low: 'green',
-              medium: 'orange', 
-              high: 'red'
-            }[record.urgency as keyof typeof {low: 'green', medium: 'orange', high: 'red'}]} className="text-xs">
+            <Tag color={(() => {
+              const colors = {
+                low: 'green',
+                medium: 'orange', 
+                high: 'red'
+              }
+              return colors[record.urgency as keyof typeof colors]
+            })()} className="text-xs">
               {record.urgency.toUpperCase()}
             </Tag>
             {record.estimated_hours && (

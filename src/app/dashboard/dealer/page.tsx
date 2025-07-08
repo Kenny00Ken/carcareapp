@@ -157,12 +157,15 @@ export default function DealerDashboard() {
             By: {record.mechanic?.name || 'Unknown'}
           </div>
           <div className="flex flex-wrap gap-1 sm:hidden">
-            <Tag color={{
-              pending: 'orange',
-              approved: 'green', 
-              rejected: 'red',
-              completed: 'blue'
-            }[record.status as keyof typeof {pending: 'orange', approved: 'green', rejected: 'red', completed: 'blue'}]} className="text-xs">
+            <Tag color={(() => {
+              const colors = {
+                pending: 'orange',
+                approved: 'green', 
+                rejected: 'red',
+                completed: 'blue'
+              }
+              return colors[record.status as keyof typeof colors]
+            })()} className="text-xs">
               {record.status.toUpperCase()}
             </Tag>
             <span className="text-xs bg-gray-100 px-2 py-1 rounded">
