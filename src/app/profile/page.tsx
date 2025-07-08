@@ -12,7 +12,7 @@ import {
   EditOutlined,
   CheckCircleOutlined,
   CalendarOutlined,
-  ShieldOutlined,
+  SafetyOutlined,
   StarFilled,
   CarOutlined,
   ToolOutlined,
@@ -232,7 +232,7 @@ export default function ProfilePage() {
                         <Statistic
                           title="Profile"
                           value="Verified"
-                          prefix={<ShieldOutlined />}
+                          prefix={<SafetyOutlined />}
                           valueStyle={{ fontSize: '14px', color: '#52c41a' }}
                         />
                       </Col>
@@ -344,7 +344,7 @@ export default function ProfilePage() {
                           className="rounded-lg bg-gray-50"
                           suffix={
                             <Tooltip title="Account type cannot be changed">
-                              <ShieldOutlined className="text-green-500" />
+                              <SafetyOutlined className="text-green-500" />
                             </Tooltip>
                           }
                         />
@@ -417,7 +417,7 @@ export default function ProfilePage() {
             className="shadow-lg border-0"
             title={
               <div className="flex items-center gap-2">
-                <ShieldOutlined className="text-green-500" />
+                <SafetyOutlined className="text-green-500" />
                 <span>Account Details</span>
               </div>
             }

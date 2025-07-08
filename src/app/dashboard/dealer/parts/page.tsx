@@ -647,7 +647,7 @@ export default function DealerPartsPage() {
                     size="large"
                     allowClear
                     filterOption={(input, option) =>
-                      (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+                      String(option?.children || '')?.toLowerCase().includes(input.toLowerCase())
                     }
                   >
                     {/* Show suggested brands first */}

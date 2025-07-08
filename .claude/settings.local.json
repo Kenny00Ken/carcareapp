@@ -21,7 +21,8 @@
       "Bash(npm cache clean:*)",
       "Bash(npx next lint:*)",
       "Bash(npm install:*)",
-      "Bash(npx next dev:*)"
+      "Bash(npx next dev:*)",
+      "Bash(npm ls:*)"
     ],
     "deny": []
   }
