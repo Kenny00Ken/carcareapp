@@ -165,13 +165,14 @@ export default function MechanicDiagnosesPage() {
       setIsEditing(true)
       
       // Handle both string and array formats for parts_needed
-      const partsData: string[] | PartNeeded[] | string | null | undefined = diagnosis.parts_needed
+      const partsData = diagnosis.parts_needed
       let convertedParts: PartNeeded[] = []
       
       // Debug logging to understand the data structure
       console.log('Diagnosis parts_needed:', partsData, 'Type:', typeof partsData, 'Is Array:', Array.isArray(partsData))
       
-      if (!partsData) {
+      // Use explicit type checking to avoid TypeScript "never" type inference
+      if (partsData == null || partsData === undefined) {
         // Handle null/undefined case
         console.log('No parts data, setting empty array')
         convertedParts = []
@@ -189,19 +190,22 @@ export default function MechanicDiagnosesPage() {
           }
           return part
         })
-      } else if (typeof partsData === 'string' && (partsData as string).trim()) {
-        // Handle string case - split by newlines or commas
-        console.log('Parts data is string, splitting...')
-        const partNames = (partsData as string).split(/[,\n]+/).map(p => p.trim()).filter(p => p.length > 0)
-        convertedParts = partNames.map(name => ({
-          name,
-          quantity: 1,
-          estimated_price: 0,
-          status: 'needed' as const
-        }))
       } else {
-        console.log('Unknown parts data format, setting empty array')
-        convertedParts = []
+        // Handle string case - split by newlines or commas
+        const stringData = String(partsData || '')
+        if (stringData.trim()) {
+          console.log('Parts data is string, splitting...')
+          const partNames = stringData.split(/[,\n]+/).map(p => p.trim()).filter(p => p.length > 0)
+          convertedParts = partNames.map(name => ({
+            name,
+            quantity: 1,
+            estimated_price: 0,
+            status: 'needed' as const
+          }))
+        } else {
+          console.log('Empty string data, setting empty array')
+          convertedParts = []
+        }
       }
       
       console.log('Converted parts:', convertedParts)
@@ -827,7 +831,7 @@ export default function MechanicDiagnosesPage() {
                       )
                     ) : (
                       // Handle string case - split by newlines or commas and display as list
-                      (selectedDiagnosis.parts_needed as string).trim() ? (
+                      String(selectedDiagnosis.parts_needed || '').trim() ? (
                         <Card size="small">
                           <Paragraph className="!mb-0 whitespace-pre-line">
                             {selectedDiagnosis.parts_needed}
