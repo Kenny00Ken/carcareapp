@@ -40,8 +40,8 @@ export const BoltNewBadge: React.FC<BoltNewBadgeProps> = ({
       // Re-detect on window resize in case of responsive background changes
       window.addEventListener('resize', detectBackgroundColor);
       return () => window.removeEventListener('resize', detectBackgroundColor);
-    } else if (variant !== 'auto' && (variant === 'light' || variant === 'dark' || variant === 'text')) {
-      setDetectedVariant(variant as 'light' | 'dark' | 'text');
+    } else if (variant === 'light' || variant === 'dark' || variant === 'text') {
+      setDetectedVariant(variant);
     }
   }, [variant]);
 
