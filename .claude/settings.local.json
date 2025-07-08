@@ -23,7 +23,8 @@
       "Bash(npm install:*)",
       "Bash(npx next dev:*)",
       "Bash(npm ls:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }
