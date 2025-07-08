@@ -228,7 +228,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const verifyOTP = async (confirmationResult: ConfirmationResult, otp: string): Promise<void> => {
     try {
       const result = await confirmationResult.confirm(otp)
-      messageApi.success('Phone number verified successfully!')
+      messageApi.success('Welcome to Auto Care!')
     } catch (error) {
       const authError = error as AuthError
       console.error('Error verifying OTP:', authError)
@@ -251,7 +251,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('Attempting Google sign in...')
       const result = await signInWithPopup(auth, provider)
       console.log('Google sign in successful:', result.user.email)
-      messageApi.success('Signed in successfully!')
+      messageApi.success('Welcome to Auto Care!')
     } catch (error) {
       const authError = error as AuthError
       console.error('Error signing in with Google:', authError)

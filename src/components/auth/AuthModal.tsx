@@ -104,7 +104,7 @@ const OTPVerificationContent: React.FC<OTPVerificationContentProps> = ({
     setLoading(true)
     try {
       await confirmationResult.confirm(otpCode)
-      messageApi.success('Phone number verified successfully!')
+      // Remove duplicate success message - handled in AuthContext
       onSuccess()
     } catch (error: any) {
       console.error('OTP verification error:', error)
@@ -296,7 +296,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
     setLoading(true)
     try {
       await signInWithGoogle()
-      message.success('Successfully signed in with Google!')
+      // Remove duplicate success message - handled in AuthContext
       onCancel()
     } catch (error) {
       console.error('Google auth error:', error)

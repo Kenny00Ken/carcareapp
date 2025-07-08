@@ -185,8 +185,8 @@ export const LandingPage: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState('car-owner')
   
   // Use the auth redirect hook to handle navigation
-  useAuthRedirect({
-    redirectOnAuth: false, // Allow viewing landing page even when authenticated
+  const { isAuthenticated, hasRole } = useAuthRedirect({
+    redirectOnAuth: true, // Automatically redirect authenticated users to their dashboard
     redirectOnSignOut: true // Redirect to landing page on sign-out
   })
 
@@ -245,12 +245,25 @@ export const LandingPage: React.FC = () => {
     },
   ]
 
+  // Show loading screen while auth is being processed
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
           <Text className="text-gray-600 dark:text-gray-300">Loading Auto Care...</Text>
+        </div>
+      </div>
+    )
+  }
+
+  // Show loading screen if authenticated user is being redirected
+  if (isAuthenticated && hasRole) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
+          <Text className="text-gray-600 dark:text-gray-300">Redirecting to your dashboard...</Text>
         </div>
       </div>
     )
