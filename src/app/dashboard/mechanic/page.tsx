@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import type { ColumnsType } from 'antd/es/table'
 import { Card, Row, Col, Statistic, Typography, Button, Table, Tag, Space, Progress } from 'antd'
 import { 
   ToolOutlined, 
@@ -101,7 +102,7 @@ export default function MechanicDashboard() {
     }
   }
 
-  const requestColumns = [
+  const requestColumns: ColumnsType<Request> = [
     {
       title: 'Request Details',
       key: 'details',
@@ -141,7 +142,7 @@ export default function MechanicDashboard() {
       dataIndex: 'urgency',
       key: 'urgency',
       width: 80,
-      responsive: ['sm'],
+      responsive: ['sm' as const],
       render: (urgency: string) => {
         const colors = {
           low: 'green',
@@ -156,7 +157,7 @@ export default function MechanicDashboard() {
       dataIndex: 'estimated_hours',
       key: 'estimated_hours',
       width: 80,
-      responsive: ['md'],
+      responsive: ['md' as const],
       render: (hours: number) => <span className="text-sm">{hours ? `${hours}h` : '-'}</span>
     },
     {

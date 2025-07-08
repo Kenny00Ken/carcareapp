@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
+import type { ColumnsType } from 'antd/es/table'
 import { Card, Row, Col, Statistic, Typography, Button, Table, Tag, Space, Spin, Empty, message } from 'antd'
 import { 
   CarOutlined, 
@@ -218,13 +219,13 @@ export default function CarOwnerDashboard() {
     return statusMap[status as keyof typeof statusMap] || status
   }
 
-  const requestColumns = [
+  const requestColumns: ColumnsType<Request> = [
     {
       title: 'Request ID',
       dataIndex: 'id',
       key: 'id',
       width: 120,
-      responsive: ['sm'],
+      responsive: ['sm' as const],
       render: (id: string) => (
         <span className="font-mono text-sm">{id.slice(-8)}</span>
       )
@@ -248,7 +249,7 @@ export default function CarOwnerDashboard() {
       dataIndex: 'title',
       key: 'title',
       ellipsis: true,
-      responsive: ['sm'],
+      responsive: ['sm' as const],
     },
     {
       title: 'Status',
@@ -266,7 +267,7 @@ export default function CarOwnerDashboard() {
       dataIndex: 'created_at',
       key: 'created_at',
       width: 100,
-      responsive: ['md'],
+      responsive: ['md' as const],
       render: (date: string) => new Date(date).toLocaleDateString()
     },
     {
@@ -274,7 +275,7 @@ export default function CarOwnerDashboard() {
       dataIndex: 'estimated_cost',
       key: 'estimated_cost',
       width: 100,
-      responsive: ['sm'],
+      responsive: ['sm' as const],
       render: (cost: number) => cost ? `GHS ${cost.toFixed(2)}` : '-'
     }
   ]

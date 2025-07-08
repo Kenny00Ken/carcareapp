@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import type { ColumnsType } from 'antd/es/table'
 import {
   Card,
   Table,
@@ -196,13 +197,13 @@ export default function CarOwnerRequestsPage() {
     return colors[urgency as keyof typeof colors] || 'default'
   }
 
-  const columns = [
+  const columns: ColumnsType<Request> = [
     {
       title: 'Request ID',
       dataIndex: 'id',
       key: 'id',
       width: 100,
-      responsive: ['md'],
+      responsive: ['md' as const],
       render: (id: string) => (
         <span className="font-mono text-xs">{id.slice(-8)}</span>
       )
@@ -237,7 +238,7 @@ export default function CarOwnerRequestsPage() {
       dataIndex: 'status',
       key: 'status',
       width: 100,
-      responsive: ['sm'],
+      responsive: ['sm' as const],
       render: (status: RequestStatus) => (
         <Tag color={getStatusColor(status)} className="text-xs">
           {status.replace('_', ' ').toUpperCase()}
@@ -249,7 +250,7 @@ export default function CarOwnerRequestsPage() {
       dataIndex: 'urgency',
       key: 'urgency',
       width: 80,
-      responsive: ['sm'],
+      responsive: ['sm' as const],
       render: (urgency: string) => (
         <Tag color={getUrgencyColor(urgency)} className="text-xs">
           {urgency.toUpperCase()}
@@ -260,7 +261,7 @@ export default function CarOwnerRequestsPage() {
       title: 'Mechanic',
       key: 'mechanic',
       width: 120,
-      responsive: ['md'],
+      responsive: ['md' as const],
       render: (record: Request) => (
         <div className="text-sm">
           {record.mechanic?.name || 'Not assigned'}
@@ -272,7 +273,7 @@ export default function CarOwnerRequestsPage() {
       dataIndex: 'estimated_cost',
       key: 'estimated_cost',
       width: 80,
-      responsive: ['lg'],
+      responsive: ['lg' as const],
       render: (cost: number) => (
         <span className="text-sm">{cost ? `GHS ${cost.toFixed(2)}` : '-'}</span>
       )
@@ -282,7 +283,7 @@ export default function CarOwnerRequestsPage() {
       dataIndex: 'created_at',
       key: 'created_at',
       width: 90,
-      responsive: ['lg'],
+      responsive: ['lg' as const],
       render: (date: string) => (
         <span className="text-xs">{new Date(date).toLocaleDateString()}</span>
       )

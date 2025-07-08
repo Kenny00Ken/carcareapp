@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { Card, Table, Button, Space, Typography, Image, Tag, Popconfirm, message, Empty, Spin, Row, Col } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
 import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
@@ -53,13 +54,13 @@ export default function CarsPage() {
     }
   }
 
-  const columns = [
+  const columns: ColumnsType<Car> = [
     {
       title: 'Image',
       dataIndex: 'image_url',
       key: 'image',
       width: 80,
-      responsive: ['sm'],
+      responsive: ['sm' as const],
       render: (imageUrl: string, record: Car) => {
         // Get primary image from image_url or first from image_urls array
         let primaryImage = imageUrl
@@ -114,7 +115,7 @@ export default function CarsPage() {
       dataIndex: 'year',
       key: 'year',
       width: 80,
-      responsive: ['md'],
+      responsive: ['md' as const],
       sorter: (a: Car, b: Car) => a.year - b.year,
     },
     {
@@ -122,7 +123,7 @@ export default function CarsPage() {
       dataIndex: 'created_at',
       key: 'created_at',
       width: 100,
-      responsive: ['sm'],
+      responsive: ['sm' as const],
       render: (date: string) => (
         <Text type="secondary" className="text-xs sm:text-sm">
           {new Date(date).toLocaleDateString()}

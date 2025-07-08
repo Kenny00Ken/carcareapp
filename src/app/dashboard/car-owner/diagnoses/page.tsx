@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import type { ColumnsType } from 'antd/es/table'
 import { 
   Card, 
   Table, 
@@ -166,7 +167,7 @@ export default function CarOwnerDiagnosesPage() {
     totalCost: diagnoses.reduce((sum, d) => sum + (d.estimated_cost || 0), 0)
   }
 
-  const columns = [
+  const columns: ColumnsType<DiagnosisWithDetails> = [
     {
       title: 'Diagnosis Details',
       key: 'details',
@@ -200,7 +201,7 @@ export default function CarOwnerDiagnosesPage() {
       title: 'Mechanic',
       key: 'mechanic',
       width: 120,
-      responsive: ['sm'],
+      responsive: ['sm' as const],
       render: (record: DiagnosisWithDetails) => (
         <div className="flex items-center space-x-2">
           <ToolOutlined className="text-green-500" />
@@ -212,7 +213,7 @@ export default function CarOwnerDiagnosesPage() {
       title: 'Cost',
       key: 'cost',
       width: 100,
-      responsive: ['md'],
+      responsive: ['md' as const],
       render: (record: DiagnosisWithDetails) => (
         <div>
           <div className="font-semibold text-green-600 text-sm">
@@ -230,7 +231,7 @@ export default function CarOwnerDiagnosesPage() {
       title: 'Date',
       key: 'date',
       width: 100,
-      responsive: ['sm'],
+      responsive: ['sm' as const],
       render: (record: DiagnosisWithDetails) => (
         <div>
           <div className="text-sm">{new Date(record.created_at || 0).toLocaleDateString()}</div>

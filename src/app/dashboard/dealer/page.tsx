@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import type { ColumnsType } from 'antd/es/table'
 import { Card, Row, Col, Statistic, Typography, Button, Table, message, Avatar, Tag, Space, Modal, Form, Input, Select, InputNumber } from 'antd'
 import { 
   ShopOutlined, 
@@ -143,7 +144,7 @@ export default function DealerDashboard() {
     }
   }
 
-  const transactionColumns = [
+  const transactionColumns: ColumnsType<Transaction> = [
     {
       title: 'Transaction Details',
       key: 'details',
@@ -180,7 +181,7 @@ export default function DealerDashboard() {
       dataIndex: 'status',
       key: 'status',
       width: 80,
-      responsive: ['sm'],
+      responsive: ['sm' as const],
       render: (status: string) => {
         const colors = {
           pending: 'orange',
@@ -196,7 +197,7 @@ export default function DealerDashboard() {
       dataIndex: 'created_at',
       key: 'created_at',
       width: 80,
-      responsive: ['md'],
+      responsive: ['md' as const],
       render: (date: string) => <span className="text-sm">{dayjs(date).format('MMM DD')}</span>
     },
     {
