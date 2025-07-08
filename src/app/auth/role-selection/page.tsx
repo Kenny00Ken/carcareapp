@@ -103,43 +103,48 @@ export default function RoleSelectionPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900">
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        <div className="text-center mb-12">
-          <Title level={1} className="!mb-4">Choose Your Role</Title>
-          <Typography.Text className="text-gray-600">
+      <div className="max-w-6xl mx-auto px-4 py-6 sm:py-12">
+        <div className="text-center mb-8 sm:mb-12">
+          <Title level={1} className="!mb-4 !text-2xl sm:!text-3xl lg:!text-4xl">Choose Your Role</Title>
+          <Typography.Text className="text-gray-600 !text-sm sm:!text-base">
             That&apos;s all the details we need for now. Let&apos;s get you connected to the automotive community in Ghana!
           </Typography.Text>
         </div>
 
         {!selectedRole ? (
-          <Row gutter={[24, 24]}>
+          <Row gutter={[16, 16]} className="sm:gutter-24">
             {roleCards.map((roleCard) => (
-              <Col xs={24} lg={8} key={roleCard.role}>
+              <Col xs={24} sm={12} lg={8} key={roleCard.role}>
                 <Card
                   className={`!h-full cursor-pointer transition-all hover:shadow-lg ${
                     selectedRole === roleCard.role ? 'border-2 !border-blue-500' : ''
                   }`}
                   onClick={() => handleRoleSelect(roleCard.role)}
                 >
-                  <div className="text-center mb-6">
-                    {roleCard.icon}
-                    <Title level={3} className="!mt-4 !mb-2">{roleCard.title}</Title>
-                    <Paragraph className="text-gray-600 dark:text-gray-300">
+                  <div className="text-center mb-4 sm:mb-6">
+                    <div className="text-3xl sm:text-4xl">
+                      {React.cloneElement(roleCard.icon, {
+                        className: roleCard.icon.props.className.replace('text-4xl', 'text-3xl sm:text-4xl')
+                      })}
+                    </div>
+                    <Title level={3} className="!mt-3 sm:!mt-4 !mb-2 !text-lg sm:!text-xl">{roleCard.title}</Title>
+                    <Paragraph className="text-gray-600 dark:text-gray-300 !text-sm sm:!text-base">
                       {roleCard.description}
                     </Paragraph>
                   </div>
                   <div className="space-y-2">
                     {roleCard.features.map((feature, index) => (
                       <div key={index} className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <span className="text-sm">{feature}</span>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
+                        <span className="text-xs sm:text-sm">{feature}</span>
                       </div>
                     ))}
                   </div>
                   <Button
                     type="primary"
                     block
-                    className="!mt-6"
+                    size="large"
+                    className="!mt-4 sm:!mt-6 !h-12"
                     onClick={() => handleRoleSelect(roleCard.role)}
                   >
                     Select {roleCard.title}
@@ -152,8 +157,8 @@ export default function RoleSelectionPage() {
           <div className="max-w-md mx-auto">
             <Card>
               <div className="text-center mb-6">
-                <Title level={3}>Complete Your Profile</Title>
-                <Paragraph>You selected: <strong>{selectedRole}</strong></Paragraph>
+                <Title level={3} className="!text-lg sm:!text-xl">Complete Your Profile</Title>
+                <Paragraph className="!text-sm sm:!text-base">You selected: <strong>{selectedRole}</strong></Paragraph>
               </div>
               
               <Form
@@ -170,7 +175,11 @@ export default function RoleSelectionPage() {
                   label="Full Name"
                   rules={[{ required: true, message: 'Please enter your name' }]}
                 >
-                  <Input prefix={<UserOutlined />} placeholder="Enter your full name" />
+                  <Input 
+                    prefix={<UserOutlined />} 
+                    placeholder="Enter your full name" 
+                    size="large"
+                  />
                 </Form.Item>
 
                 <Form.Item
@@ -178,7 +187,11 @@ export default function RoleSelectionPage() {
                   label="Phone Number"
                   rules={[{ required: true, message: 'Please enter your phone number' }]}
                 >
-                  <Input prefix={<PhoneOutlined />} placeholder="Enter your phone number" />
+                  <Input 
+                    prefix={<PhoneOutlined />} 
+                    placeholder="Enter your phone number" 
+                    size="large"
+                  />
                 </Form.Item>
 
                 <Form.Item
@@ -188,7 +201,11 @@ export default function RoleSelectionPage() {
                     { type: 'email', message: 'Please enter a valid email' },
                   ]}
                 >
-                  <Input prefix={<UserOutlined />} placeholder="Enter your email (optional)" />
+                  <Input 
+                    prefix={<UserOutlined />} 
+                    placeholder="Enter your email (optional)" 
+                    size="large"
+                  />
                 </Form.Item>
 
                 <Form.Item
@@ -199,6 +216,7 @@ export default function RoleSelectionPage() {
                   <Input.TextArea 
                     placeholder="Enter your address"
                     rows={3}
+                    size="large"
                   />
                 </Form.Item>
 
@@ -209,13 +227,16 @@ export default function RoleSelectionPage() {
                     block
                     loading={loading}
                     size="large"
+                    className="!h-12"
                   >
                     Complete Setup
                   </Button>
                   <Button
                     type="text"
                     block
+                    size="large"
                     onClick={() => setSelectedRole(null)}
+                    className="!h-12"
                   >
                     ← Back to role selection
                   </Button>

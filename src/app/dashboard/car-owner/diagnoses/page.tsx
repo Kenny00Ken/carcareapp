@@ -168,38 +168,30 @@ export default function CarOwnerDiagnosesPage() {
 
   const columns = [
     {
-      title: 'Vehicle',
-      key: 'vehicle',
+      title: 'Diagnosis Details',
+      key: 'details',
       render: (record: DiagnosisWithDetails) => (
-        <div className="flex items-center space-x-3">
-          <CarOutlined className="text-blue-500" />
-          <div>
-            <div className="font-medium">
-              {record.car?.make} {record.car?.model}
-            </div>
-            <div className="text-sm text-gray-500">
-              {record.car?.year}
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <CarOutlined className="text-blue-500" />
+            <div className="font-medium text-sm">
+              {record.car?.make} {record.car?.model} ({record.car?.year})
             </div>
           </div>
-        </div>
-      )
-    },
-    {
-      title: 'Diagnosis',
-      key: 'diagnosis',
-      render: (record: DiagnosisWithDetails) => (
-        <div>
-          <div className="font-medium">{record.title as string}</div>
-          <div className="text-sm text-gray-500 truncate max-w-xs">
+          <div className="font-medium text-sm">{record.title as string}</div>
+          <div className="text-xs text-gray-500 line-clamp-2">
             {record.details as string}
           </div>
-          <div className="flex items-center space-x-2 mt-1">
-            <Tag color={getSeverityColor(record.severity as string)}>
+          <div className="flex flex-wrap gap-1">
+            <Tag color={getSeverityColor(record.severity as string)} className="text-xs">
               {(record.severity as string)?.toUpperCase()}
             </Tag>
-            <Tag color={getStatusColor(record.status as string)}>
+            <Tag color={getStatusColor(record.status as string)} className="text-xs">
               {(record.status as string)?.toUpperCase()}
             </Tag>
+          </div>
+          <div className="sm:hidden text-xs text-gray-500">
+            By: {record.mechanic_name} • {new Date(record.created_at || 0).toLocaleDateString()}
           </div>
         </div>
       )
@@ -207,23 +199,27 @@ export default function CarOwnerDiagnosesPage() {
     {
       title: 'Mechanic',
       key: 'mechanic',
+      width: 120,
+      responsive: ['sm'],
       render: (record: DiagnosisWithDetails) => (
         <div className="flex items-center space-x-2">
           <ToolOutlined className="text-green-500" />
-          <span>{record.mechanic_name}</span>
+          <span className="text-sm">{record.mechanic_name}</span>
         </div>
       )
     },
     {
-      title: 'Cost Estimate',
+      title: 'Cost',
       key: 'cost',
+      width: 100,
+      responsive: ['md'],
       render: (record: DiagnosisWithDetails) => (
         <div>
-          <div className="font-semibold text-green-600">
+          <div className="font-semibold text-green-600 text-sm">
             GHS {record.estimated_cost?.toFixed(2) || '0.00'}
           </div>
           {record.resolution_time && (
-            <div className="text-sm text-gray-500">
+            <div className="text-xs text-gray-500">
               {record.resolution_time as string}
             </div>
           )}
@@ -233,10 +229,12 @@ export default function CarOwnerDiagnosesPage() {
     {
       title: 'Date',
       key: 'date',
+      width: 100,
+      responsive: ['sm'],
       render: (record: DiagnosisWithDetails) => (
         <div>
-          <div>{new Date(record.created_at || 0).toLocaleDateString()}</div>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm">{new Date(record.created_at || 0).toLocaleDateString()}</div>
+          <div className="text-xs text-gray-500">
             {new Date(record.created_at || 0).toLocaleTimeString()}
           </div>
         </div>
@@ -245,14 +243,17 @@ export default function CarOwnerDiagnosesPage() {
     {
       title: 'Actions',
       key: 'actions',
+      width: 100,
       render: (record: DiagnosisWithDetails) => (
         <Button
           icon={<EyeOutlined />}
           onClick={() => handleViewDetails(record)}
           type="primary"
           size="small"
+          className="!w-full sm:!w-auto"
         >
-          View Details
+          <span className="hidden sm:inline">View Details</span>
+          <span className="sm:hidden">View</span>
         </Button>
       )
     }
@@ -273,55 +274,55 @@ export default function CarOwnerDiagnosesPage() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <Title level={2} className="!mb-2">
+          <Title level={2} className="!text-xl sm:!text-2xl !mb-2">
             <FileTextOutlined className="mr-2" />
             Vehicle Diagnoses
           </Title>
-          <Text type="secondary">
+          <Text type="secondary" className="!text-sm sm:!text-base">
             View detailed diagnoses and estimates for your vehicles
           </Text>
         </div>
 
         {/* Statistics */}
-        <Row gutter={16}>
+        <Row gutter={[16, 16]}>
           <Col xs={12} sm={6}>
-            <Card>
+            <Card className="text-center">
               <Statistic
-                title="Total Diagnoses"
+                title={<span className="text-xs sm:text-sm">Total Diagnoses</span>}
                 value={stats.total}
                 prefix={<FileTextOutlined />}
-                valueStyle={{ color: '#1890ff' }}
+                valueStyle={{ color: '#1890ff', fontSize: '18px' }}
               />
             </Card>
           </Col>
           <Col xs={12} sm={6}>
-            <Card>
+            <Card className="text-center">
               <Statistic
-                title="Pending Review"
+                title={<span className="text-xs sm:text-sm">Pending Review</span>}
                 value={stats.pending}
                 prefix={<ClockCircleOutlined />}
-                valueStyle={{ color: '#faad14' }}
+                valueStyle={{ color: '#faad14', fontSize: '18px' }}
               />
             </Card>
           </Col>
           <Col xs={12} sm={6}>
-            <Card>
+            <Card className="text-center">
               <Statistic
-                title="Completed"
+                title={<span className="text-xs sm:text-sm">Completed</span>}
                 value={stats.completed}
                 prefix={<ToolOutlined />}
-                valueStyle={{ color: '#52c41a' }}
+                valueStyle={{ color: '#52c41a', fontSize: '18px' }}
               />
             </Card>
           </Col>
           <Col xs={12} sm={6}>
-            <Card>
+            <Card className="text-center">
               <Statistic
-                title="Total Estimates"
+                title={<span className="text-xs sm:text-sm">Total Estimates</span>}
                 value={stats.totalCost}
                 prefix={<DollarOutlined />}
                 precision={2}
-                valueStyle={{ color: '#722ed1' }}
+                valueStyle={{ color: '#722ed1', fontSize: '18px' }}
               />
             </Card>
           </Col>
@@ -329,22 +330,24 @@ export default function CarOwnerDiagnosesPage() {
 
         {/* Filters */}
         <Card>
-          <Row gutter={16} align="middle">
-            <Col xs={24} sm={8}>
+          <Row gutter={[16, 16]} align="middle">
+            <Col xs={24} md={8}>
               <Input
                 placeholder="Search diagnoses..."
                 prefix={<SearchOutlined />}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 allowClear
+                size="large"
               />
             </Col>
-            <Col xs={12} sm={4}>
+            <Col xs={12} md={4}>
               <Select
                 placeholder="Status"
                 value={statusFilter}
                 onChange={setStatusFilter}
                 style={{ width: '100%' }}
+                size="large"
               >
                 <Option value="all">All Status</Option>
                 <Option value="draft">Draft</Option>
@@ -353,12 +356,13 @@ export default function CarOwnerDiagnosesPage() {
                 <Option value="completed">Completed</Option>
               </Select>
             </Col>
-            <Col xs={12} sm={4}>
+            <Col xs={12} md={4}>
               <Select
                 placeholder="Severity"
                 value={severityFilter}
                 onChange={setSeverityFilter}
                 style={{ width: '100%' }}
+                size="large"
               >
                 <Option value="all">All Severity</Option>
                 <Option value="low">Low</Option>
@@ -367,12 +371,13 @@ export default function CarOwnerDiagnosesPage() {
                 <Option value="critical">Critical</Option>
               </Select>
             </Col>
-            <Col xs={24} sm={8}>
+            <Col xs={24} md={8}>
               <RangePicker
                 value={dateRange}
                 onChange={setDateRange}
                 style={{ width: '100%' }}
                 placeholder={['Start Date', 'End Date']}
+                size="large"
               />
             </Col>
           </Row>
@@ -396,23 +401,32 @@ export default function CarOwnerDiagnosesPage() {
               rowKey="id"
               pagination={{ 
                 pageSize: 10,
-                showSizeChanger: true,
-                showQuickJumper: true,
+                showSizeChanger: false,
+                showQuickJumper: false,
+                responsive: true,
                 showTotal: (total, range) => 
                   `${range[0]}-${range[1]} of ${total} diagnoses`
               }}
-              scroll={{ x: 1000 }}
+              scroll={{ x: 500 }}
+              size="small"
+              className="overflow-x-auto"
             />
           )}
         </Card>
 
         {/* Details Modal */}
         <Modal
-          title="Diagnosis Details"
+          title={<span className="text-sm sm:text-base">Diagnosis Details</span>}
           open={detailsModalVisible}
           onCancel={() => setDetailsModalVisible(false)}
           footer={null}
           width={800}
+          className="!mx-4"
+          styles={{
+            body: {
+              padding: '16px',
+            },
+          }}
         >
           {selectedDiagnosis && (
             <div className="space-y-6">

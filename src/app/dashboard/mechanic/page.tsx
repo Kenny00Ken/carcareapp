@@ -103,54 +103,69 @@ export default function MechanicDashboard() {
 
   const requestColumns = [
     {
-      title: 'Request ID',
-      dataIndex: 'id',
-      key: 'id',
-      render: (id: string) => id.slice(-8)
-    },
-    {
-      title: 'Vehicle',
-      key: 'vehicle',
-      render: (record: Request) => `${record.car?.make} ${record.car?.model} (${record.car?.year})`
-    },
-    {
-      title: 'Owner',
-      key: 'owner',
-      render: (record: Request) => record.owner?.name || 'Unknown'
-    },
-    {
-      title: 'Issue',
-      dataIndex: 'title',
-      key: 'title',
-      ellipsis: true,
+      title: 'Request Details',
+      key: 'details',
+      render: (record: Request) => (
+        <div className="space-y-1">
+          <div className="font-medium text-sm">
+            {record.title}
+          </div>
+          <div className="text-xs text-gray-500">
+            {record.car?.make} {record.car?.model} ({record.car?.year})
+          </div>
+          <div className="text-xs text-gray-500">
+            Owner: {record.owner?.name || 'Unknown'}
+          </div>
+          <div className="flex flex-wrap gap-1 sm:hidden">
+            <Tag color={{
+              low: 'green',
+              medium: 'orange', 
+              high: 'red'
+            }[record.urgency as keyof typeof {low: 'green', medium: 'orange', high: 'red'}]} className="text-xs">
+              {record.urgency.toUpperCase()}
+            </Tag>
+            {record.estimated_hours && (
+              <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                {record.estimated_hours}h
+              </span>
+            )}
+          </div>
+        </div>
+      )
     },
     {
       title: 'Urgency',
       dataIndex: 'urgency',
       key: 'urgency',
+      width: 80,
+      responsive: ['sm'],
       render: (urgency: string) => {
         const colors = {
           low: 'green',
           medium: 'orange',
           high: 'red'
         }
-        return <Tag color={colors[urgency as keyof typeof colors]}>{urgency.toUpperCase()}</Tag>
+        return <Tag color={colors[urgency as keyof typeof colors]} className="text-xs">{urgency.toUpperCase()}</Tag>
       }
     },
     {
       title: 'Est. Hours',
       dataIndex: 'estimated_hours',
       key: 'estimated_hours',
-      render: (hours: number) => hours ? `${hours}h` : '-'
+      width: 80,
+      responsive: ['md'],
+      render: (hours: number) => <span className="text-sm">{hours ? `${hours}h` : '-'}</span>
     },
     {
       title: 'Action',
       key: 'action',
+      width: 80,
       render: (record: Request) => (
         <Button 
           type="primary" 
           size="small"
           onClick={() => handleClaimRequest(record.id)}
+          className="!w-full sm:!w-auto"
         >
           Claim
         </Button>
@@ -183,48 +198,52 @@ export default function MechanicDashboard() {
       <div className="space-y-6">
         {/* Welcome Section */}
         <div>
-          <Title level={2}>Welcome back, {user?.name}!</Title>
-          <Paragraph className="text-gray-600 dark:text-gray-300">
+          <Title level={2} className="!text-xl sm:!text-2xl">Welcome back, {user?.name}!</Title>
+          <Paragraph className="text-gray-600 dark:text-gray-300 !text-sm sm:!text-base">
             Here's your service overview and available opportunities.
           </Paragraph>
         </div>
 
         {/* Statistics Cards */}
         <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
+          <Col xs={12} sm={12} lg={6}>
+            <Card className="text-center">
               <Statistic
-                title="Available Requests"
+                title={<span className="text-xs sm:text-sm">Available Requests</span>}
                 value={stats.available_requests}
                 prefix={<FileTextOutlined className="text-blue-600" />}
+                valueStyle={{ fontSize: '18px' }}
               />
             </Card>
           </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
+          <Col xs={12} sm={12} lg={6}>
+            <Card className="text-center">
               <Statistic
-                title="Active Jobs"
+                title={<span className="text-xs sm:text-sm">Active Jobs</span>}
                 value={stats.active_jobs}
                 prefix={<ClockCircleOutlined className="text-orange-600" />}
+                valueStyle={{ fontSize: '18px' }}
               />
             </Card>
           </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
+          <Col xs={12} sm={12} lg={6}>
+            <Card className="text-center">
               <Statistic
-                title="Completed Jobs"
+                title={<span className="text-xs sm:text-sm">Completed Jobs</span>}
                 value={stats.completed_jobs}
                 prefix={<CheckCircleOutlined className="text-green-600" />}
+                valueStyle={{ fontSize: '18px' }}
               />
             </Card>
           </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
+          <Col xs={12} sm={12} lg={6}>
+            <Card className="text-center">
               <Statistic
-                title="Total Earnings"
+                title={<span className="text-xs sm:text-sm">Total Earnings</span>}
                 value={stats.total_earnings}
                 prefix={<DollarOutlined className="text-purple-600" />}
                 precision={2}
+                valueStyle={{ fontSize: '18px' }}
               />
             </Card>
           </Col>
@@ -233,22 +252,22 @@ export default function MechanicDashboard() {
         {/* Performance Overview */}
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={12}>
-            <Card title="Performance Overview">
+            <Card title={<span className="text-sm sm:text-base">Performance Overview</span>}>
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between mb-2">
-                    <span>Customer Rating</span>
-                    <span className="flex items-center">
+                    <span className="text-sm sm:text-base">Customer Rating</span>
+                    <span className="flex items-center text-sm sm:text-base">
                       <StarOutlined className="text-yellow-400 mr-1" />
                       {stats.average_rating}/5.0
                     </span>
                   </div>
-                  <Progress percent={(stats.average_rating / 5) * 100} strokeColor="#faad14" />
+                  <Progress percent={(stats.average_rating / 5) * 100} strokeColor="#faad14" size="small" />
                 </div>
                 <div>
                   <div className="flex justify-between mb-2">
-                    <span>Job Completion Rate</span>
-                    <span>
+                    <span className="text-sm sm:text-base">Job Completion Rate</span>
+                    <span className="text-sm sm:text-base">
                       {stats.completed_jobs > 0 
                         ? Math.round((stats.completed_jobs / (stats.completed_jobs + stats.active_jobs)) * 100)
                         : 0}%
@@ -259,49 +278,62 @@ export default function MechanicDashboard() {
                       ? Math.round((stats.completed_jobs / (stats.completed_jobs + stats.active_jobs)) * 100)
                       : 0} 
                     strokeColor="#52c41a" 
+                    size="small"
                   />
                 </div>
                 <div>
                   <div className="flex justify-between mb-2">
-                    <span>Response Time</span>
-                    <span>Excellent</span>
+                    <span className="text-sm sm:text-base">Response Time</span>
+                    <span className="text-sm sm:text-base">Excellent</span>
                   </div>
-                  <Progress percent={88} strokeColor="#1890ff" />
+                  <Progress percent={88} strokeColor="#1890ff" size="small" />
                 </div>
               </div>
             </Card>
           </Col>
           <Col xs={24} lg={12}>
-            <Card title="Quick Actions">
+            <Card title={<span className="text-sm sm:text-base">Quick Actions</span>}>
               <Space direction="vertical" size="middle" className="w-full">
                 <Button 
                   type="primary" 
                   icon={<FileTextOutlined />}
                   block
+                  size="large"
                   onClick={() => router.push('/dashboard/mechanic/requests')}
+                  className="!h-12"
                 >
-                  View All Service Requests
+                  <span className="hidden sm:inline">View All Service Requests</span>
+                  <span className="sm:hidden">Service Requests</span>
                 </Button>
                 <Button 
                   icon={<ToolOutlined />}
                   block
+                  size="large"
                   onClick={() => router.push('/dashboard/mechanic/diagnoses')}
+                  className="!h-12"
                 >
-                  Manage Diagnoses
+                  <span className="hidden sm:inline">Manage Diagnoses</span>
+                  <span className="sm:hidden">Diagnoses</span>
                 </Button>
                 <Button 
                   icon={<CarOutlined />}
                   block
+                  size="large"
                   onClick={() => router.push('/dashboard/mechanic/parts')}
+                  className="!h-12"
                 >
-                  Browse Parts Catalog
+                  <span className="hidden sm:inline">Browse Parts Catalog</span>
+                  <span className="sm:hidden">Parts Catalog</span>
                 </Button>
                 <Button 
                   icon={<HistoryOutlined />}
                   block
+                  size="large"
                   onClick={() => router.push('/dashboard/mechanic/history')}
+                  className="!h-12"
                 >
-                  View Maintenance History
+                  <span className="hidden sm:inline">View Maintenance History</span>
+                  <span className="sm:hidden">Maintenance History</span>
                 </Button>
               </Space>
             </Card>
@@ -310,11 +342,12 @@ export default function MechanicDashboard() {
 
         {/* Available Requests */}
         <Card 
-          title="Available Service Requests"
+          title={<span className="text-sm sm:text-base">Available Service Requests</span>}
           extra={
             <Button 
               type="link" 
               onClick={() => router.push('/dashboard/mechanic/requests')}
+              className="!text-sm"
             >
               View All
             </Button>
@@ -326,21 +359,23 @@ export default function MechanicDashboard() {
             rowKey="id"
             loading={loading}
             pagination={false}
-            scroll={{ x: 800 }}
+            scroll={{ x: 400 }}
+            size="small"
+            className="overflow-x-auto"
             locale={{ emptyText: 'No available requests at the moment' }}
           />
         </Card>
 
         {/* Recent Activity */}
-        <Card title="Recent Activity">
-          <div className="space-y-4">
+        <Card title={<span className="text-sm sm:text-base">Recent Activity</span>}>
+          <div className="space-y-3">
             {recentActivity.length > 0 ? (
               recentActivity.map((activity, index) => (
                 <div key={activity.id} className={`flex items-center space-x-3 p-3 bg-${getActivityColor(activity.activity_type)}-50 dark:bg-${getActivityColor(activity.activity_type)}-900/20 rounded`}>
                   {getActivityIcon(activity.activity_type)}
                   <div className="flex-1">
-                    <div className="font-medium">{activity.description}</div>
-                    <div className="text-sm text-gray-500">
+                    <div className="font-medium text-sm sm:text-base">{activity.description}</div>
+                    <div className="text-xs sm:text-sm text-gray-500">
                       {new Date(activity.timestamp).toLocaleString()}
                     </div>
                   </div>
@@ -348,8 +383,8 @@ export default function MechanicDashboard() {
               ))
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <ClockCircleOutlined className="text-4xl mb-4" />
-                <p>No recent activity</p>
+                <ClockCircleOutlined className="text-2xl sm:text-4xl mb-4" />
+                <p className="text-sm sm:text-base">No recent activity</p>
               </div>
             )}
           </div>

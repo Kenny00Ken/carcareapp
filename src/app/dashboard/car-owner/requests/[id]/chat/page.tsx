@@ -116,71 +116,78 @@ export default function ChatPage() {
 
   return (
     <DashboardLayout activeKey="requests">
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
         {/* Breadcrumb Navigation */}
-        <div className="flex items-center justify-between">
-          <Breadcrumb
-            items={[
-              {
-                href: '/dashboard/car-owner',
-                title: <HomeOutlined />
-              },
-              {
-                href: '/dashboard/car-owner/requests',
-                title: 'Requests'
-              },
-              {
-                href: `/dashboard/car-owner/requests/${requestId}`,
-                title: request.title
-              },
-              {
-                title: (
-                  <span className="flex items-center gap-2">
-                    <MessageOutlined />
-                    Chat
-                  </span>
-                )
-              }
-            ]}
-          />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
+          <div className="w-full sm:w-auto overflow-x-auto">
+            <Breadcrumb
+              className="whitespace-nowrap"
+              items={[
+                {
+                  href: '/dashboard/car-owner',
+                  title: <HomeOutlined />
+                },
+                {
+                  href: '/dashboard/car-owner/requests',
+                  title: <span className="text-xs sm:text-sm">Requests</span>
+                },
+                {
+                  href: `/dashboard/car-owner/requests/${requestId}`,
+                  title: <span className="text-xs sm:text-sm truncate max-w-32">{request.title}</span>
+                },
+                {
+                  title: (
+                    <span className="flex items-center gap-1 text-xs sm:text-sm">
+                      <MessageOutlined />
+                      Chat
+                    </span>
+                  )
+                }
+              ]}
+            />
+          </div>
           
           <Button 
             icon={<ArrowLeftOutlined />} 
             onClick={() => router.back()}
+            className="!w-full sm:!w-auto"
           >
-            Back
+            <span className="hidden sm:inline">Back</span>
+            <span className="sm:hidden">Back to Request</span>
           </Button>
         </div>
 
         {/* Request Summary */}
         <Card size="small" className="mb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Title level={4} className="!mb-1">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+            <div className="flex-1">
+              <Title level={4} className="!mb-1 !text-base sm:!text-lg">
                 {request.title}
               </Title>
-              <Text className="text-gray-500">
+              <Text className="text-gray-500 text-xs sm:text-sm">
                 {request.car ? `${request.car.make} ${request.car.model}` : 'Vehicle'} • 
                 Status: <span className="font-medium capitalize">{request.status?.replace('_', ' ')}</span>
               </Text>
             </div>
             
             {mechanic && (
-              <div className="text-right">
-                <Text strong>Mechanic</Text>
+              <div className="text-left sm:text-right">
+                <Text strong className="text-sm">Mechanic</Text>
                 <br />
-                <Text>{mechanic.name}</Text>
+                <Text className="text-sm">{mechanic.name}</Text>
               </div>
             )}
           </div>
         </Card>
 
         {/* Chat Interface */}
-        <Card styles={{ body: { padding: 0 } }} className="shadow-lg">
-          <ChatInterface 
-            request={request} 
-            otherUser={mechanic || undefined}
-          />
+        <Card styles={{ body: { padding: 0 } }} className="shadow-lg !mx-0">
+          <div className="h-[60vh] sm:h-[70vh]">
+            <ChatInterface 
+              request={request} 
+              otherUser={mechanic || undefined}
+            />
+          </div>
         </Card>
       </div>
     </DashboardLayout>

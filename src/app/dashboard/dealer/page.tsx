@@ -145,37 +145,39 @@ export default function DealerDashboard() {
 
   const transactionColumns = [
     {
-      title: 'Transaction ID',
-      dataIndex: 'id',
-      key: 'id',
-      render: (id: string) => id.slice(-8)
-    },
-    {
-      title: 'Part',
-      key: 'part',
+      title: 'Transaction Details',
+      key: 'details',
       render: (record: Transaction) => (
-        <div>
-          <div className="font-medium">{record.part?.name}</div>
-          <div className="text-sm text-gray-500">Qty: {record.quantity}</div>
+        <div className="space-y-1">
+          <div className="font-medium text-sm">{record.part?.name}</div>
+          <div className="text-xs text-gray-500">
+            Qty: {record.quantity} • ${record.total_amount.toFixed(2)}
+          </div>
+          <div className="text-xs text-gray-500">
+            By: {record.mechanic?.name || 'Unknown'}
+          </div>
+          <div className="flex flex-wrap gap-1 sm:hidden">
+            <Tag color={{
+              pending: 'orange',
+              approved: 'green', 
+              rejected: 'red',
+              completed: 'blue'
+            }[record.status as keyof typeof {pending: 'orange', approved: 'green', rejected: 'red', completed: 'blue'}]} className="text-xs">
+              {record.status.toUpperCase()}
+            </Tag>
+            <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+              {dayjs(record.created_at).format('MMM DD')}
+            </span>
+          </div>
         </div>
-      ),
-      ellipsis: true,
-    },
-    {
-      title: 'Mechanic',
-      key: 'mechanic',
-      render: (record: Transaction) => record.mechanic?.name || 'Unknown'
-    },
-    {
-      title: 'Amount',
-      dataIndex: 'total_amount',
-      key: 'total_amount',
-      render: (amount: number) => `$${amount.toFixed(2)}`
+      )
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      width: 80,
+      responsive: ['sm'],
       render: (status: string) => {
         const colors = {
           pending: 'orange',
@@ -183,25 +185,29 @@ export default function DealerDashboard() {
           rejected: 'red',
           completed: 'blue'
         }
-        return <Tag color={colors[status as keyof typeof colors]}>{status.toUpperCase()}</Tag>
+        return <Tag color={colors[status as keyof typeof colors]} className="text-xs">{status.toUpperCase()}</Tag>
       }
     },
     {
       title: 'Date',
       dataIndex: 'created_at',
       key: 'created_at',
-      render: (date: string) => dayjs(date).format('MMM DD')
+      width: 80,
+      responsive: ['md'],
+      render: (date: string) => <span className="text-sm">{dayjs(date).format('MMM DD')}</span>
     },
     {
       title: 'Action',
       key: 'action',
+      width: 120,
       render: (record: Transaction) => (
         record.status === 'pending' ? (
-          <Space size="small">
+          <div className="flex flex-col gap-1">
             <Button 
               type="primary" 
               size="small"
               onClick={() => handleApproveTransaction(record.id)}
+              className="!w-full sm:!w-auto"
             >
               Approve
             </Button>
@@ -209,10 +215,11 @@ export default function DealerDashboard() {
               danger 
               size="small"
               onClick={() => handleRejectTransaction(record.id)}
+              className="!w-full sm:!w-auto"
             >
               Reject
             </Button>
-          </Space>
+          </div>
         ) : null
       )
     }
@@ -223,48 +230,52 @@ export default function DealerDashboard() {
       <div className="space-y-6">
         {/* Welcome Section */}
         <div>
-          <Title level={2}>Welcome back, {user?.name}!</Title>
-          <Paragraph className="text-gray-600 dark:text-gray-300">
+          <Title level={2} className="!text-xl sm:!text-2xl">Welcome back, {user?.name}!</Title>
+          <Paragraph className="text-gray-600 dark:text-gray-300 !text-sm sm:!text-base">
             Manage your parts inventory and track sales performance.
           </Paragraph>
         </div>
 
         {/* Statistics Cards */}
         <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
+          <Col xs={12} sm={12} lg={6}>
+            <Card className="text-center">
               <Statistic
-                title="Total Parts"
+                title={<span className="text-xs sm:text-sm">Total Parts</span>}
                 value={stats.total_parts}
                 prefix={<ShopOutlined className="text-blue-600" />}
+                valueStyle={{ fontSize: '18px' }}
               />
             </Card>
           </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
+          <Col xs={12} sm={12} lg={6}>
+            <Card className="text-center">
               <Statistic
-                title="Pending Orders"
+                title={<span className="text-xs sm:text-sm">Pending Orders</span>}
                 value={stats.pending_orders}
                 prefix={<ClockCircleOutlined className="text-orange-600" />}
+                valueStyle={{ fontSize: '18px' }}
               />
             </Card>
           </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
+          <Col xs={12} sm={12} lg={6}>
+            <Card className="text-center">
               <Statistic
-                title="Monthly Sales"
+                title={<span className="text-xs sm:text-sm">Monthly Sales</span>}
                 value={stats.monthly_sales}
                 prefix={<CheckCircleOutlined className="text-green-600" />}
+                valueStyle={{ fontSize: '18px' }}
               />
             </Card>
           </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
+          <Col xs={12} sm={12} lg={6}>
+            <Card className="text-center">
               <Statistic
-                title="Monthly Revenue"
+                title={<span className="text-xs sm:text-sm">Monthly Revenue</span>}
                 value={stats.monthly_revenue}
                 prefix={<DollarOutlined className="text-purple-600" />}
                 precision={2}
+                valueStyle={{ fontSize: '18px' }}
               />
             </Card>
           </Col>
@@ -273,17 +284,17 @@ export default function DealerDashboard() {
         {/* Alerts & Quick Actions */}
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={12}>
-            <Card title="Inventory Alerts" bordered={false}>
+            <Card title={<span className="text-sm sm:text-base">Inventory Alerts</span>} bordered={false}>
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded">
                   <div className="flex items-center space-x-2">
                     <WarningOutlined className="text-red-600" />
-                    <span>Low Stock Items</span>
+                    <span className="text-sm sm:text-base">Low Stock Items</span>
                   </div>
-                  <Tag color="red">{stats.low_stock_items} items</Tag>
+                  <Tag color="red" className="text-xs">{stats.low_stock_items} items</Tag>
                 </div>
                 {lowStockParts.length > 0 && (
-                  <div className="text-sm text-gray-600 dark:text-gray-300">
+                  <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                     {lowStockParts.slice(0, 3).map((part, index) => (
                       <div key={part.id}>
                         • {part.name} ({part.stock} left)
@@ -298,29 +309,38 @@ export default function DealerDashboard() {
             </Card>
           </Col>
           <Col xs={24} lg={12}>
-            <Card title="Quick Actions" bordered={false}>
+            <Card title={<span className="text-sm sm:text-base">Quick Actions</span>} bordered={false}>
               <Space direction="vertical" size="middle" className="w-full">
                 <Button 
                   type="primary" 
                   icon={<PlusOutlined />}
                   block
+                  size="large"
                   onClick={() => router.push('/dashboard/dealer/parts')}
+                  className="!h-12"
                 >
-                  Manage Inventory
+                  <span className="hidden sm:inline">Manage Inventory</span>
+                  <span className="sm:hidden">Inventory</span>
                 </Button>
                 <Button 
                   icon={<FileTextOutlined />}
                   block
+                  size="large"
                   onClick={() => router.push('/dashboard/dealer/transactions')}
+                  className="!h-12"
                 >
-                  Review Transactions
+                  <span className="hidden sm:inline">Review Transactions</span>
+                  <span className="sm:hidden">Transactions</span>
                 </Button>
                 <Button 
                   icon={<BarChartOutlined />}
                   block
+                  size="large"
                   onClick={() => router.push('/dashboard/dealer/analytics')}
+                  className="!h-12"
                 >
-                  View Sales Analytics
+                  <span className="hidden sm:inline">View Sales Analytics</span>
+                  <span className="sm:hidden">Analytics</span>
                 </Button>
               </Space>
             </Card>
@@ -329,11 +349,12 @@ export default function DealerDashboard() {
 
         {/* Recent Transactions */}
         <Card 
-          title="Recent Transactions"
+          title={<span className="text-sm sm:text-base">Recent Transactions</span>}
           extra={
             <Button 
               type="link" 
               onClick={() => router.push('/dashboard/dealer/transactions')}
+              className="!text-sm"
             >
               View All
             </Button>
@@ -345,7 +366,9 @@ export default function DealerDashboard() {
             rowKey="id"
             loading={loading}
             pagination={false}
-            scroll={{ x: 800 }}
+            scroll={{ x: 400 }}
+            size="small"
+            className="overflow-x-auto"
             locale={{ emptyText: 'No recent transactions' }}
           />
         </Card>
@@ -353,22 +376,22 @@ export default function DealerDashboard() {
         {/* Sales Overview */}
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={12}>
-            <Card title="Top Selling Parts" bordered={false}>
+            <Card title={<span className="text-sm sm:text-base">Top Selling Parts</span>} bordered={false}>
               <div className="space-y-3">
                 {topSellingParts.length > 0 ? (
                   topSellingParts.map((part, index) => (
                     <div key={index} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded">
                       <div>
-                        <div className="font-medium">{part.name}</div>
-                        <div className="text-sm text-gray-500">{part.sold} units sold</div>
+                        <div className="font-medium text-sm sm:text-base">{part.name}</div>
+                        <div className="text-xs sm:text-sm text-gray-500">{part.sold} units sold</div>
                       </div>
                       <div className="text-right">
-                        <div className="font-medium text-green-600">${part.revenue.toFixed(2)}</div>
+                        <div className="font-medium text-green-600 text-sm sm:text-base">${part.revenue.toFixed(2)}</div>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-4 text-gray-500">
+                  <div className="text-center py-4 text-gray-500 text-sm sm:text-base">
                     No sales data available
                   </div>
                 )}
@@ -376,23 +399,23 @@ export default function DealerDashboard() {
             </Card>
           </Col>
           <Col xs={24} lg={12}>
-            <Card title="Monthly Overview" bordered={false}>
+            <Card title={<span className="text-sm sm:text-base">Monthly Overview</span>} bordered={false}>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span>Total Transactions</span>
-                  <span className="font-semibold">{recentTransactions.length}</span>
+                  <span className="text-sm sm:text-base">Total Transactions</span>
+                  <span className="font-semibold text-sm sm:text-base">{recentTransactions.length}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span>Pending Approvals</span>
-                  <span className="font-semibold text-orange-600">{stats.pending_orders}</span>
+                  <span className="text-sm sm:text-base">Pending Approvals</span>
+                  <span className="font-semibold text-orange-600 text-sm sm:text-base">{stats.pending_orders}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span>Monthly Revenue</span>
-                  <span className="font-semibold text-green-600">${stats.monthly_revenue.toFixed(2)}</span>
+                  <span className="text-sm sm:text-base">Monthly Revenue</span>
+                  <span className="font-semibold text-green-600 text-sm sm:text-base">${stats.monthly_revenue.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span>Low Stock Alerts</span>
-                  <span className="font-semibold text-red-600">{stats.low_stock_items}</span>
+                  <span className="text-sm sm:text-base">Low Stock Alerts</span>
+                  <span className="font-semibold text-red-600 text-sm sm:text-base">{stats.low_stock_items}</span>
                 </div>
               </div>
             </Card>

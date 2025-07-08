@@ -201,21 +201,34 @@ export default function CarOwnerRequestsPage() {
       title: 'Request ID',
       dataIndex: 'id',
       key: 'id',
-      render: (id: string) => id.slice(-8)
+      width: 100,
+      responsive: ['md'],
+      render: (id: string) => (
+        <span className="font-mono text-xs">{id.slice(-8)}</span>
+      )
     },
     {
-      title: 'Title',
-      dataIndex: 'title',
-      key: 'title',
-      ellipsis: true
-    },
-    {
-      title: 'Car',
-      key: 'car',
+      title: 'Request Details',
+      key: 'details',
       render: (record: Request) => (
-        <div>
-          <div>{record.car?.make} {record.car?.model}</div>
-          <div className="text-sm text-gray-500">{record.car?.year}</div>
+        <div className="space-y-1">
+          <div className="font-medium text-sm">{record.title}</div>
+          <div className="text-xs text-gray-500">
+            {record.car?.make} {record.car?.model} ({record.car?.year})
+          </div>
+          <div className="flex items-center gap-2 sm:hidden">
+            <Tag color={getStatusColor(record.status)} className="text-xs">
+              {record.status.replace('_', ' ').toUpperCase()}
+            </Tag>
+            <Tag color={getUrgencyColor(record.urgency)} className="text-xs">
+              {record.urgency.toUpperCase()}
+            </Tag>
+          </div>
+          {record.mechanic && (
+            <div className="text-xs text-blue-600 sm:hidden">
+              Mechanic: {record.mechanic.name}
+            </div>
+          )}
         </div>
       )
     },
@@ -223,70 +236,87 @@ export default function CarOwnerRequestsPage() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      width: 100,
+      responsive: ['sm'],
       render: (status: RequestStatus) => (
-        <Tag color={getStatusColor(status)}>{status.toUpperCase()}</Tag>
+        <Tag color={getStatusColor(status)} className="text-xs">
+          {status.replace('_', ' ').toUpperCase()}
+        </Tag>
       )
     },
     {
       title: 'Urgency',
       dataIndex: 'urgency',
       key: 'urgency',
+      width: 80,
+      responsive: ['sm'],
       render: (urgency: string) => (
-        <Tag color={getUrgencyColor(urgency)}>{urgency.toUpperCase()}</Tag>
+        <Tag color={getUrgencyColor(urgency)} className="text-xs">
+          {urgency.toUpperCase()}
+        </Tag>
       )
     },
     {
       title: 'Mechanic',
       key: 'mechanic',
-      render: (record: Request) => record.mechanic?.name || 'Not assigned'
+      width: 120,
+      responsive: ['md'],
+      render: (record: Request) => (
+        <div className="text-sm">
+          {record.mechanic?.name || 'Not assigned'}
+        </div>
+      )
     },
     {
-      title: 'Est. Cost',
+      title: 'Cost',
       dataIndex: 'estimated_cost',
       key: 'estimated_cost',
-      render: (cost: number) => cost ? `GHS ${cost.toFixed(2)}` : '-'
+      width: 80,
+      responsive: ['lg'],
+      render: (cost: number) => (
+        <span className="text-sm">{cost ? `GHS ${cost.toFixed(2)}` : '-'}</span>
+      )
     },
     {
       title: 'Created',
       dataIndex: 'created_at',
       key: 'created_at',
-      render: (date: string) => new Date(date).toLocaleDateString()
+      width: 90,
+      responsive: ['lg'],
+      render: (date: string) => (
+        <span className="text-xs">{new Date(date).toLocaleDateString()}</span>
+      )
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 200,
+      width: 100,
       render: (record: Request) => (
         <div className="flex flex-col gap-1">
-          {/* Primary Actions Row */}
           <Space size="small">
             <Button
               size="small"
-              type="default"
+              type="text"
               icon={<EyeOutlined />}
               onClick={() => {
                 setSelectedRequest(record)
                 setViewModalVisible(true)
               }}
-              className="min-w-[70px]"
               title="View Details"
-            >
-              View
-            </Button>
+              className="!w-8 !h-8"
+            />
             
             {record.mechanic && (
               <Button
                 size="small"
-                type="primary"
+                type="text"
                 icon={<MessageOutlined />}
                 onClick={() => {
                   window.location.href = `/dashboard/car-owner/requests/${record.id}/chat`
                 }}
-                className="min-w-[70px] bg-blue-600 hover:bg-blue-700"
                 title="Chat with Mechanic"
-              >
-                Chat
-              </Button>
+                className="!w-8 !h-8 !text-blue-600"
+              />
             )}
             
             {record.status === 'pending' && (
@@ -305,28 +335,11 @@ export default function CarOwnerRequestsPage() {
                     onOk: () => handleDeleteRequest(record.id)
                   })
                 }}
-                className="min-w-[70px] hover:bg-red-50"
                 title="Delete Request"
-              >
-                Delete
-              </Button>
+                className="!w-8 !h-8"
+              />
             )}
           </Space>
-          
-          {/* Status Badge Row */}
-          <div className="flex items-center justify-between mt-1">
-            <Tag 
-              color={getStatusColor(record.status)} 
-              className="text-xs font-medium px-2 py-1 rounded-md"
-            >
-              {record.status.replace('_', ' ').toUpperCase()}
-            </Tag>
-            {record.mechanic && (
-              <Text type="secondary" className="text-xs">
-                Assigned: {record.mechanic.name}
-              </Text>
-            )}
-          </div>
         </div>
       )
     }
@@ -335,10 +348,10 @@ export default function CarOwnerRequestsPage() {
   return (
     <DashboardLayout activeKey="requests">
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
           <div>
-            <Title level={2}>My Service Requests</Title>
-            <Text type="secondary">Manage your car service requests</Text>
+            <Title level={2} className="!text-xl sm:!text-2xl !mb-2">My Service Requests</Title>
+            <Text type="secondary" className="!text-sm sm:!text-base">Manage your car service requests</Text>
           </div>
           <Button
             type="primary"
@@ -358,8 +371,10 @@ export default function CarOwnerRequestsPage() {
               }
               setModalVisible(true)
             }}
+            className="!w-full sm:!w-auto"
           >
-            New Request
+            <span className="hidden sm:inline">New Request</span>
+            <span className="sm:hidden">Create Request</span>
           </Button>
         </div>
 
@@ -369,8 +384,15 @@ export default function CarOwnerRequestsPage() {
             dataSource={requests}
             rowKey="id"
             loading={loading}
-            pagination={{ pageSize: 10 }}
-            scroll={{ x: 800 }}
+            pagination={{ 
+              pageSize: 10,
+              showSizeChanger: false,
+              showQuickJumper: false,
+              responsive: true,
+            }}
+            scroll={{ x: 500 }}
+            size="small"
+            className="overflow-x-auto"
             locale={{
               emptyText: (
                 <Empty
@@ -402,6 +424,12 @@ export default function CarOwnerRequestsPage() {
             form.resetFields()
           }}
           width={600}
+          className="!mx-4"
+          styles={{
+            body: {
+              padding: '20px 16px',
+            },
+          }}
         >
           {cars.length === 0 ? (
             <div className="text-center py-8">

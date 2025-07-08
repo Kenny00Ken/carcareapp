@@ -91,8 +91,8 @@ export default function SettingsPage() {
     <DashboardLayout activeKey="settings">
       <div className="max-w-4xl mx-auto space-y-6">
         <div>
-          <Title level={2}>Settings</Title>
-          <Paragraph>
+          <Title level={2} className="!text-xl sm:!text-2xl !mb-2">Settings</Title>
+          <Paragraph className="!text-sm sm:!text-base">
             Manage your preferences, location settings, and notifications.
           </Paragraph>
         </div>
@@ -102,28 +102,28 @@ export default function SettingsPage() {
           title={
             <Space>
               <BellOutlined />
-              <span>Notification Settings</span>
+              <span className="text-sm sm:text-base">Notification Settings</span>
             </Space>
           }
         >
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             <div>
-              <Row justify="space-between" align="middle">
-                <Col>
+              <Row justify="space-between" align="middle" gutter={[16, 16]}>
+                <Col xs={18} sm={20}>
                   <Space direction="vertical" size="small">
-                    <Text strong>Push Notifications</Text>
-                    <Text type="secondary">
+                    <Text strong className="text-sm sm:text-base">Push Notifications</Text>
+                    <Text type="secondary" className="text-xs sm:text-sm">
                       Receive notifications for new requests, messages, and updates
                     </Text>
                     <Space>
-                      <Text>Status:</Text>
-                      <Tag color={permissionStatus.color} icon={permissionStatus.icon}>
+                      <Text className="text-xs sm:text-sm">Status:</Text>
+                      <Tag color={permissionStatus.color} icon={permissionStatus.icon} className="text-xs">
                         {permissionStatus.status}
                       </Tag>
                     </Space>
                   </Space>
                 </Col>
-                <Col>
+                <Col xs={6} sm={4} className="text-right">
                   <Switch
                     checked={notificationPermission === 'granted'}
                     onChange={handleNotificationToggle}
@@ -173,56 +173,56 @@ export default function SettingsPage() {
         </Card>
 
         {/* Notification Types */}
-        <Card title="Notification Types">
+        <Card title={<span className="text-sm sm:text-base">Notification Types</span>}>
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            <Row justify="space-between" align="middle">
-              <Col>
+            <Row justify="space-between" align="middle" gutter={[16, 16]}>
+              <Col xs={18} sm={20}>
                 <Space>
-                  <MessageOutlined />
+                  <MessageOutlined className="text-blue-500" />
                   <div>
-                    <Text strong>New Messages</Text>
+                    <Text strong className="text-sm sm:text-base">New Messages</Text>
                     <br />
-                    <Text type="secondary">Chat messages from customers or mechanics</Text>
+                    <Text type="secondary" className="text-xs sm:text-sm">Chat messages from customers or mechanics</Text>
                   </div>
                 </Space>
               </Col>
-              <Col>
+              <Col xs={6} sm={4} className="text-right">
                 <Switch defaultChecked disabled={notificationPermission !== 'granted'} />
               </Col>
             </Row>
 
-            <Divider />
+            <Divider className="!my-3" />
 
-            <Row justify="space-between" align="middle">
-              <Col>
+            <Row justify="space-between" align="middle" gutter={[16, 16]}>
+              <Col xs={18} sm={20}>
                 <Space>
-                  <SettingOutlined />
+                  <SettingOutlined className="text-green-500" />
                   <div>
-                    <Text strong>Request Updates</Text>
+                    <Text strong className="text-sm sm:text-base">Request Updates</Text>
                     <br />
-                    <Text type="secondary">Status changes on your service requests</Text>
+                    <Text type="secondary" className="text-xs sm:text-sm">Status changes on your service requests</Text>
                   </div>
                 </Space>
               </Col>
-              <Col>
+              <Col xs={6} sm={4} className="text-right">
                 <Switch defaultChecked disabled={notificationPermission !== 'granted'} />
               </Col>
             </Row>
 
-            <Divider />
+            <Divider className="!my-3" />
 
-            <Row justify="space-between" align="middle">
-              <Col>
+            <Row justify="space-between" align="middle" gutter={[16, 16]}>
+              <Col xs={18} sm={20}>
                 <Space>
-                  <PhoneOutlined />
+                  <PhoneOutlined className="text-purple-500" />
                   <div>
-                    <Text strong>New Requests</Text>
+                    <Text strong className="text-sm sm:text-base">New Requests</Text>
                     <br />
-                    <Text type="secondary">New service requests in your area (Mechanics only)</Text>
+                    <Text type="secondary" className="text-xs sm:text-sm">New service requests in your area (Mechanics only)</Text>
                   </div>
                 </Space>
               </Col>
-              <Col>
+              <Col xs={6} sm={4} className="text-right">
                 <Switch defaultChecked disabled={notificationPermission !== 'granted'} />
               </Col>
             </Row>
@@ -230,13 +230,17 @@ export default function SettingsPage() {
         </Card>
 
         {/* Additional Settings */}
-        <Card title="Other Settings">
+        <Card title={<span className="text-sm sm:text-base">Other Settings</span>}>
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            <Text type="secondary">
+            <Text type="secondary" className="text-xs sm:text-sm">
               More settings coming soon. You can manage your profile, location preferences, 
               and other options from the profile page.
             </Text>
-            <Button type="link" onClick={() => window.location.href = '/profile'}>
+            <Button 
+              type="link" 
+              onClick={() => window.location.href = '/profile'}
+              className="!text-sm sm:!text-base !px-0"
+            >
               Go to Profile Settings
             </Button>
           </Space>

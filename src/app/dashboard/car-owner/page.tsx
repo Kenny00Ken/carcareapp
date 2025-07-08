@@ -224,7 +224,7 @@ export default function CarOwnerDashboard() {
       dataIndex: 'id',
       key: 'id',
       width: 120,
-      responsive: ['sm'] as const,
+      responsive: ['sm'],
       render: (id: string) => (
         <span className="font-mono text-sm">{id.slice(-8)}</span>
       )
@@ -248,7 +248,7 @@ export default function CarOwnerDashboard() {
       dataIndex: 'title',
       key: 'title',
       ellipsis: true,
-      responsive: ['sm'] as const,
+      responsive: ['sm'],
     },
     {
       title: 'Status',
@@ -266,7 +266,7 @@ export default function CarOwnerDashboard() {
       dataIndex: 'created_at',
       key: 'created_at',
       width: 100,
-      responsive: ['md'] as const,
+      responsive: ['md'],
       render: (date: string) => new Date(date).toLocaleDateString()
     },
     {
@@ -274,7 +274,7 @@ export default function CarOwnerDashboard() {
       dataIndex: 'estimated_cost',
       key: 'estimated_cost',
       width: 100,
-      responsive: ['sm'] as const,
+      responsive: ['sm'],
       render: (cost: number) => cost ? `GHS ${cost.toFixed(2)}` : '-'
     }
   ]

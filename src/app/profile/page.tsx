@@ -115,16 +115,16 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 via-purple-600 to-green-600 p-8 text-white"
+          className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 via-purple-600 to-green-600 p-4 sm:p-8 text-white"
         >
           <div className="absolute inset-0 bg-black/20"></div>
           <div className="relative z-10">
-            <div className="flex items-start justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
               <div>
-                <Title level={1} className="!text-white !mb-2">
+                <Title level={1} className="!text-white !mb-2 !text-2xl sm:!text-3xl">
                   Profile Settings
                 </Title>
-                <Paragraph className="!text-blue-100 !mb-0 text-lg">
+                <Paragraph className="!text-blue-100 !mb-0 text-sm sm:text-lg">
                   Manage your account information and preferences
                 </Paragraph>
               </div>
@@ -137,7 +137,7 @@ export default function ProfilePage() {
                     size={80}
                     src={profileImage}
                     icon={<UserOutlined />}
-                    className="border-4 border-white/20 shadow-xl"
+                    className="border-4 border-white/20 shadow-xl !w-14 !h-14 sm:!w-20 sm:!h-20"
                   />
                 </Badge>
               </div>
@@ -145,8 +145,8 @@ export default function ProfilePage() {
           </div>
           
           {/* Decorative elements */}
-          <div className="absolute top-4 right-4 w-20 h-20 bg-white/5 rounded-full blur-xl"></div>
-          <div className="absolute bottom-4 left-4 w-16 h-16 bg-white/5 rounded-full blur-xl"></div>
+          <div className="absolute top-4 right-4 w-16 h-16 sm:w-20 sm:h-20 bg-white/5 rounded-full blur-xl"></div>
+          <div className="absolute bottom-4 left-4 w-12 h-12 sm:w-16 sm:h-16 bg-white/5 rounded-full blur-xl"></div>
         </motion.div>
 
         <Row gutter={[24, 24]}>
@@ -165,7 +165,7 @@ export default function ProfilePage() {
                       size={140}
                       src={profileImage}
                       icon={<UserOutlined />}
-                      className="border-4 border-white shadow-2xl"
+                      className="border-4 border-white shadow-2xl !w-20 !h-20 sm:!w-32 sm:!h-32"
                     />
                     <div className="absolute bottom-2 right-2">
                       <Badge 
@@ -373,14 +373,14 @@ export default function ProfilePage() {
                   <Divider />
 
                   <Form.Item className="!mb-0">
-                    <div className="flex items-center justify-between">
-                      <Space>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
+                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
                         <Button 
                           type="primary" 
                           htmlType="submit" 
                           loading={loading}
                           size="large"
-                          className="rounded-lg px-8"
+                          className="rounded-lg px-8 !w-full sm:!w-auto"
                           icon={<SaveOutlined />}
                         >
                           Update Profile
@@ -388,14 +388,14 @@ export default function ProfilePage() {
                         <Button 
                           onClick={() => form.resetFields()}
                           size="large"
-                          className="rounded-lg"
+                          className="rounded-lg !w-full sm:!w-auto"
                         >
                           Reset Changes
                         </Button>
-                      </Space>
+                      </div>
                       
-                      <div className="text-right">
-                        <Text type="secondary" className="text-sm">
+                      <div className="text-left sm:text-right w-full sm:w-auto">
+                        <Text type="secondary" className="text-xs sm:text-sm">
                           Last updated: {user.updated_at ? new Date(user.updated_at).toLocaleDateString() : 'Never'}
                         </Text>
                       </div>
@@ -422,13 +422,13 @@ export default function ProfilePage() {
               </div>
             }
           >
-            <Row gutter={[32, 24]}>
+            <Row gutter={[16, 16]}>
               <Col xs={24} sm={8}>
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <CalendarOutlined className="text-2xl text-blue-500 mb-2" />
+                <div className="text-center p-3 sm:p-4 bg-blue-50 rounded-lg">
+                  <CalendarOutlined className="text-xl sm:text-2xl text-blue-500 mb-2" />
                   <div>
-                    <Text strong className="block text-gray-700">Account Created</Text>
-                    <Text type="secondary">
+                    <Text strong className="block text-gray-700 text-sm sm:text-base">Account Created</Text>
+                    <Text type="secondary" className="text-xs sm:text-sm">
                       {user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',
@@ -440,20 +440,20 @@ export default function ProfilePage() {
               </Col>
               
               <Col xs={24} sm={8}>
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <CheckCircleOutlined className="text-2xl text-green-500 mb-2" />
+                <div className="text-center p-3 sm:p-4 bg-green-50 rounded-lg">
+                  <CheckCircleOutlined className="text-xl sm:text-2xl text-green-500 mb-2" />
                   <div>
-                    <Text strong className="block text-gray-700">Profile Status</Text>
+                    <Text strong className="block text-gray-700 text-sm sm:text-base">Profile Status</Text>
                     <Badge status="success" text="Verified & Active" />
                   </div>
                 </div>
               </Col>
               
               <Col xs={24} sm={8}>
-                <div className="text-center p-4 bg-purple-50 rounded-lg">
-                  <StarFilled className="text-2xl text-purple-500 mb-2" />
+                <div className="text-center p-3 sm:p-4 bg-purple-50 rounded-lg">
+                  <StarFilled className="text-xl sm:text-2xl text-purple-500 mb-2" />
                   <div>
-                    <Text strong className="block text-gray-700">Member Tier</Text>
+                    <Text strong className="block text-gray-700 text-sm sm:text-base">Member Tier</Text>
                     <Badge color="purple" text="Standard Member" />
                   </div>
                 </div>

@@ -144,18 +144,18 @@ export default function NotificationsPage() {
   return (
     <DashboardLayout activeKey="notifications">
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
           <div>
-            <Title level={2}>
+            <Title level={2} className="!text-xl sm:!text-2xl">
               <Space>
                 <BellOutlined />
-                Notifications
+                <span>Notifications</span>
                 {unreadCount > 0 && (
                   <Badge count={unreadCount} />
                 )}
               </Space>
             </Title>
-            <Text type="secondary">
+            <Text type="secondary" className="!text-sm sm:!text-base">
               Stay updated with your car service requests and activities
             </Text>
           </div>
@@ -167,9 +167,9 @@ export default function NotificationsPage() {
               image={Empty.PRESENTED_IMAGE_SIMPLE}
               description={
                 <div className="text-center py-8">
-                  <BellOutlined className="text-4xl text-gray-300 mb-4" />
-                  <Title level={4} type="secondary">No notifications yet</Title>
-                  <Text type="secondary">
+                  <BellOutlined className="text-2xl sm:text-4xl text-gray-300 mb-4" />
+                  <Title level={4} type="secondary" className="!text-base sm:!text-lg">No notifications yet</Title>
+                  <Text type="secondary" className="!text-sm sm:!text-base">
                     You'll see updates about your service requests and activities here
                   </Text>
                 </div>
@@ -194,8 +194,10 @@ export default function NotificationsPage() {
                           e.stopPropagation()
                           handleMarkAsRead(notification.id)
                         }}
+                        className="!text-xs sm:!text-sm"
                       >
-                        Mark as read
+                        <span className="hidden sm:inline">Mark as read</span>
+                        <span className="sm:hidden">Read</span>
                       </Button>
                     )
                   ].filter(Boolean)}
@@ -203,30 +205,32 @@ export default function NotificationsPage() {
                 >
                   <List.Item.Meta
                     avatar={
-                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-100 flex items-center justify-center">
                         {getNotificationIcon(notification.type)}
                       </div>
                     }
                     title={
-                      <div className="flex items-center space-x-2">
-                        <span className={!notification.read ? 'font-semibold' : 'font-medium'}>
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+                        <span className={`${!notification.read ? 'font-semibold' : 'font-medium'} text-sm sm:text-base`}>
                           {notification.title}
                         </span>
-                                    <Tag color={getNotificationColor(notification.type)}>
-              {notification.type.replace('_', ' ').toUpperCase()}
-            </Tag>
-                        {!notification.read && (
-                          <Badge color="blue" />
-                        )}
+                        <div className="flex items-center gap-2">
+                          <Tag color={getNotificationColor(notification.type)} className="text-xs">
+                            {notification.type.replace('_', ' ').toUpperCase()}
+                          </Tag>
+                          {!notification.read && (
+                            <Badge color="blue" />
+                          )}
+                        </div>
                       </div>
                     }
                     description={
                       <div className="space-y-2">
-                        <div className={!notification.read ? 'text-gray-700' : 'text-gray-500'}>
+                        <div className={`${!notification.read ? 'text-gray-700' : 'text-gray-500'} text-sm sm:text-base`}>
                           {notification.message}
                         </div>
-                        <div className="flex items-center justify-between">
-                          <Text type="secondary" className="text-sm">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 sm:gap-0">
+                          <Text type="secondary" className="text-xs sm:text-sm">
                             {formatTimeAgo(notification.timestamp)}
                           </Text>
                           {notification.data && (
@@ -250,8 +254,9 @@ export default function NotificationsPage() {
               )}
               pagination={{
                 pageSize: 20,
-                showSizeChanger: true,
-                showQuickJumper: true,
+                showSizeChanger: false,
+                showQuickJumper: false,
+                responsive: true,
                 showTotal: (total, range) =>
                   `${range[0]}-${range[1]} of ${total} notifications`,
               }}
@@ -261,29 +266,29 @@ export default function NotificationsPage() {
 
         {/* Quick Stats */}
         {notifications.length > 0 && (
-          <Card title="Notification Summary">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card title={<span className="text-sm sm:text-base">Notification Summary</span>}>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{unreadCount}</div>
-                <div className="text-sm text-gray-500">Unread</div>
+                <div className="text-lg sm:text-2xl font-bold text-blue-600">{unreadCount}</div>
+                <div className="text-xs sm:text-sm text-gray-500">Unread</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-lg sm:text-2xl font-bold text-green-600">
                   {notifications.filter(n => n.type === 'diagnosis').length}
                 </div>
-                <div className="text-sm text-gray-500">Diagnoses</div>
+                <div className="text-xs sm:text-sm text-gray-500">Diagnoses</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">
+                <div className="text-lg sm:text-2xl font-bold text-purple-600">
                   {notifications.filter(n => n.type === 'message').length}
                 </div>
-                <div className="text-sm text-gray-500">Messages</div>
+                <div className="text-xs sm:text-sm text-gray-500">Messages</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600">
+                <div className="text-lg sm:text-2xl font-bold text-orange-600">
                   {notifications.filter(n => n.type === 'transaction').length}
                 </div>
-                <div className="text-sm text-gray-500">Transactions</div>
+                <div className="text-xs sm:text-sm text-gray-500">Transactions</div>
               </div>
             </div>
           </Card>

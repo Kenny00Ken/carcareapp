@@ -58,7 +58,8 @@ export default function CarsPage() {
       title: 'Image',
       dataIndex: 'image_url',
       key: 'image',
-      width: 100,
+      width: 80,
+      responsive: ['sm'],
       render: (imageUrl: string, record: Car) => {
         // Get primary image from image_url or first from image_urls array
         let primaryImage = imageUrl
@@ -69,15 +70,15 @@ export default function CarsPage() {
         const totalImages = record.image_urls ? record.image_urls.length : (imageUrl ? 1 : 0)
         
         return (
-          <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+          <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
             {primaryImage ? (
               <>
                 <Image
                   src={primaryImage}
                   alt={`${record.make} ${record.model}`}
-                  width={64}
-                  height={64}
-                  className="object-cover"
+                  width={48}
+                  height={48}
+                  className="object-cover sm:w-16 sm:h-16"
                   preview={false}
                 />
                 {totalImages > 1 && (
@@ -96,12 +97,15 @@ export default function CarsPage() {
       },
     },
     {
-      title: 'Make & Model',
+      title: 'Vehicle',
       key: 'makeModel',
       render: (record: Car) => (
         <div>
-          <div className="font-medium">{record.make} {record.model}</div>
-          <div className="text-gray-500 text-sm">Year: {record.year}</div>
+          <div className="font-medium text-sm sm:text-base">{record.make} {record.model}</div>
+          <div className="text-gray-500 text-xs sm:text-sm">
+            Year: {record.year}
+            <span className="sm:hidden"> • Added: {new Date(record.created_at).toLocaleDateString()}</span>
+          </div>
         </div>
       ),
     },
@@ -109,16 +113,18 @@ export default function CarsPage() {
       title: 'Year',
       dataIndex: 'year',
       key: 'year',
-      width: 100,
+      width: 80,
+      responsive: ['md'],
       sorter: (a: Car, b: Car) => a.year - b.year,
     },
     {
       title: 'Added',
       dataIndex: 'created_at',
       key: 'created_at',
-      width: 120,
+      width: 100,
+      responsive: ['sm'],
       render: (date: string) => (
-        <Text type="secondary">
+        <Text type="secondary" className="text-xs sm:text-sm">
           {new Date(date).toLocaleDateString()}
         </Text>
       ),
@@ -127,7 +133,7 @@ export default function CarsPage() {
     {
       title: 'Actions',
       key: 'actions',
-      width: 150,
+      width: 120,
       render: (record: Car) => (
         <Space size="small">
           <Button
@@ -135,12 +141,14 @@ export default function CarsPage() {
             icon={<EyeOutlined />}
             onClick={() => router.push(`/dashboard/car-owner/cars/${record.id}`)}
             title="View Details"
+            className="!w-8 !h-8 sm:!w-auto sm:!h-auto"
           />
           <Button
             type="text"
             icon={<EditOutlined />}
             onClick={() => router.push(`/dashboard/car-owner/cars/${record.id}/edit`)}
             title="Edit Car"
+            className="!w-8 !h-8 sm:!w-auto sm:!h-auto"
           />
           <Popconfirm
             title="Delete Car"
@@ -155,6 +163,7 @@ export default function CarsPage() {
               icon={<DeleteOutlined />}
               loading={deleteLoading === record.id}
               title="Delete Car"
+              className="!w-8 !h-8 sm:!w-auto sm:!h-auto"
             />
           </Popconfirm>
         </Space>
@@ -175,10 +184,10 @@ export default function CarsPage() {
   return (
     <DashboardLayout activeKey="cars">
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
           <div>
-            <Title level={2}>My Cars</Title>
-            <Text type="secondary">
+            <Title level={2} className="!text-xl sm:!text-2xl !mb-2">My Cars</Title>
+            <Text type="secondary" className="!text-sm sm:!text-base">
               Manage your vehicle information and service history
             </Text>
           </div>
@@ -187,8 +196,10 @@ export default function CarsPage() {
             icon={<PlusOutlined />}
             size="large"
             onClick={() => router.push('/dashboard/car-owner/cars/add')}
+            className="!w-full sm:!w-auto"
           >
-            Add New Car
+            <span className="hidden sm:inline">Add New Car</span>
+            <span className="sm:hidden">Add Car</span>
           </Button>
         </div>
 
@@ -219,12 +230,15 @@ export default function CarsPage() {
               rowKey="id"
               pagination={{
                 pageSize: 10,
-                showSizeChanger: true,
-                showQuickJumper: true,
+                showSizeChanger: false,
+                showQuickJumper: false,
                 showTotal: (total, range) =>
                   `${range[0]}-${range[1]} of ${total} cars`,
+                responsive: true,
               }}
-              scroll={{ x: 800 }}
+              scroll={{ x: 600 }}
+              size="small"
+              className="overflow-x-auto"
             />
           )}
         </Card>

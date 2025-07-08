@@ -81,19 +81,21 @@ export default function CarDetailPage() {
   return (
     <DashboardLayout activeKey="cars">
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
             <Button
               icon={<ArrowLeftOutlined />}
               onClick={() => router.push('/dashboard/car-owner/cars')}
+              className="!w-full sm:!w-auto"
             >
-              Back to Cars
+              <span className="hidden sm:inline">Back to Cars</span>
+              <span className="sm:hidden">Back</span>
             </Button>
             <div>
-              <Title level={2} className="mb-0">
+              <Title level={2} className="!mb-0 !text-lg sm:!text-xl md:!text-2xl">
                 {car.make} {car.model} ({car.year})
               </Title>
-              <Text type="secondary">Car Details & Service History</Text>
+              <Text type="secondary" className="!text-sm sm:!text-base">Car Details & Service History</Text>
             </div>
           </div>
           <Button
@@ -101,8 +103,10 @@ export default function CarDetailPage() {
             icon={<EditOutlined />}
             size="large"
             onClick={() => router.push(`/dashboard/car-owner/cars/${carId}/edit`)}
+            className="!w-full sm:!w-auto"
           >
-            Edit Car
+            <span className="hidden sm:inline">Edit Car</span>
+            <span className="sm:hidden">Edit</span>
           </Button>
         </div>
 
@@ -110,11 +114,11 @@ export default function CarDetailPage() {
           title={
             <div className="flex items-center">
               <CarOutlined className="mr-2" />
-              Vehicle Information
+              <span className="text-sm sm:text-base">Vehicle Information</span>
             </div>
           }
         >
-          <Descriptions bordered column={2} size="middle">
+          <Descriptions bordered column={{ xs: 1, sm: 2 }} size="middle">
             <Descriptions.Item label="Make">
               <Text strong>{car.make}</Text>
             </Descriptions.Item>
@@ -173,13 +177,13 @@ export default function CarDetailPage() {
                 title={
                   <div className="flex items-center">
                     <PictureOutlined className="mr-2" />
-                    Car Photos ({uniqueImages.length})
+                    <span className="text-sm sm:text-base">Car Photos ({uniqueImages.length})</span>
                   </div>
                 }
               >
                 <Row gutter={[16, 16]}>
                   {uniqueImages.map((imageUrl, index) => (
-                    <Col key={index} xs={24} sm={12} md={8} lg={6}>
+                    <Col key={index} xs={12} sm={8} md={6} lg={4}>
                       <div className="relative">
                         {index === 0 && (
                           <div className="absolute top-2 left-2 z-10">
@@ -190,7 +194,7 @@ export default function CarDetailPage() {
                         )}
                         <Image
                           width="100%"
-                          height={200}
+                          height={150}
                           src={imageUrl}
                           alt={`${car.make} ${car.model} - Image ${index + 1}`}
                           className="object-cover rounded-lg"
@@ -201,7 +205,7 @@ export default function CarDetailPage() {
                   ))}
                 </Row>
                 <div className="mt-4 text-center">
-                  <Text type="secondary" className="text-sm">
+                  <Text type="secondary" className="text-xs sm:text-sm">
                     Click on any image to view in full size
                   </Text>
                 </div>
@@ -211,7 +215,7 @@ export default function CarDetailPage() {
                 title={
                   <div className="flex items-center">
                     <PictureOutlined className="mr-2" />
-                    Car Photos
+                    <span className="text-sm sm:text-base">Car Photos</span>
                   </div>
                 }
               >
@@ -222,6 +226,7 @@ export default function CarDetailPage() {
                   <Button 
                     type="primary" 
                     onClick={() => router.push(`/dashboard/car-owner/cars/${carId}/edit`)}
+                    className="!w-full sm:!w-auto"
                   >
                     Add Photos
                   </Button>
