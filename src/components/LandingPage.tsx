@@ -28,7 +28,7 @@ import { useAuthRedirect } from '@/hooks/useAuthRedirect'
 import { LampContainer } from '@/components/ui/lamp-demo'
 import { motion } from 'framer-motion'
 import DisplayCards from '@/components/ui/display-cards'
-import { appimage } from '../../public/index.js'
+import appimage from '/images/appimage.png'
 import RoleSelector from '@/components/ui/role-selector'
 
 const { Title, Paragraph, Text } = Typography

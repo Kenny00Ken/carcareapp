@@ -42,7 +42,7 @@ const OTPVerificationContent: React.FC<OTPVerificationContentProps> = ({
   const [resendLoading, setResendLoading] = useState(false)
   const [countdown, setCountdown] = useState(60)
   const [canResend, setCanResend] = useState(false)
-  const inputRefs = useRef<(Input | null)[]>([])
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   // Countdown timer for resend
   useEffect(() => {
@@ -181,7 +181,7 @@ const OTPVerificationContent: React.FC<OTPVerificationContentProps> = ({
           {otp.map((digit, index) => (
             <Input
               key={index}
-              ref={el => inputRefs.current[index] = el}
+              ref={el => inputRefs.current[index] = el?.input || null}
               value={digit}
               onChange={e => handleOtpChange(index, e.target.value)}
               onKeyDown={e => handleKeyDown(index, e)}

@@ -26,7 +26,7 @@ import {
 import { 
   DollarOutlined,
   ShoppingCartOutlined,
-  TrendingUpOutlined,
+  RiseOutlined,
   BarChartOutlined,
   PieChartOutlined,
   CalendarOutlined,

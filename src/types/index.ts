@@ -42,7 +42,10 @@ export interface Request {
   description: string
   urgency: 'low' | 'medium' | 'high'
   location: string
+  location_coords?: { lat: number; lng: number }
+  distance?: number
   status: RequestStatus
+  status_notes?: string
   estimated_hours?: number
   actual_hours?: number
   estimated_cost?: number
@@ -157,7 +160,7 @@ export interface MaintenanceRecord {
   created_at: string
 }
 
-export type ActivityType = 'request_created' | 'request_claimed' | 'diagnosis_submitted' | 'quote_approved' | 'work_started' | 'parts_requested' | 'parts_approved' | 'parts_received' | 'work_completed' | 'payment_processed'
+export type ActivityType = 'request_created' | 'request_claimed' | 'diagnosis_submitted' | 'quote_approved' | 'work_started' | 'parts_requested' | 'parts_approved' | 'parts_received' | 'work_completed' | 'payment_processed' | 'status_updated'
 
 export interface ActivityLog {
   id: string

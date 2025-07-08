@@ -12,7 +12,7 @@ import {
   EditOutlined,
   CheckCircleOutlined,
   CalendarOutlined,
-  ShieldCheckOutlined,
+  ShieldOutlined,
   StarFilled,
   CarOutlined,
   ToolOutlined,
