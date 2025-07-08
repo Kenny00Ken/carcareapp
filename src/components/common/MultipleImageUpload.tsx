@@ -251,7 +251,7 @@ export const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
                     className={`relative transition-all duration-200 ${
                       dragOverIndex === index ? 'ring-2 ring-blue-500' : ''
                     } ${index === 0 ? 'border-blue-500 border-2' : ''}`}
-                    bodyStyle={{ padding: 8 }}
+                    styles={{ body: { padding: 8 } }}
                     draggable={allowReorder && !disabled}
                     onDragStart={(e) => handleDragStart(e, index)}
                     onDragOver={(e) => handleDragOver(e, index)}

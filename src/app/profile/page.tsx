@@ -1,14 +1,29 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Card, Form, Input, Button, Select, Avatar, Upload, Row, Col, Typography, Space, Divider, message } from 'antd'
-import { UserOutlined, PhoneOutlined, MailOutlined, EnvironmentOutlined, CameraOutlined, SaveOutlined } from '@ant-design/icons'
+import { Card, Form, Input, Button, Avatar, Row, Col, Typography, Space, Divider, Badge, Tooltip, Statistic, message } from 'antd'
+import { 
+  UserOutlined, 
+  PhoneOutlined, 
+  MailOutlined, 
+  EnvironmentOutlined, 
+  CameraOutlined, 
+  SaveOutlined,
+  EditOutlined,
+  CheckCircleOutlined,
+  CalendarOutlined,
+  ShieldCheckOutlined,
+  StarFilled,
+  CarOutlined,
+  ToolOutlined,
+  ShopOutlined
+} from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { ImageUpload } from '@/components/common/ImageUpload'
-import { StorageService } from '@/services/storage'
+import { motion } from 'framer-motion'
 
-const { Title, Text } = Typography
+const { Title, Text, Paragraph } = Typography
 
 export default function ProfilePage() {
   const { user, firebaseUser, updateUserProfile } = useAuth()
@@ -62,6 +77,26 @@ export default function ProfilePage() {
     }
   }
 
+  // Helper function to get role icon
+  const getRoleIcon = (role?: string) => {
+    switch (role) {
+      case 'CarOwner': return <CarOutlined className="text-blue-500" />
+      case 'Mechanic': return <ToolOutlined className="text-green-500" />
+      case 'Dealer': return <ShopOutlined className="text-purple-500" />
+      default: return <UserOutlined />
+    }
+  }
+
+  // Helper function to get role color
+  const getRoleColor = (role?: string) => {
+    switch (role) {
+      case 'CarOwner': return 'blue'
+      case 'Mechanic': return 'green'
+      case 'Dealer': return 'purple'
+      default: return 'default'
+    }
+  }
+
   if (!user) {
     return (
       <DashboardLayout activeKey="profile">
@@ -74,187 +109,359 @@ export default function ProfilePage() {
 
   return (
     <DashboardLayout activeKey="profile">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div>
-          <Title level={2}>Profile Settings</Title>
-          <Text type="secondary">
-            Manage your account information and preferences
-          </Text>
-        </div>
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Header Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 via-purple-600 to-green-600 p-8 text-white"
+        >
+          <div className="absolute inset-0 bg-black/20"></div>
+          <div className="relative z-10">
+            <div className="flex items-start justify-between">
+              <div>
+                <Title level={1} className="!text-white !mb-2">
+                  Profile Settings
+                </Title>
+                <Paragraph className="!text-blue-100 !mb-0 text-lg">
+                  Manage your account information and preferences
+                </Paragraph>
+              </div>
+              <div className="text-right">
+                <Badge 
+                  count={<CheckCircleOutlined className="text-green-400" />} 
+                  offset={[-5, 5]}
+                >
+                  <Avatar
+                    size={80}
+                    src={profileImage}
+                    icon={<UserOutlined />}
+                    className="border-4 border-white/20 shadow-xl"
+                  />
+                </Badge>
+              </div>
+            </div>
+          </div>
+          
+          {/* Decorative elements */}
+          <div className="absolute top-4 right-4 w-20 h-20 bg-white/5 rounded-full blur-xl"></div>
+          <div className="absolute bottom-4 left-4 w-16 h-16 bg-white/5 rounded-full blur-xl"></div>
+        </motion.div>
 
         <Row gutter={[24, 24]}>
-          {/* Profile Image Section */}
+          {/* Profile Summary Card */}
           <Col xs={24} lg={8}>
-            <Card>
-              <div className="text-center space-y-4">
-                <Avatar
-                  size={120}
-                  src={profileImage}
-                  icon={<UserOutlined />}
-                  className="mb-4"
-                />
-                <div>
-                  <Title level={4}>{user.name}</Title>
-                  <Text type="secondary" className="capitalize">
-                    {user.role?.replace('CarOwner', 'Car Owner')}
-                  </Text>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <Card className="text-center shadow-lg border-0 bg-gradient-to-br from-slate-50 to-blue-50">
+                <div className="space-y-6">
+                  {/* Profile Image Section */}
+                  <div className="relative inline-block">
+                    <Avatar
+                      size={140}
+                      src={profileImage}
+                      icon={<UserOutlined />}
+                      className="border-4 border-white shadow-2xl"
+                    />
+                    <div className="absolute bottom-2 right-2">
+                      <Badge 
+                        status="success" 
+                        dot 
+                        className="w-4 h-4 border-2 border-white rounded-full"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* User Info */}
+                  <div className="space-y-3">
+                    <div>
+                      <Title level={3} className="!mb-1">
+                        {user.name || 'User Name'}
+                      </Title>
+                      <Badge 
+                        color={getRoleColor(user.role)} 
+                        text={
+                          <span className="text-sm font-medium">
+                            {user.role?.replace('CarOwner', 'Car Owner')}
+                          </span>
+                        }
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-center gap-2 text-gray-600">
+                      <MailOutlined />
+                      <Text type="secondary">{user.email || firebaseUser?.email}</Text>
+                    </div>
+                    
+                    {user.phone && (
+                      <div className="flex items-center justify-center gap-2 text-gray-600">
+                        <PhoneOutlined />
+                        <Text type="secondary">{user.phone}</Text>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Profile Image Upload */}
+                  <ImageUpload
+                    value={profileImage || undefined}
+                    onChange={handleImageUpload}
+                    folder={`users/${user.id}/profile`}
+                    buttonText="Change Photo"
+                    className="w-full"
+                  />
+
+                  {/* Quick Stats */}
+                  <div className="bg-white/80 rounded-lg p-4 space-y-3">
+                    <Title level={5} className="!mb-3 text-gray-700">
+                      Account Status
+                    </Title>
+                    <Row gutter={[16, 16]}>
+                      <Col span={12}>
+                        <Statistic
+                          title="Member Since"
+                          value={user.created_at ? new Date(user.created_at).getFullYear() : 'N/A'}
+                          prefix={<CalendarOutlined />}
+                          valueStyle={{ fontSize: '18px', color: '#1890ff' }}
+                        />
+                      </Col>
+                      <Col span={12}>
+                        <Statistic
+                          title="Profile"
+                          value="Verified"
+                          prefix={<ShieldCheckOutlined />}
+                          valueStyle={{ fontSize: '14px', color: '#52c41a' }}
+                        />
+                      </Col>
+                    </Row>
+                  </div>
                 </div>
-                
-                <ImageUpload
-                  value={profileImage || undefined}
-                  onChange={handleImageUpload}
-                  folder={`users/${user.id}/profile`}
-                  buttonText="Change Photo"
-                  className="w-full"
-                />
-              </div>
-            </Card>
+              </Card>
+            </motion.div>
           </Col>
 
           {/* Profile Form Section */}
           <Col xs={24} lg={16}>
-            <Card>
-              <Title level={4}>Personal Information</Title>
-              <Divider />
-              
-              <Form
-                form={form}
-                layout="vertical"
-                onFinish={handleSubmit}
-                className="space-y-4"
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <Card 
+                className="shadow-lg border-0"
+                title={
+                  <div className="flex items-center gap-2">
+                    <EditOutlined className="text-blue-500" />
+                    <span>Personal Information</span>
+                  </div>
+                }
               >
-                <Row gutter={[16, 0]}>
-                  <Col xs={24} sm={12}>
-                    <Form.Item
-                      name="name"
-                      label="Full Name"
-                      rules={[{ required: true, message: 'Please enter your name' }]}
-                    >
-                      <Input 
-                        prefix={<UserOutlined />} 
-                        placeholder="Enter your full name"
-                        size="large"
-                      />
-                    </Form.Item>
-                  </Col>
-                  
-                  <Col xs={24} sm={12}>
-                    <Form.Item
-                      name="email"
-                      label="Email Address"
-                      rules={[
-                        { required: true, message: 'Please enter your email' },
-                        { type: 'email', message: 'Please enter a valid email' }
-                      ]}
-                    >
-                      <Input 
-                        prefix={<MailOutlined />} 
-                        placeholder="Enter your email"
-                        size="large"
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-
-                <Row gutter={[16, 0]}>
-                  <Col xs={24} sm={12}>
-                    <Form.Item
-                      name="phone"
-                      label="Phone Number"
-                      rules={[{ required: true, message: 'Please enter your phone number' }]}
-                    >
-                      <Input 
-                        prefix={<PhoneOutlined />} 
-                        placeholder="Enter your phone number"
-                        size="large"
-                      />
-                    </Form.Item>
-                  </Col>
-                  
-                  <Col xs={24} sm={12}>
-                    <Form.Item
-                      label="Role"
-                    >
-                      <Input 
-                        value={user.role?.replace('CarOwner', 'Car Owner')}
-                        disabled
-                        size="large"
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-
-                <Form.Item
-                  name="address"
-                  label="Address"
-                  rules={[{ required: true, message: 'Please enter your address' }]}
+                <Form
+                  form={form}
+                  layout="vertical"
+                  onFinish={handleSubmit}
+                  className="space-y-4"
                 >
-                  <Input.TextArea 
-                    placeholder="Enter your full address"
-                    rows={3}
-                    size="large"
-                  />
-                </Form.Item>
+                  <Row gutter={[24, 16]}>
+                    <Col xs={24} md={12}>
+                      <Form.Item
+                        name="name"
+                        label={
+                          <span className="font-medium text-gray-700">
+                            <UserOutlined className="mr-2" />
+                            Full Name
+                          </span>
+                        }
+                        rules={[{ required: true, message: 'Please enter your name' }]}
+                      >
+                        <Input 
+                          placeholder="Enter your full name"
+                          size="large"
+                          className="rounded-lg"
+                        />
+                      </Form.Item>
+                    </Col>
+                    
+                    <Col xs={24} md={12}>
+                      <Form.Item
+                        name="email"
+                        label={
+                          <span className="font-medium text-gray-700">
+                            <MailOutlined className="mr-2" />
+                            Email Address
+                          </span>
+                        }
+                        rules={[
+                          { required: true, message: 'Please enter your email' },
+                          { type: 'email', message: 'Please enter a valid email' }
+                        ]}
+                      >
+                        <Input 
+                          placeholder="Enter your email"
+                          size="large"
+                          className="rounded-lg"
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
 
-                <Form.Item>
-                  <Space>
-                    <Button 
-                      type="primary" 
-                      htmlType="submit" 
-                      loading={loading}
+                  <Row gutter={[24, 16]}>
+                    <Col xs={24} md={12}>
+                      <Form.Item
+                        name="phone"
+                        label={
+                          <span className="font-medium text-gray-700">
+                            <PhoneOutlined className="mr-2" />
+                            Phone Number
+                          </span>
+                        }
+                        rules={[{ required: true, message: 'Please enter your phone number' }]}
+                      >
+                        <Input 
+                          placeholder="Enter your phone number"
+                          size="large"
+                          className="rounded-lg"
+                        />
+                      </Form.Item>
+                    </Col>
+                    
+                    <Col xs={24} md={12}>
+                      <Form.Item
+                        label={
+                          <span className="font-medium text-gray-700">
+                            {getRoleIcon(user.role)}
+                            <span className="ml-2">Account Type</span>
+                          </span>
+                        }
+                      >
+                        <Input 
+                          value={user.role?.replace('CarOwner', 'Car Owner')}
+                          disabled
+                          size="large"
+                          className="rounded-lg bg-gray-50"
+                          suffix={
+                            <Tooltip title="Account type cannot be changed">
+                              <ShieldCheckOutlined className="text-green-500" />
+                            </Tooltip>
+                          }
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+
+                  <Form.Item
+                    name="address"
+                    label={
+                      <span className="font-medium text-gray-700">
+                        <EnvironmentOutlined className="mr-2" />
+                        Address
+                      </span>
+                    }
+                    rules={[{ required: true, message: 'Please enter your address' }]}
+                  >
+                    <Input.TextArea 
+                      placeholder="Enter your full address"
+                      rows={4}
                       size="large"
-                    >
-                      Update Profile
-                    </Button>
-                    <Button 
-                      onClick={() => form.resetFields()}
-                      size="large"
-                    >
-                      Reset
-                    </Button>
-                  </Space>
-                </Form.Item>
-              </Form>
-            </Card>
+                      className="rounded-lg"
+                    />
+                  </Form.Item>
+
+                  <Divider />
+
+                  <Form.Item className="!mb-0">
+                    <div className="flex items-center justify-between">
+                      <Space>
+                        <Button 
+                          type="primary" 
+                          htmlType="submit" 
+                          loading={loading}
+                          size="large"
+                          className="rounded-lg px-8"
+                          icon={<SaveOutlined />}
+                        >
+                          Update Profile
+                        </Button>
+                        <Button 
+                          onClick={() => form.resetFields()}
+                          size="large"
+                          className="rounded-lg"
+                        >
+                          Reset Changes
+                        </Button>
+                      </Space>
+                      
+                      <div className="text-right">
+                        <Text type="secondary" className="text-sm">
+                          Last updated: {user.updated_at ? new Date(user.updated_at).toLocaleDateString() : 'Never'}
+                        </Text>
+                      </div>
+                    </div>
+                  </Form.Item>
+                </Form>
+              </Card>
+            </motion.div>
           </Col>
         </Row>
 
-        {/* Account Information */}
-        <Card>
-          <Title level={4}>Account Information</Title>
-          <Divider />
-          
-          <Row gutter={[24, 16]}>
-            <Col xs={24} sm={12}>
-              <div className="space-y-2">
-                <Text strong>Account Created:</Text>
-                <br />
-                <Text type="secondary">
-                  {user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  }) : 'N/A'}
-                </Text>
+        {/* Account Information Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <Card 
+            className="shadow-lg border-0"
+            title={
+              <div className="flex items-center gap-2">
+                <ShieldCheckOutlined className="text-green-500" />
+                <span>Account Details</span>
               </div>
-            </Col>
-            
-            <Col xs={24} sm={12}>
-              <div className="space-y-2">
-                <Text strong>Last Updated:</Text>
-                <br />
-                <Text type="secondary">
-                  {user.updated_at ? new Date(user.updated_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  }) : 'N/A'}
-                </Text>
-              </div>
-            </Col>
-          </Row>
-        </Card>
+            }
+          >
+            <Row gutter={[32, 24]}>
+              <Col xs={24} sm={8}>
+                <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <CalendarOutlined className="text-2xl text-blue-500 mb-2" />
+                  <div>
+                    <Text strong className="block text-gray-700">Account Created</Text>
+                    <Text type="secondary">
+                      {user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      }) : 'N/A'}
+                    </Text>
+                  </div>
+                </div>
+              </Col>
+              
+              <Col xs={24} sm={8}>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <CheckCircleOutlined className="text-2xl text-green-500 mb-2" />
+                  <div>
+                    <Text strong className="block text-gray-700">Profile Status</Text>
+                    <Badge status="success" text="Verified & Active" />
+                  </div>
+                </div>
+              </Col>
+              
+              <Col xs={24} sm={8}>
+                <div className="text-center p-4 bg-purple-50 rounded-lg">
+                  <StarFilled className="text-2xl text-purple-500 mb-2" />
+                  <div>
+                    <Text strong className="block text-gray-700">Member Tier</Text>
+                    <Badge color="purple" text="Standard Member" />
+                  </div>
+                </div>
+              </Col>
+            </Row>
+          </Card>
+        </motion.div>
       </div>
     </DashboardLayout>
   )
-} 
+}

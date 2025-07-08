@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button, Card, Space, Typography, Row, Col, Avatar, Dropdown } from 'antd'
+import { Button, Typography, Avatar, Dropdown } from 'antd'
 import { 
   CarOutlined, 
   ToolOutlined, 
@@ -25,9 +25,11 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { AuthModal } from './auth/AuthModal'
 import { useAuthRedirect } from '@/hooks/useAuthRedirect'
-import GlassCard from '@/components/ui/glass-card'
 import { LampContainer } from '@/components/ui/lamp-demo'
 import { motion } from 'framer-motion'
+import DisplayCards from '@/components/ui/display-cards'
+import { appimage } from '../../public/index.js'
+import RoleSelector from '@/components/ui/role-selector'
 
 const { Title, Paragraph, Text } = Typography
 
@@ -175,33 +177,36 @@ const TypingText: React.FC<{
   )
 }
 
-// Floating animation component
-const FloatingCard: React.FC<{ children: React.ReactNode, delay?: number }> = ({ children, delay = 0 }) => {
-  return (
-    <div 
-      className="animate-float"
-      style={{ 
-        animationDelay: `${delay}s`,
-        animationDuration: '6s',
-        animationIterationCount: 'infinite'
-      }}
-    >
-      {children}
-    </div>
-  )
-}
 
 export const LandingPage: React.FC = () => {
   const { user, firebaseUser, loading, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const router = useRouter()
   const [authModalVisible, setAuthModalVisible] = useState(false)
+  const [selectedRole, setSelectedRole] = useState('car-owner')
   
   // Use the auth redirect hook to handle navigation
   useAuthRedirect({
     redirectOnAuth: false, // Allow viewing landing page even when authenticated
     redirectOnSignOut: true // Redirect to landing page on sign-out
   })
+
+  // Helper function to get dashboard path based on user role
+  const getDashboardPath = (userRole: string) => {
+    switch (userRole) {
+      case 'CarOwner': return '/dashboard/car-owner'
+      case 'Mechanic': return '/dashboard/mechanic'
+      case 'Dealer': return '/dashboard/dealer'
+      default: return '/dashboard/car-owner'
+    }
+  }
+
+  // Helper function to navigate to dashboard
+  const navigateToDashboard = () => {
+    if (user) {
+      router.push(getDashboardPath(user.role))
+    }
+  }
 
   // User menu items for dropdown
   const getRoleIcon = (role?: string) => {
@@ -218,12 +223,7 @@ export const LandingPage: React.FC = () => {
       key: 'dashboard',
       icon: getRoleIcon(user.role),
       label: `${user.role === 'CarOwner' ? 'Car Owner' : user.role} Dashboard`,
-      onClick: () => {
-        const dashboardPath = user.role === 'CarOwner' ? '/dashboard/car-owner' :
-                             user.role === 'Mechanic' ? '/dashboard/mechanic' :
-                             '/dashboard/dealer'
-        router.push(dashboardPath)
-      },
+      onClick: navigateToDashboard,
     }] : []),
     {
       key: 'profile',
@@ -326,7 +326,55 @@ export const LandingPage: React.FC = () => {
         {/* Light Theme Hero */}
         <div className="hidden dark:block">
           <LampContainer className="pt-20">
-            {/* Dark Theme Hero Content */}
+            {/* Dark Theme Hero Content with automotive graphics */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-10">
+              {/* Dark theme car visualization */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <div className="w-[600px] h-[300px]">
+                  <svg viewBox="0 0 600 300" className="w-full h-full">
+                    {/* Modern car outline */}
+                    <path d="M75 180 L525 180 L510 210 L90 210 Z" fill="url(#darkCarGradient)" opacity="0.8" />
+                    <path d="M120 150 L480 150 L495 180 L105 180 Z" fill="url(#darkCarGradient)" opacity="0.9" />
+                    
+                    {/* Car details */}
+                    <path d="M150 120 L450 120 L465 150 L135 150 Z" fill="url(#darkWindowGradient)" opacity="0.6" />
+                    
+                    {/* Wheels */}
+                    <circle cx="180" cy="210" r="30" fill="url(#darkWheelGradient)" opacity="0.8" />
+                    <circle cx="420" cy="210" r="30" fill="url(#darkWheelGradient)" opacity="0.8" />
+                    
+                    {/* Headlights */}
+                    <ellipse cx="105" cy="165" rx="8" ry="12" fill="#60A5FA" opacity="0.7" />
+                    <ellipse cx="495" cy="165" rx="8" ry="12" fill="#EF4444" opacity="0.7" />
+                    
+                    {/* Dark theme gradients */}
+                    <defs>
+                      <linearGradient id="darkCarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#1E293B" stopOpacity="0.9" />
+                        <stop offset="100%" stopColor="#0F172A" stopOpacity="0.7" />
+                      </linearGradient>
+                      <linearGradient id="darkWindowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#475569" stopOpacity="0.4" />
+                        <stop offset="100%" stopColor="#1E293B" stopOpacity="0.6" />
+                      </linearGradient>
+                      <radialGradient id="darkWheelGradient">
+                        <stop offset="0%" stopColor="#374151" stopOpacity="0.9" />
+                        <stop offset="100%" stopColor="#111827" stopOpacity="1" />
+                      </radialGradient>
+                    </defs>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Floating tool icons */}
+              <div className="absolute top-20 left-20 animate-float" style={{ animationDelay: '2s' }}>
+                <CarOutlined className="text-6xl text-slate-600" />
+              </div>
+              <div className="absolute bottom-20 right-20 animate-float" style={{ animationDelay: '4s' }}>
+                <ToolOutlined className="text-5xl text-slate-600" />
+              </div>
+            </div>
+            
             <motion.div
               initial={{ opacity: 0.5, y: 100 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -335,7 +383,7 @@ export const LandingPage: React.FC = () => {
                 duration: 0.8,
                 ease: "easeInOut",
               }}
-              className="text-center max-w-4xl mx-auto"
+              className="text-center max-w-4xl mx-auto relative z-10"
             >
               <Title level={1} className="!text-5xl md:!text-7xl !mb-8 !leading-tight !font-bold text-shadow-lg">
                 <span className="text-transparent bg-clip-text bg-gradient-to-br from-slate-200 to-slate-400">
@@ -379,12 +427,7 @@ export const LandingPage: React.FC = () => {
                       type="primary"
                       size="large"
                       icon={getRoleIcon(user.role)}
-                      onClick={() => {
-                        const dashboardPath = user.role === 'CarOwner' ? '/dashboard/car-owner' :
-                                             user.role === 'Mechanic' ? '/dashboard/mechanic' :
-                                             '/dashboard/dealer'
-                        router.push(dashboardPath)
-                      }}
+                      onClick={navigateToDashboard}
                       className="!h-12 !px-8 !text-base font-medium shadow-glow hover:shadow-glow-lg transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl"
                     >
                       Go to Dashboard <ArrowRightOutlined />
@@ -424,12 +467,61 @@ export const LandingPage: React.FC = () => {
         </div>
 
         {/* Light Theme Hero */}
-        <div className="dark:hidden min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-          {/* Light theme background decorations */}
+        <div className="dark:hidden min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50" style={{
+          backgroundImage: `url(${appimage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}>
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/90 via-white/80 to-indigo-50/90"></div>
+          {/* Professional automotive hero graphics */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {/* Car silhouette */}
+            <div className="absolute top-1/2 right-10 transform -translate-y-1/2">
+              <div className="w-96 h-48 opacity-10 group-hover:opacity-20 transition-opacity duration-1000">
+                <svg viewBox="0 0 400 200" className="w-full h-full">
+                  {/* Car body */}
+                  <path d="M50 120 L350 120 L340 140 L60 140 Z" fill="url(#carGradient)" opacity="0.6" />
+                  <path d="M80 100 L320 100 L330 120 L70 120 Z" fill="url(#carGradient)" opacity="0.8" />
+                  
+                  {/* Car windows */}
+                  <path d="M100 80 L300 80 L310 100 L90 100 Z" fill="url(#windowGradient)" opacity="0.4" />
+                  
+                  {/* Wheels */}
+                  <circle cx="120" cy="140" r="20" fill="url(#wheelGradient)" opacity="0.7" />
+                  <circle cx="280" cy="140" r="20" fill="url(#wheelGradient)" opacity="0.7" />
+                  
+                  {/* Gradients */}
+                  <defs>
+                    <linearGradient id="carGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.8" />
+                      <stop offset="100%" stopColor="#1E40AF" stopOpacity="0.6" />
+                    </linearGradient>
+                    <linearGradient id="windowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#60A5FA" stopOpacity="0.3" />
+                      <stop offset="100%" stopColor="#2563EB" stopOpacity="0.5" />
+                    </linearGradient>
+                    <radialGradient id="wheelGradient">
+                      <stop offset="0%" stopColor="#374151" stopOpacity="0.8" />
+                      <stop offset="100%" stopColor="#111827" stopOpacity="0.9" />
+                    </radialGradient>
+                  </defs>
+                </svg>
+              </div>
+            </div>
+            
+            {/* Floating elements */}
             <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-br from-brand-100 to-brand-200 rounded-full opacity-60 animate-float blur-sm"></div>
             <div className="absolute top-40 right-20 w-16 h-16 bg-gradient-to-br from-secondary-100 to-secondary-200 rounded-full opacity-60 animate-float blur-sm" style={{ animationDelay: '2s' }}></div>
             <div className="absolute bottom-40 left-20 w-12 h-12 bg-gradient-to-br from-accent-100 to-accent-200 rounded-full opacity-60 animate-float blur-sm" style={{ animationDelay: '4s' }}></div>
+            
+            {/* Tool icons floating */}
+            <div className="absolute top-32 left-1/4 opacity-20 animate-float" style={{ animationDelay: '1s' }}>
+              <ToolOutlined className="text-4xl text-secondary-500" />
+            </div>
+            <div className="absolute bottom-32 right-1/4 opacity-20 animate-float" style={{ animationDelay: '3s' }}>
+              <ShopOutlined className="text-3xl text-accent-500" />
+            </div>
           </div>
 
           <motion.div
@@ -442,6 +534,16 @@ export const LandingPage: React.FC = () => {
             }}
             className="text-center max-w-4xl mx-auto px-4 relative z-10"
           >
+            {/* Professional badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1, duration: 0.6 }}
+              className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-brand-100 to-brand-200 text-brand-800 text-sm font-medium mb-6 shadow-soft"
+            >
+              <CarOutlined className="mr-2" />
+              Ghana's #1 Automotive Platform
+            </motion.div>
             <Title level={1} className="!text-5xl md:!text-7xl !mb-8 !leading-tight !font-bold">
               <span className="text-transparent bg-clip-text bg-gradient-to-br from-brand-600 via-brand-700 to-brand-800">
                 <TypingText 
@@ -484,12 +586,7 @@ export const LandingPage: React.FC = () => {
                     type="primary"
                     size="large"
                     icon={getRoleIcon(user.role)}
-                    onClick={() => {
-                      const dashboardPath = user.role === 'CarOwner' ? '/dashboard/car-owner' :
-                                           user.role === 'Mechanic' ? '/dashboard/mechanic' :
-                                           '/dashboard/dealer'
-                      router.push(dashboardPath)
-                    }}
+                    onClick={navigateToDashboard}
                     className="!h-12 !px-8 !text-base font-medium shadow-medium hover:shadow-hard transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl"
                   >
                     Go to Dashboard <ArrowRightOutlined />
@@ -529,80 +626,328 @@ export const LandingPage: React.FC = () => {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 dark:-mt-20 relative z-10">
 
-          {/* Features Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              className="group"
-            >
-              <div className="bg-white dark:bg-white/10 backdrop-blur-sm border border-gray-200 dark:border-white/20 rounded-2xl p-8 text-center hover:shadow-medium dark:hover:bg-white/15 transition-all duration-300 transform hover:-translate-y-2 shadow-soft hover:shadow-glow theme-transition">
-                <div className="w-16 h-16 bg-brand-100 dark:bg-brand-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-brand-200 dark:group-hover:bg-brand-500/30 transition-colors theme-transition">
-                  <CarOutlined className="text-3xl text-brand-600 dark:text-brand-400 group-hover:text-brand-700 dark:group-hover:text-brand-300 theme-transition" />
+          {/* Role Cards Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            className="mb-20"
+          >
+            <Title level={2} className="text-center text-text-primary dark:!text-white !mb-4 !text-3xl md:!text-4xl theme-transition">
+              Choose Your Professional Role
+            </Title>
+            <Paragraph className="text-center text-text-secondary dark:!text-slate-400 !mb-8 !text-lg max-w-2xl mx-auto theme-transition">
+              Join Ghana's most trusted automotive platform designed for professionals at every level of the industry
+            </Paragraph>
+            
+            {/* Role Selector */}
+            <div className="flex justify-center mb-12">
+              <RoleSelector 
+                onRoleSelect={setSelectedRole} 
+                selectedRole={selectedRole}
+              />
+            </div>
+            
+            {/* Professional Role Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {/* Car Owner Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 40, rotateX: 20 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{ delay: 0.1, duration: 0.8, ease: "easeOut" }}
+                whileHover={{ 
+                  y: -12, 
+                  rotateY: 2, 
+                  transition: { duration: 0.3, ease: "easeOut" } 
+                }}
+                className={`group relative perspective-1000 ${selectedRole === 'car-owner' ? 'ring-2 ring-brand-400 ring-offset-2' : ''}`}>
+                {/* Gradient background glow */}
+                <div className="absolute inset-0 bg-gradient-to-r from-brand-400/20 via-brand-500/20 to-brand-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
+                
+                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border border-brand-200/50 dark:border-brand-300/20 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:border-brand-300 dark:hover:border-brand-400/60 theme-transition cursor-pointer overflow-hidden"
+                     onClick={() => setAuthModalVisible(true)}
+                     style={{ filter: selectedRole === 'car-owner' ? 'url("#radio-glass")' : 'none' }}>
+                  {/* Animated background pattern */}
+                  <div className="absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-900/20 dark:to-brand-800/20 transform rotate-12 scale-150"></div>
+                  </div>
+                  
+                  {/* Floating icon container */}
+                  <motion.div 
+                    className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-900/50 dark:to-brand-800/50 rounded-2xl mb-6 group-hover:from-brand-200 group-hover:to-brand-300 dark:group-hover:from-brand-800/60 dark:group-hover:to-brand-700/60 transition-all duration-500 relative shadow-lg"
+                    whileHover={{ 
+                      scale: 1.1, 
+                      rotate: 5,
+                      transition: { duration: 0.3 } 
+                    }}
+                  >
+                    <CarOutlined className="text-3xl text-brand-600 dark:text-brand-400 theme-transition" />
+                    {/* Floating particles */}
+                    <div className="absolute -inset-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <div className="absolute top-0 left-0 w-2 h-2 bg-brand-400 rounded-full animate-ping"></div>
+                      <div className="absolute bottom-0 right-0 w-1.5 h-1.5 bg-brand-500 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, duration: 0.6 }}
+                  >
+                    <Title level={3} className="!text-brand-700 dark:!text-brand-300 !mb-3 !text-xl font-bold theme-transition">
+                      Car Owner
+                    </Title>
+                    <Paragraph className="text-text-secondary dark:!text-slate-400 !mb-6 !text-base leading-relaxed theme-transition">
+                      Connect with trusted mechanics and track your vehicle's maintenance history with our comprehensive platform
+                    </Paragraph>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="space-y-3 mb-6"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ delay: 0.4, duration: 0.6 }}
+                  >
+                    {[
+                      'Submit repair requests instantly',
+                      'Track maintenance history',
+                      'Get transparent quotes'
+                    ].map((feature, index) => (
+                      <motion.div 
+                        key={index}
+                        className="flex items-center text-sm text-text-secondary dark:text-slate-400 theme-transition"
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
+                      >
+                        <CheckCircleOutlined className="text-brand-500 mr-3 text-base" />
+                        <span>{feature}</span>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="text-xs text-text-tertiary dark:text-slate-500 bg-gradient-to-r from-brand-50 to-brand-100 dark:from-brand-900/30 dark:to-brand-800/30 px-4 py-3 rounded-xl theme-transition border border-brand-200/50 dark:border-brand-700/30"
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6, duration: 0.6 }}
+                  >
+                    <StarFilled className="text-brand-500 mr-2" />
+                    Perfect for vehicle owners seeking reliable service
+                  </motion.div>
                 </div>
-                <Title level={3} className="text-text-primary dark:!text-white !mb-4 !text-xl theme-transition">Car Owners</Title>
-                <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-6 !text-sm !leading-relaxed theme-transition">
-                  Submit repair requests and track maintenance history
-                </Paragraph>
-                <Button
-                  type="link"
-                  onClick={() => setAuthModalVisible(true)}
-                  className="!text-brand-600 dark:!text-brand-400 hover:!text-brand-700 dark:hover:!text-brand-300 !p-0 !h-auto theme-transition"
-                >
-                  Get Started <ArrowRightOutlined className="ml-1" />
-                </Button>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              className="group"
-            >
-              <div className="bg-white dark:bg-white/10 backdrop-blur-sm border border-gray-200 dark:border-white/20 rounded-2xl p-8 text-center hover:shadow-medium dark:hover:bg-white/15 transition-all duration-300 transform hover:-translate-y-2 shadow-soft hover:shadow-glow theme-transition">
-                <div className="w-16 h-16 bg-secondary-100 dark:bg-secondary-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-secondary-200 dark:group-hover:bg-secondary-500/30 transition-colors theme-transition">
-                  <ToolOutlined className="text-3xl text-secondary-600 dark:text-secondary-400 group-hover:text-secondary-700 dark:group-hover:text-secondary-300 theme-transition" />
+              </motion.div>
+              
+              {/* Mechanic Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 40, rotateX: 20 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
+                whileHover={{ 
+                  y: -12, 
+                  rotateY: -2, 
+                  transition: { duration: 0.3, ease: "easeOut" } 
+                }}
+                className={`group relative perspective-1000 ${selectedRole === 'mechanic' ? 'ring-2 ring-secondary-400 ring-offset-2' : ''}`}>
+                {/* Gradient background glow */}
+                <div className="absolute inset-0 bg-gradient-to-r from-secondary-400/20 via-secondary-500/20 to-secondary-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
+                
+                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border border-secondary-200/50 dark:border-secondary-300/20 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:border-secondary-300 dark:hover:border-secondary-400/60 theme-transition cursor-pointer overflow-hidden"
+                     onClick={() => setAuthModalVisible(true)}
+                     style={{ filter: selectedRole === 'mechanic' ? 'url("#radio-glass")' : 'none' }}>
+                  {/* Animated background pattern */}
+                  <div className="absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+                    <div className="absolute inset-0 bg-gradient-to-br from-secondary-100 to-secondary-200 dark:from-secondary-900/20 dark:to-secondary-800/20 transform -rotate-12 scale-150"></div>
+                  </div>
+                  
+                  {/* Floating icon container */}
+                  <motion.div 
+                    className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-secondary-100 to-secondary-200 dark:from-secondary-900/50 dark:to-secondary-800/50 rounded-2xl mb-6 group-hover:from-secondary-200 group-hover:to-secondary-300 dark:group-hover:from-secondary-800/60 dark:group-hover:to-secondary-700/60 transition-all duration-500 relative shadow-lg"
+                    whileHover={{ 
+                      scale: 1.1, 
+                      rotate: -5,
+                      transition: { duration: 0.3 } 
+                    }}
+                  >
+                    <ToolOutlined className="text-3xl text-secondary-600 dark:text-secondary-400 theme-transition" />
+                    {/* Floating particles */}
+                    <div className="absolute -inset-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <div className="absolute top-0 right-0 w-2 h-2 bg-secondary-400 rounded-full animate-ping"></div>
+                      <div className="absolute bottom-0 left-0 w-1.5 h-1.5 bg-secondary-500 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, duration: 0.6 }}
+                  >
+                    <Title level={3} className="!text-secondary-700 dark:!text-secondary-300 !mb-3 !text-xl font-bold theme-transition">
+                      Mechanic
+                    </Title>
+                    <Paragraph className="text-text-secondary dark:!text-slate-400 !mb-6 !text-base leading-relaxed theme-transition">
+                      Grow your business by connecting with customers who need professional automotive services
+                    </Paragraph>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="space-y-3 mb-6"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ delay: 0.4, duration: 0.6 }}
+                  >
+                    {[
+                      'Claim nearby service requests',
+                      'Set your service radius',
+                      'Digital diagnosis tools'
+                    ].map((feature, index) => (
+                      <motion.div 
+                        key={index}
+                        className="flex items-center text-sm text-text-secondary dark:text-slate-400 theme-transition"
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
+                      >
+                        <CheckCircleOutlined className="text-secondary-500 mr-3 text-base" />
+                        <span>{feature}</span>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="text-xs text-text-tertiary dark:text-slate-500 bg-gradient-to-r from-secondary-50 to-secondary-100 dark:from-secondary-900/30 dark:to-secondary-800/30 px-4 py-3 rounded-xl theme-transition border border-secondary-200/50 dark:border-secondary-700/30"
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6, duration: 0.6 }}
+                  >
+                    <StarFilled className="text-secondary-500 mr-2" />
+                    Ideal for automotive professionals
+                  </motion.div>
                 </div>
-                <Title level={3} className="text-text-primary dark:!text-white !mb-4 !text-xl theme-transition">Mechanics</Title>
-                <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-6 !text-sm !leading-relaxed theme-transition">
-                  Claim requests and provide professional diagnoses
-                </Paragraph>
-                <Button
-                  type="link"
-                  onClick={() => setAuthModalVisible(true)}
-                  className="!text-secondary-600 dark:!text-secondary-400 hover:!text-secondary-700 dark:hover:!text-secondary-300 !p-0 !h-auto theme-transition"
-                >
-                  Join Now <ArrowRightOutlined className="ml-1" />
-                </Button>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
-              className="group"
-            >
-              <div className="bg-white dark:bg-white/10 backdrop-blur-sm border border-gray-200 dark:border-white/20 rounded-2xl p-8 text-center hover:shadow-medium dark:hover:bg-white/15 transition-all duration-300 transform hover:-translate-y-2 shadow-soft hover:shadow-glow theme-transition">
-                <div className="w-16 h-16 bg-accent-100 dark:bg-accent-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-accent-200 dark:group-hover:bg-accent-500/30 transition-colors theme-transition">
-                  <ShopOutlined className="text-3xl text-accent-600 dark:text-accent-400 group-hover:text-accent-700 dark:group-hover:text-accent-300 theme-transition" />
+              </motion.div>
+              
+              {/* Parts Dealer Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 40, rotateX: 20 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
+                whileHover={{ 
+                  y: -12, 
+                  rotateY: 2, 
+                  transition: { duration: 0.3, ease: "easeOut" } 
+                }}
+                className={`group relative md:col-span-2 lg:col-span-1 perspective-1000 ${selectedRole === 'dealer' ? 'ring-2 ring-accent-400 ring-offset-2' : ''}`}>
+                {/* Gradient background glow */}
+                <div className="absolute inset-0 bg-gradient-to-r from-accent-400/20 via-accent-500/20 to-accent-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
+                
+                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border border-accent-200/50 dark:border-accent-300/20 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:border-accent-300 dark:hover:border-accent-400/60 theme-transition cursor-pointer overflow-hidden"
+                     onClick={() => setAuthModalVisible(true)}
+                     style={{ filter: selectedRole === 'dealer' ? 'url("#radio-glass")' : 'none' }}>
+                  {/* Animated background pattern */}
+                  <div className="absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+                    <div className="absolute inset-0 bg-gradient-to-br from-accent-100 to-accent-200 dark:from-accent-900/20 dark:to-accent-800/20 transform rotate-6 scale-150"></div>
+                  </div>
+                  
+                  {/* Floating icon container */}
+                  <motion.div 
+                    className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-accent-100 to-accent-200 dark:from-accent-900/50 dark:to-accent-800/50 rounded-2xl mb-6 group-hover:from-accent-200 group-hover:to-accent-300 dark:group-hover:from-accent-800/60 dark:group-hover:to-accent-700/60 transition-all duration-500 relative shadow-lg"
+                    whileHover={{ 
+                      scale: 1.1, 
+                      rotate: 3,
+                      transition: { duration: 0.3 } 
+                    }}
+                  >
+                    <ShopOutlined className="text-3xl text-accent-600 dark:text-accent-400 theme-transition" />
+                    {/* Floating particles */}
+                    <div className="absolute -inset-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <div className="absolute top-0 left-0 w-2 h-2 bg-accent-400 rounded-full animate-ping"></div>
+                      <div className="absolute bottom-0 right-0 w-1.5 h-1.5 bg-accent-500 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, duration: 0.6 }}
+                  >
+                    <Title level={3} className="!text-accent-700 dark:!text-accent-300 !mb-3 !text-xl font-bold theme-transition">
+                      Parts Dealer
+                    </Title>
+                    <Paragraph className="text-text-secondary dark:!text-slate-400 !mb-6 !text-base leading-relaxed theme-transition">
+                      Expand your reach by connecting with mechanics who need quality automotive parts
+                    </Paragraph>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="space-y-3 mb-6"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ delay: 0.4, duration: 0.6 }}
+                  >
+                    {[
+                      'Manage parts inventory',
+                      'Connect with mechanics',
+                      'Process orders efficiently'
+                    ].map((feature, index) => (
+                      <motion.div 
+                        key={index}
+                        className="flex items-center text-sm text-text-secondary dark:text-slate-400 theme-transition"
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
+                      >
+                        <CheckCircleOutlined className="text-accent-500 mr-3 text-base" />
+                        <span>{feature}</span>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="text-xs text-text-tertiary dark:text-slate-500 bg-gradient-to-r from-accent-50 to-accent-100 dark:from-accent-900/30 dark:to-accent-800/30 px-4 py-3 rounded-xl theme-transition border border-accent-200/50 dark:border-accent-700/30"
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6, duration: 0.6 }}
+                  >
+                    <StarFilled className="text-accent-500 mr-2" />
+                    Perfect for parts suppliers and dealers
+                  </motion.div>
                 </div>
-                <Title level={3} className="text-text-primary dark:!text-white !mb-4 !text-xl theme-transition">Parts Dealers</Title>
-                <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-6 !text-sm !leading-relaxed theme-transition">
-                  List inventory and connect with mechanics
-                </Paragraph>
-                <Button
-                  type="link"
-                  onClick={() => setAuthModalVisible(true)}
-                  className="!text-accent-600 dark:!text-accent-400 hover:!text-accent-700 dark:hover:!text-accent-300 !p-0 !h-auto theme-transition"
-                >
-                  Start Selling <ArrowRightOutlined className="ml-1" />
-                </Button>
-              </div>
-            </motion.div>
-          </div>
+              </motion.div>
+            </div>
+          </motion.div>
+          
+          {/* Add Glass Filter SVG */}
+          <svg className="hidden">
+            <defs>
+              <filter
+                id="radio-glass"
+                x="0%"
+                y="0%"
+                width="100%"
+                height="100%"
+                colorInterpolationFilters="sRGB"
+              >
+                <feTurbulence
+                  type="fractalNoise"
+                  baseFrequency="0.05 0.05"
+                  numOctaves="1"
+                  seed="1"
+                  result="turbulence"
+                />
+                <feGaussianBlur in="turbulence" stdDeviation="2" result="blurredNoise" />
+                <feDisplacementMap
+                  in="SourceGraphic"
+                  in2="blurredNoise"
+                  scale="30"
+                  xChannelSelector="R"
+                  yChannelSelector="B"
+                  result="displaced"
+                />
+                <feGaussianBlur in="displaced" stdDeviation="2" result="finalBlur" />
+                <feComposite in="finalBlur" in2="finalBlur" operator="over" />
+              </filter>
+            </defs>
+          </svg>
 
           {/* Stats Section */}
           <motion.div
@@ -715,6 +1060,7 @@ export const LandingPage: React.FC = () => {
       
       {/* Recaptcha Container */}
       <div id="recaptcha-container"></div>
+      
     </div>
   )
 } 

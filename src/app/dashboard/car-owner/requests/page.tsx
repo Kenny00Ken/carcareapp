@@ -255,38 +255,79 @@ export default function CarOwnerRequestsPage() {
     {
       title: 'Actions',
       key: 'actions',
+      width: 200,
       render: (record: Request) => (
-        <Space>
-          <Button
-            icon={<EyeOutlined />}
-            onClick={() => {
-              setSelectedRequest(record)
-              setViewModalVisible(true)
-            }}
-          />
-          {record.mechanic && (
+        <div className="flex flex-col gap-1">
+          {/* Primary Actions Row */}
+          <Space size="small">
             <Button
-              icon={<MessageOutlined />}
+              size="small"
+              type="default"
+              icon={<EyeOutlined />}
               onClick={() => {
-                // Navigate to chat
-                window.location.href = `/dashboard/car-owner/requests/${record.id}/chat`
+                setSelectedRequest(record)
+                setViewModalVisible(true)
               }}
-            />
-          )}
-          {record.status === 'pending' && (
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => {
-                Modal.confirm({
-                  title: 'Delete Request',
-                  content: 'Are you sure you want to delete this request?',
-                  onOk: () => handleDeleteRequest(record.id)
-                })
-              }}
-            />
-          )}
-        </Space>
+              className="min-w-[70px]"
+              title="View Details"
+            >
+              View
+            </Button>
+            
+            {record.mechanic && (
+              <Button
+                size="small"
+                type="primary"
+                icon={<MessageOutlined />}
+                onClick={() => {
+                  window.location.href = `/dashboard/car-owner/requests/${record.id}/chat`
+                }}
+                className="min-w-[70px] bg-blue-600 hover:bg-blue-700"
+                title="Chat with Mechanic"
+              >
+                Chat
+              </Button>
+            )}
+            
+            {record.status === 'pending' && (
+              <Button
+                size="small"
+                danger
+                type="text"
+                icon={<DeleteOutlined />}
+                onClick={() => {
+                  Modal.confirm({
+                    title: 'Delete Request',
+                    content: 'Are you sure you want to delete this request? This action cannot be undone.',
+                    okText: 'Yes, Delete',
+                    cancelText: 'Cancel',
+                    okType: 'danger',
+                    onOk: () => handleDeleteRequest(record.id)
+                  })
+                }}
+                className="min-w-[70px] hover:bg-red-50"
+                title="Delete Request"
+              >
+                Delete
+              </Button>
+            )}
+          </Space>
+          
+          {/* Status Badge Row */}
+          <div className="flex items-center justify-between mt-1">
+            <Tag 
+              color={getStatusColor(record.status)} 
+              className="text-xs font-medium px-2 py-1 rounded-md"
+            >
+              {record.status.replace('_', ' ').toUpperCase()}
+            </Tag>
+            {record.mechanic && (
+              <Text type="secondary" className="text-xs">
+                Assigned: {record.mechanic.name}
+              </Text>
+            )}
+          </div>
+        </div>
       )
     }
   ]

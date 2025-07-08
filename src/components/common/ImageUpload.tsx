@@ -16,7 +16,7 @@ interface ImageUploadProps {
   disabled?: boolean
   accept?: string
   className?: string
-  buttonText?: string
+  buttonText?: React.ReactNode
   showPreview?: boolean
   resize?: boolean
   maxWidth?: number

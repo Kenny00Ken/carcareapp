@@ -449,6 +449,7 @@ export class DatabaseService {
     })
   }
 
+
   // Diagnoses
   static async createDiagnosis(diagnosisData: Omit<Diagnosis, 'id'>): Promise<string> {
     const batch = writeBatch(db)
@@ -527,8 +528,9 @@ export class DatabaseService {
   static async createPart(partData: Omit<Part, 'id'>): Promise<string> {
     const docRef = await addDoc(collection(db, 'parts'), {
       ...partData,
-      is_active: true,
-      created_at: Timestamp.now().toDate().toISOString()
+      is_active: partData.is_active !== undefined ? partData.is_active : true,
+      created_at: partData.created_at || Timestamp.now().toDate().toISOString(),
+      updated_at: Timestamp.now().toDate().toISOString()
     })
     return docRef.id
   }
@@ -553,14 +555,31 @@ export class DatabaseService {
   }
 
   static async getPartsByDealer(dealerId: string): Promise<Part[]> {
-    const q = query(
-      collection(db, 'parts'), 
-      where('dealer_id', '==', dealerId),
-      where('is_active', '==', true),
-      orderBy('created_at', 'desc')
-    )
-    const querySnapshot = await getDocs(q)
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Part))
+    try {
+      const q = query(
+        collection(db, 'parts'), 
+        where('dealer_id', '==', dealerId),
+        where('is_active', '==', true),
+        orderBy('created_at', 'desc')
+      )
+      const querySnapshot = await getDocs(q)
+      return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Part))
+    } catch (error: any) {
+      // If compound index is missing, fall back to simpler query
+      if (error?.code === 'failed-precondition' && error?.message?.includes('index')) {
+        console.warn('Using fallback query due to missing compound index')
+        const q = query(
+          collection(db, 'parts'), 
+          where('dealer_id', '==', dealerId)
+        )
+        const querySnapshot = await getDocs(q)
+        return querySnapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() } as Part))
+          .filter(part => part.is_active !== false) // Include parts where is_active is undefined or true
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      }
+      throw error
+    }
   }
 
   static async getAllParts(limitCount?: number): Promise<Part[]> {
@@ -700,13 +719,63 @@ export class DatabaseService {
   }
 
   static async getTransactionsByDealer(dealerId: string): Promise<Transaction[]> {
-    const q = query(
-      collection(db, 'transactions'),
-      where('dealer_id', '==', dealerId),
-      orderBy('created_at', 'desc')
-    )
-    const querySnapshot = await getDocs(q)
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction))
+    try {
+      const q = query(
+        collection(db, 'transactions'),
+        where('dealer_id', '==', dealerId),
+        orderBy('created_at', 'desc')
+      )
+      const querySnapshot = await getDocs(q)
+      
+      // Fetch related data for each transaction
+      const transactions = await Promise.all(
+        querySnapshot.docs.map(async (doc) => {
+          const transactionData = { id: doc.id, ...doc.data() } as Transaction
+          
+          // Fetch part details
+          if (transactionData.part_id) {
+            try {
+              const partData = await this.getPart(transactionData.part_id)
+              if (partData) {
+                transactionData.part = partData
+              }
+            } catch (error) {
+              console.warn('Failed to fetch part data for transaction:', transactionData.id)
+            }
+          }
+          
+          // Fetch mechanic details
+          if (transactionData.mechanic_id) {
+            try {
+              const mechanicData = await this.getUser(transactionData.mechanic_id)
+              if (mechanicData) {
+                transactionData.mechanic = mechanicData
+              }
+            } catch (error) {
+              console.warn('Failed to fetch mechanic data for transaction:', transactionData.id)
+            }
+          }
+          
+          return transactionData
+        })
+      )
+      
+      return transactions
+    } catch (error: any) {
+      // Fallback for missing index
+      if (error?.code === 'failed-precondition' && error?.message?.includes('index')) {
+        console.warn('Using fallback query for transactions due to missing index')
+        const q = query(
+          collection(db, 'transactions'),
+          where('dealer_id', '==', dealerId)
+        )
+        const querySnapshot = await getDocs(q)
+        return querySnapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() } as Transaction))
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      }
+      throw error
+    }
   }
 
   static async getTransactionsByMechanic(mechanicId: string): Promise<Transaction[]> {
@@ -1200,21 +1269,105 @@ export class DatabaseService {
 
   // Chat Messaging
   static async sendMessage(messageData: Omit<ChatMessage, 'id' | 'timestamp'>): Promise<string> {
-    const docRef = await addDoc(collection(db, 'chat_messages'), {
+    const batch = writeBatch(db)
+    
+    // Create message
+    const messageRef = doc(collection(db, 'chat_messages'))
+    const finalMessageData = {
       ...messageData,
       timestamp: Timestamp.now().toDate().toISOString()
-    })
-    return docRef.id
+    }
+    batch.set(messageRef, finalMessageData)
+
+    // Get request details for notification
+    const request = await this.getRequest(messageData.request_id)
+    if (!request) {
+      throw new Error('Request not found')
+    }
+
+    // Determine recipient (other party in the conversation)
+    const recipientId = messageData.sender_id === request.owner_id 
+      ? request.mechanic_id 
+      : request.owner_id
+    
+    if (recipientId) {
+      // Create notification for recipient
+      const notificationRef = doc(collection(db, 'notifications'))
+      batch.set(notificationRef, {
+        user_id: recipientId,
+        title: 'New Message',
+        message: `You have a new message: ${messageData.message.substring(0, 50)}${messageData.message.length > 50 ? '...' : ''}`,
+        type: 'message',
+        read: false,
+        timestamp: Timestamp.now().toDate().toISOString(),
+        data: {
+          request_id: messageData.request_id,
+          sender_id: messageData.sender_id,
+          action: 'view_chat'
+        }
+      })
+    }
+
+    await batch.commit()
+
+    // Send FCM notification
+    if (recipientId) {
+      try {
+        const [sender, car] = await Promise.all([
+          this.getUser(messageData.sender_id),
+          request.car_id ? this.getCar(request.car_id) : null
+        ])
+
+        const carInfo = car ? `${car.make} ${car.model}` : 'Your service request'
+        const senderName = sender?.name || 'User'
+        
+        // Dynamically import FCMService to avoid circular dependency
+        const { FCMService } = await import('./fcm')
+        await FCMService.sendMessageNotification(recipientId, {
+          requestId: messageData.request_id,
+          senderName,
+          carInfo,
+          messagePreview: messageData.message.substring(0, 100)
+        })
+      } catch (error) {
+        console.error('Error sending message notification:', error)
+      }
+    }
+
+    return messageRef.id
   }
 
   static async getMessages(requestId: string): Promise<ChatMessage[]> {
-    const q = query(
-      collection(db, 'chat_messages'),
-      where('request_id', '==', requestId),
-      orderBy('timestamp', 'asc')
-    )
-    const querySnapshot = await getDocs(q)
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatMessage))
+    try {
+      const q = query(
+        collection(db, 'chat_messages'),
+        where('request_id', '==', requestId),
+        orderBy('timestamp', 'asc')
+      )
+      const querySnapshot = await getDocs(q)
+      return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatMessage))
+    } catch (error: any) {
+      // Handle missing index error
+      if (error?.code === 'failed-precondition' && error?.message?.includes('index')) {
+        console.warn('Using fallback query for messages due to missing index')
+        const q = query(
+          collection(db, 'chat_messages'),
+          where('request_id', '==', requestId)
+        )
+        const querySnapshot = await getDocs(q)
+        const messages = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatMessage))
+        
+        // Sort in memory by timestamp
+        return messages.sort((a, b) => {
+          const aTime = new Date(a.timestamp || 0).getTime()
+          const bTime = new Date(b.timestamp || 0).getTime()
+          return aTime - bTime
+        })
+      }
+      
+      console.error('Error fetching messages:', error)
+      throw new Error(`Failed to fetch messages: ${error.message || 'Unknown error'}`)
+    }
   }
 
   static async markMessageAsRead(messageId: string, userId: string): Promise<void> {
@@ -1232,16 +1385,66 @@ export class DatabaseService {
   }
 
   static subscribeToMessages(requestId: string, callback: (messages: ChatMessage[]) => void) {
-    const q = query(
-      collection(db, 'chat_messages'),
-      where('request_id', '==', requestId),
-      orderBy('timestamp', 'asc')
-    )
-    
-    return onSnapshot(q, (querySnapshot) => {
-      const messages = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatMessage))
-      callback(messages)
-    })
+    try {
+      const q = query(
+        collection(db, 'chat_messages'),
+        where('request_id', '==', requestId),
+        orderBy('timestamp', 'asc')
+      )
+      
+      return onSnapshot(q, 
+        (querySnapshot) => {
+          try {
+            const messages = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatMessage))
+            callback(messages)
+          } catch (error) {
+            console.error('Error processing message snapshot:', error)
+            callback([])
+          }
+        },
+        (error) => {
+          console.error('Message subscription error:', error)
+          
+          // Try fallback subscription without orderBy
+          if (error.code === 'failed-precondition') {
+            console.warn('Using fallback subscription due to missing index')
+            const fallbackQuery = query(
+              collection(db, 'chat_messages'),
+              where('request_id', '==', requestId)
+            )
+            
+            return onSnapshot(fallbackQuery,
+              (querySnapshot) => {
+                try {
+                  const messages = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatMessage))
+                  // Sort in memory
+                  const sortedMessages = messages.sort((a, b) => {
+                    const aTime = new Date(a.timestamp || 0).getTime()
+                    const bTime = new Date(b.timestamp || 0).getTime()
+                    return aTime - bTime
+                  })
+                  callback(sortedMessages)
+                } catch (error) {
+                  console.error('Error processing fallback message snapshot:', error)
+                  callback([])
+                }
+              },
+              (fallbackError) => {
+                console.error('Fallback subscription also failed:', fallbackError)
+                callback([])
+              }
+            )
+          }
+          
+          // Return empty messages on error
+          callback([])
+        }
+      )
+    } catch (error) {
+      console.error('Error setting up message subscription:', error)
+      // Return a no-op function
+      return () => {}
+    }
   }
 
   static async getUnreadMessageCount(requestId: string, userId: string): Promise<number> {
@@ -1255,5 +1458,98 @@ export class DatabaseService {
     return messages.filter(msg => 
       msg.sender_id !== userId && !msg.read_by.includes(userId)
     ).length
+  }
+
+  // Location-based Request Filtering for Mechanics
+  static async getAvailableRequestsForMechanic(mechanicId: string): Promise<Request[]> {
+    try {
+      // Get all available requests first
+      const availableRequests = await this.getAvailableRequests()
+      
+      // Dynamically import services to avoid circular dependencies
+      const [{ SettingsService }, { LocationService }] = await Promise.all([
+        import('./settings'),
+        import('./location')
+      ])
+      
+      // Get mechanic's settings
+      const mechanicSettings = await SettingsService.getUserSettings(mechanicId)
+      
+      // If location services are disabled, return all requests
+      if (!mechanicSettings?.location_enabled || !mechanicSettings?.current_location) {
+        return availableRequests
+      }
+      
+      // Get service radius from mechanic settings
+      const serviceRadius = mechanicSettings.mechanic_settings?.service_radius || 25
+      const mechanicLocation = mechanicSettings.current_location
+      
+      // Filter requests based on location and service radius
+      const filteredRequests = await Promise.all(
+        availableRequests.map(async (request) => {
+          // If request has location coordinates, calculate distance
+          if (request.location_coords && request.location_coords.lat && request.location_coords.lng) {
+            const distance = LocationService.calculateDistance(
+              mechanicLocation.lat,
+              mechanicLocation.lng,
+              request.location_coords.lat,
+              request.location_coords.lng
+            )
+            
+            // Return request if within service radius
+            if (distance <= serviceRadius) {
+              return { ...request, distance }
+            }
+          }
+          
+          // If no location data, include the request (fallback)
+          return request
+        })
+      )
+      
+      // Filter out null/undefined results and sort by distance
+      const validRequests = filteredRequests.filter(Boolean)
+      
+      // Sort by distance (closest first) and then by urgency and timestamp
+      validRequests.sort((a, b) => {
+        // First, sort by distance if both have distance data
+        if (a.distance !== undefined && b.distance !== undefined) {
+          return a.distance - b.distance
+        }
+        
+        // Then by urgency (high > medium > low)
+        const urgencyOrder = { high: 3, medium: 2, low: 1 }
+        const urgencyDiff = urgencyOrder[b.urgency] - urgencyOrder[a.urgency]
+        if (urgencyDiff !== 0) return urgencyDiff
+        
+        // Finally by timestamp (newest first)
+        const aTime = new Date(a.created_at || 0).getTime()
+        const bTime = new Date(b.created_at || 0).getTime()
+        return bTime - aTime
+      })
+      
+      return validRequests
+      
+    } catch (error) {
+      console.error('Error filtering requests for mechanic:', error)
+      // Fallback to all available requests if filtering fails
+      return this.getAvailableRequests()
+    }
+  }
+
+  // Subscribe to location-filtered requests for mechanics
+  static subscribeToAvailableRequestsForMechanic(mechanicId: string, callback: (requests: Request[]) => void) {
+    // Subscribe to all available requests and filter client-side
+    return this.subscribeToAvailableRequests(async (allRequests) => {
+      try {
+        // Get filtered requests for this mechanic
+        const filteredRequests = await this.getAvailableRequestsForMechanic(mechanicId)
+        callback(filteredRequests)
+      } catch (error) {
+        console.error('Error in subscription filter:', error)
+        // Fallback to all requests if filtering fails
+        callback(allRequests)
+      }
+    })
   }
 } 

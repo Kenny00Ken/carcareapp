@@ -1,13 +1,21 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, Form, Input, Button, Select, InputNumber, Row, Col, Typography, Space, message, Divider } from 'antd'
-import { CarOutlined, SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons'
+import { CarOutlined, SaveOutlined, ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { MultipleImageUpload } from '@/components/common/MultipleImageUpload'
 import { useAuth } from '@/contexts/AuthContext'
 import { DatabaseService } from '@/services/database'
 import { useRouter } from 'next/navigation'
+import { 
+  getCarMakes, 
+  getModelsByMake, 
+  getAvailableYears,
+  getCarCategoryLabel,
+  CarMake, 
+  CarModel 
+} from '@/data/carMakesModels'
 
 const { Title, Text } = Typography
 const { Option } = Select
@@ -18,17 +26,44 @@ export default function AddCarPage() {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const [carImages, setCarImages] = useState<string[]>([])
+  const [selectedMake, setSelectedMake] = useState<string>('')
+  const [selectedModel, setSelectedModel] = useState<string>('')
+  const [availableModels, setAvailableModels] = useState<CarModel[]>([])
+  const [availableYears, setAvailableYears] = useState<number[]>([])
 
   const currentYear = new Date().getFullYear()
+  const carMakes = getCarMakes()
 
-  // Popular car makes and models data
-  const carMakes = [
-    'Toyota', 'Honda', 'Ford', 'Chevrolet', 'BMW', 'Mercedes-Benz', 
-    'Audi', 'Volkswagen', 'Nissan', 'Hyundai', 'Kia', 'Mazda',
-    'Subaru', 'Lexus', 'Infiniti', 'Acura', 'Volvo', 'Jaguar',
-    'Land Rover', 'Porsche', 'Tesla', 'Cadillac', 'Lincoln',
-    'Buick', 'GMC', 'Jeep', 'Ram', 'Dodge', 'Chrysler', 'Other'
-  ].sort()
+  // Handle make selection - update available models
+  const handleMakeChange = (makeId: string) => {
+    setSelectedMake(makeId)
+    setSelectedModel('')
+    setAvailableYears([])
+    
+    // Get models for selected make
+    const models = getModelsByMake(makeId)
+    setAvailableModels(models)
+    
+    // Clear model and year fields
+    form.setFieldsValue({
+      model: undefined,
+      year: undefined
+    })
+  }
+
+  // Handle model selection - update available years
+  const handleModelChange = (modelId: string) => {
+    setSelectedModel(modelId)
+    
+    // Get available years for selected make and model
+    const years = getAvailableYears(selectedMake, modelId)
+    setAvailableYears(years)
+    
+    // Clear year field
+    form.setFieldsValue({
+      year: undefined
+    })
+  }
 
   const handleSubmit = async (values: Record<string, unknown>) => {
     if (!user) {
@@ -157,9 +192,16 @@ export default function AddCarPage() {
                       filterOption={(input, option) =>
                         option?.children?.toString().toLowerCase().includes(input.toLowerCase()) ?? false
                       }
+                      onChange={handleMakeChange}
+                      suffixIcon={<SearchOutlined />}
                     >
                       {carMakes.map(make => (
-                        <Option key={make} value={make}>{make}</Option>
+                        <Option key={make.id} value={make.id}>
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">{make.name}</span>
+                            <span className="text-xs text-gray-500">{make.country}</span>
+                          </div>
+                        </Option>
                       ))}
                     </Select>
                   </Form.Item>
@@ -169,12 +211,29 @@ export default function AddCarPage() {
                   <Form.Item
                     name="model"
                     label="Model"
-                    rules={[{ required: true, message: 'Please enter car model' }]}
+                    rules={[{ required: true, message: 'Please select car model' }]}
                   >
-                    <Input 
-                      placeholder="e.g., Camry, Civic, Focus"
+                    <Select
+                      placeholder={selectedMake ? "Select model" : "Select make first"}
                       size="large"
-                    />
+                      showSearch
+                      disabled={!selectedMake}
+                      filterOption={(input, option) =>
+                        option?.children?.toString().toLowerCase().includes(input.toLowerCase()) ?? false
+                      }
+                      onChange={handleModelChange}
+                      suffixIcon={<SearchOutlined />}
+                      notFoundContent={selectedMake ? "No models found" : "Please select a make first"}
+                    >
+                      {availableModels.map(model => (
+                        <Option key={model.id} value={model.id}>
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">{model.name}</span>
+                            <span className="text-xs text-gray-500">{getCarCategoryLabel(model.category)}</span>
+                          </div>
+                        </Option>
+                      ))}
+                    </Select>
                   </Form.Item>
                 </Col>
                 
@@ -184,13 +243,22 @@ export default function AddCarPage() {
                     label="Year"
                     rules={[{ required: true, message: 'Please select year' }]}
                   >
-                    <InputNumber
-                      min={1900}
-                      max={currentYear + 1}
-                      placeholder="Year"
+                    <Select
+                      placeholder={selectedModel ? "Select year" : "Select model first"}
                       size="large"
-                      className="w-full"
-                    />
+                      showSearch
+                      disabled={!selectedModel}
+                      filterOption={(input, option) =>
+                        option?.children?.toString().includes(input) ?? false
+                      }
+                      notFoundContent={selectedModel ? "No years available" : "Please select a model first"}
+                    >
+                      {availableYears.map(year => (
+                        <Option key={year} value={year}>
+                          {year}
+                        </Option>
+                      ))}
+                    </Select>
                   </Form.Item>
                 </Col>
               </Row>

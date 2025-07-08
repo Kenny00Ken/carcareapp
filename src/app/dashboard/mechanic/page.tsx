@@ -42,9 +42,9 @@ export default function MechanicDashboard() {
   }, [user])
 
   useEffect(() => {
-    // Subscribe to real-time updates for available requests
+    // Subscribe to real-time updates for available requests with location filtering
     if (user?.id) {
-      const unsubscribe = DatabaseService.subscribeToAvailableRequests((requests) => {
+      const unsubscribe = DatabaseService.subscribeToAvailableRequestsForMechanic(user.id, (requests) => {
         setAvailableRequestsData(requests.slice(0, 5)) // Show only first 5
       })
       return unsubscribe
@@ -60,8 +60,8 @@ export default function MechanicDashboard() {
       const mechanicStats = await DatabaseService.getMechanicStats(user.id)
       setStats(mechanicStats)
 
-      // Load available requests
-      const availableReqs = await DatabaseService.getAvailableRequests()
+      // Load available requests with location filtering
+      const availableReqs = await DatabaseService.getAvailableRequestsForMechanic(user.id)
       setAvailableRequestsData(availableReqs.slice(0, 5))
 
       // Load recent activity (activity logs)

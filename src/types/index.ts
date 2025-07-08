@@ -272,4 +272,93 @@ export interface ServiceRequest {
   estimated_cost?: number
   actual_cost?: number
   [key: string]: unknown
+}
+
+// Settings and Preferences
+export interface UserSettings {
+  id: string
+  user_id: string
+  
+  // Location Settings
+  location_enabled: boolean
+  current_location?: {
+    lat: number
+    lng: number
+    address?: string
+    last_updated: string
+  }
+  auto_update_location: boolean
+  
+  // Notification Settings
+  notifications_enabled: boolean
+  push_notifications: boolean
+  email_notifications: boolean
+  sms_notifications: boolean
+  notification_types: {
+    new_requests: boolean
+    request_updates: boolean
+    messages: boolean
+    system_updates: boolean
+  }
+  
+  // Privacy Settings
+  share_location_with_customers: boolean
+  show_online_status: boolean
+  
+  // Mechanic-specific Settings
+  mechanic_settings?: MechanicSettings
+  
+  created_at: string
+  updated_at: string
+}
+
+export interface MechanicSettings {
+  // Service Area Settings
+  service_radius: number // in kilometers (1-100)
+  auto_accept_radius: number // auto-accept requests within this radius
+  
+  // Working Hours
+  working_hours: {
+    enabled: boolean
+    schedule: {
+      monday: { enabled: boolean; start: string; end: string }
+      tuesday: { enabled: boolean; start: string; end: string }
+      wednesday: { enabled: boolean; start: string; end: string }
+      thursday: { enabled: boolean; start: string; end: string }
+      friday: { enabled: boolean; start: string; end: string }
+      saturday: { enabled: boolean; start: string; end: string }
+      sunday: { enabled: boolean; start: string; end: string }
+    }
+  }
+  
+  // Request Preferences
+  max_concurrent_requests: number // 1-10
+  minimum_job_value: number // minimum GHS value
+  preferred_urgency_levels: ('low' | 'medium' | 'high')[]
+  emergency_services: boolean
+  
+  // Auto-Assignment Settings
+  auto_accept_requests: boolean
+  auto_accept_conditions: {
+    within_radius: boolean
+    during_working_hours: boolean
+    below_max_concurrent: boolean
+  }
+}
+
+export interface LocationPermissionStatus {
+  granted: boolean
+  denied: boolean
+  prompt: boolean
+  unavailable: boolean
+}
+
+export interface GeolocationCoords {
+  lat: number
+  lng: number
+  accuracy?: number
+  altitude?: number
+  altitudeAccuracy?: number
+  heading?: number
+  speed?: number
 } 

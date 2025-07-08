@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export function LampDemo({ children }: { children?: React.ReactNode }) {
   return (
@@ -106,12 +107,5 @@ export const LampContainer = ({
   );
 };
 
-// cn function (utility from "@/lib/utils")
-// This is a placeholder for the actual cn function.
-// In a real project, you would import it from a utility file.
-// For this self-contained example, we define it here.
-function cn(...inputs: (string | undefined | null | boolean)[]) {
-  return inputs.filter(Boolean).join(" ");
-}
 
 export default LampDemo; 

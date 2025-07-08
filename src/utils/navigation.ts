@@ -21,18 +21,6 @@ export const redirectToRoleSelection = (router: any) => {
   router.replace('/auth/role-selection')
 }
 
-export const getDashboardPath = (role?: string): string => {
-  switch (role) {
-    case 'CarOwner':
-      return '/dashboard/car-owner'
-    case 'Mechanic':
-      return '/dashboard/mechanic'
-    case 'Dealer':
-      return '/dashboard/dealer'
-    default:
-      return '/auth/role-selection'
-  }
-}
 
 export const isValidRole = (role: unknown): role is UserRole => {
   return typeof role === 'string' && ['CarOwner', 'Mechanic', 'Dealer'].includes(role)

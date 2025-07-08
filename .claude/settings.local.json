@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(npx tsc:*)",
+      "Bash(rg:*)",
+      "Bash(rm:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx eslint:*)",
+      "Bash(node:*)",
+      "Bash(grep:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(npm run lint)",
+      "Bash(cp:*)",
+      "Bash(sed:*)",
+      "Bash(firebase deploy:*)",
+      "Bash(firebase projects:list:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npx next build:*)",
+      "Bash(ls:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(npx next lint:*)",
+      "Bash(npm install:*)",
+      "Bash(npx next dev:*)"
+    ],
+    "deny": []
+  }
+}

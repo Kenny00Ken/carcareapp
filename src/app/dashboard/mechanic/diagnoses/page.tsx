@@ -46,7 +46,7 @@ import { Diagnosis, Request, SeverityLevel, DiagnosisStatus, PartNeeded } from '
 
 const { TextArea } = Input
 const { Option } = Select
-const { Title, Text } = Typography
+const { Title, Text, Paragraph } = Typography
 
 export default function MechanicDiagnosesPage() {
   const { user } = useAuth()
@@ -158,23 +158,59 @@ export default function MechanicDiagnosesPage() {
   }
 
   const handleEdit = (diagnosis: Diagnosis) => {
-    setSelectedDiagnosis(diagnosis)
-    setIsEditing(true)
+    console.log('handleEdit called with diagnosis:', diagnosis)
     
-    // Convert parts_needed to PartNeeded[] format if it's string[]
-    const parts = diagnosis.parts_needed || []
-    const convertedParts: PartNeeded[] = parts.map(part => {
-      if (typeof part === 'string') {
-        return {
-          name: part,
+    try {
+      setSelectedDiagnosis(diagnosis)
+      setIsEditing(true)
+      
+      // Handle both string and array formats for parts_needed
+      const partsData = diagnosis.parts_needed
+      let convertedParts: PartNeeded[] = []
+      
+      // Debug logging to understand the data structure
+      console.log('Diagnosis parts_needed:', partsData, 'Type:', typeof partsData, 'Is Array:', Array.isArray(partsData))
+      
+      if (!partsData) {
+        // Handle null/undefined case
+        console.log('No parts data, setting empty array')
+        convertedParts = []
+      } else if (Array.isArray(partsData)) {
+        // Handle array case (string[] or PartNeeded[])
+        console.log('Parts data is array, processing...')
+        convertedParts = partsData.map(part => {
+          if (typeof part === 'string') {
+            return {
+              name: part,
+              quantity: 1,
+              estimated_price: 0,
+              status: 'needed' as const
+            }
+          }
+          return part
+        })
+      } else if (typeof partsData === 'string' && partsData.trim()) {
+        // Handle string case - split by newlines or commas
+        console.log('Parts data is string, splitting...')
+        const partNames = partsData.split(/[,\n]+/).map(p => p.trim()).filter(p => p.length > 0)
+        convertedParts = partNames.map(name => ({
+          name,
           quantity: 1,
           estimated_price: 0,
           status: 'needed' as const
-        }
+        }))
+      } else {
+        console.log('Unknown parts data format, setting empty array')
+        convertedParts = []
       }
-      return part
-    })
-    setPartsNeeded(convertedParts)
+      
+      console.log('Converted parts:', convertedParts)
+      setPartsNeeded(convertedParts)
+    } catch (error) {
+      console.error('Error in handleEdit:', error)
+      // Set safe defaults
+      setPartsNeeded([])
+    }
     
     form.setFieldsValue({
       request_id: diagnosis.request_id,
@@ -757,28 +793,50 @@ export default function MechanicDiagnosesPage() {
                 </Card>
               </div>
 
-              {selectedDiagnosis.parts_needed && selectedDiagnosis.parts_needed.length > 0 && (
+              {selectedDiagnosis.parts_needed && (
                 <div>
                   <Title level={4}>Required Parts</Title>
                   <div className="space-y-2">
-                    {selectedDiagnosis.parts_needed.map((part, index) => (
-                      <Card key={index} size="small">
-                        <Row justify="space-between" align="middle">
-                          <Col>
-                            <Text strong>{part.name}</Text>
-                            <div className="text-gray-500">Quantity: {part.quantity}</div>
-                          </Col>
-                          <Col>
-                            <div className="text-right">
-                              <div className="text-gray-500">Unit: {formatCurrency(part.estimated_price)}</div>
-                              <div className="font-semibold text-blue-600">
-                                Total: {formatCurrency(part.estimated_price * part.quantity)}
-                              </div>
-                            </div>
-                          </Col>
-                        </Row>
-                      </Card>
-                    ))}
+                    {Array.isArray(selectedDiagnosis.parts_needed) ? (
+                      // Handle array of PartNeeded objects
+                      selectedDiagnosis.parts_needed.length > 0 ? (
+                        selectedDiagnosis.parts_needed.map((part, index) => (
+                          <Card key={index} size="small">
+                            <Row justify="space-between" align="middle">
+                              <Col>
+                                <Text strong>{typeof part === 'string' ? part : part.name}</Text>
+                                {typeof part === 'object' && part.quantity && (
+                                  <div className="text-gray-500">Quantity: {part.quantity}</div>
+                                )}
+                              </Col>
+                              {typeof part === 'object' && part.estimated_price && (
+                                <Col>
+                                  <div className="text-right">
+                                    <div className="text-gray-500">Unit: {formatCurrency(part.estimated_price)}</div>
+                                    <div className="font-semibold text-blue-600">
+                                      Total: {formatCurrency(part.estimated_price * (part.quantity || 1))}
+                                    </div>
+                                  </div>
+                                </Col>
+                              )}
+                            </Row>
+                          </Card>
+                        ))
+                      ) : (
+                        <Text type="secondary">No parts listed</Text>
+                      )
+                    ) : (
+                      // Handle string case - split by newlines or commas and display as list
+                      selectedDiagnosis.parts_needed.trim() ? (
+                        <Card size="small">
+                          <Paragraph className="!mb-0 whitespace-pre-line">
+                            {selectedDiagnosis.parts_needed}
+                          </Paragraph>
+                        </Card>
+                      ) : (
+                        <Text type="secondary">No parts specified</Text>
+                      )
+                    )}
                   </div>
                 </div>
               )}

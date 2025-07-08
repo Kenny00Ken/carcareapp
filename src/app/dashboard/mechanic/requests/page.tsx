@@ -30,9 +30,12 @@ import {
   CheckCircleOutlined,
   ReloadOutlined,
   FileTextOutlined,
-  MedicineBoxOutlined
+  MedicineBoxOutlined,
+  EyeOutlined,
+  MessageOutlined
 } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
+import { RequestStatusUpdate } from '@/components/requests/RequestStatusUpdate'
 import { useAuth } from '@/contexts/AuthContext'
 import { DatabaseService } from '@/services/database'
 import { Request, RequestStatus, Car, User } from '@/types'
@@ -113,6 +116,7 @@ export default function MechanicRequestsPage() {
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
   const [detailsModalVisible, setDetailsModalVisible] = useState(false)
   const [diagnosisModalVisible, setDiagnosisModalVisible] = useState(false)
+  const [statusUpdateModalVisible, setStatusUpdateModalVisible] = useState(false)
   const [creatingDiagnosis, setCreatingDiagnosis] = useState(false)
   const [diagnosisForm] = Form.useForm<DiagnosisFormValues>()
   
@@ -122,9 +126,9 @@ export default function MechanicRequestsPage() {
     try {
       setLoading(true)
       
-      // Load available requests and my requests in parallel
+      // Load available requests (with location filtering) and my requests in parallel
       const [availableReqs, myReqs] = await Promise.all([
-        DatabaseService.getAvailableRequests(),
+        DatabaseService.getAvailableRequestsForMechanic(user.id),
         DatabaseService.getRequestsByMechanic(user.id)
       ])
       
@@ -141,8 +145,8 @@ export default function MechanicRequestsPage() {
   const setupRealtimeSubscriptions = useCallback(() => {
     if (!user) return
 
-    // Subscribe to available requests
-    const unsubscribeAvailable = DatabaseService.subscribeToAvailableRequests((requests) => {
+    // Subscribe to available requests with location filtering
+    const unsubscribeAvailable = DatabaseService.subscribeToAvailableRequestsForMechanic(user.id, (requests) => {
       setAvailableRequests(requests)
     })
 
@@ -191,6 +195,23 @@ export default function MechanicRequestsPage() {
     setSelectedRequest(request)
     setDiagnosisModalVisible(true)
     diagnosisForm.resetFields()
+  }
+
+  const handleUpdateStatus = (request: Request) => {
+    setSelectedRequest(request)
+    setStatusUpdateModalVisible(true)
+  }
+
+  const handleStatusUpdated = (updatedRequest: Request) => {
+    // Update the request in both arrays
+    setMyRequests(prev => prev.map(req => 
+      req.id === updatedRequest.id ? updatedRequest : req
+    ))
+    setAvailableRequests(prev => prev.map(req => 
+      req.id === updatedRequest.id ? updatedRequest : req
+    ))
+    setStatusUpdateModalVisible(false)
+    setSelectedRequest(null)
   }
 
   const handleSubmitDiagnosis = async (values: DiagnosisFormValues) => {
@@ -297,13 +318,17 @@ export default function MechanicRequestsPage() {
     {
       title: 'Actions',
       key: 'actions',
+      width: 200,
       render: (record: Request) => (
-        <Space>
+        <Space size="small" className="flex flex-wrap gap-1">
           <Button 
-            size="small" 
+            size="small"
+            type="default"
+            icon={<EyeOutlined />}
             onClick={() => handleViewDetails(record)}
+            className="min-w-[90px]"
           >
-            View Details
+            View
           </Button>
           <Button
             type="primary"
@@ -311,8 +336,9 @@ export default function MechanicRequestsPage() {
             loading={claimingRequest === record.id}
             onClick={() => handleClaimRequest(record.id)}
             icon={<CheckCircleOutlined />}
+            className="min-w-[90px] bg-green-600 hover:bg-green-700 border-green-600"
           >
-            Claim Request
+            {claimingRequest === record.id ? 'Claiming...' : 'Claim'}
           </Button>
         </Space>
       ),
@@ -399,32 +425,54 @@ export default function MechanicRequestsPage() {
     {
       title: 'Actions',
       key: 'actions',
+      width: 280,
       render: (record: Request) => (
-        <Space>
-          <Button 
-            size="small" 
-            onClick={() => handleViewDetails(record)}
-          >
-            View Details
-          </Button>
+        <div className="flex flex-col gap-1">
+          {/* Primary Action Row */}
+          <Space size="small">
+            <Button 
+              size="small"
+              type="default"
+              icon={<EyeOutlined />}
+              onClick={() => handleViewDetails(record)}
+              className="min-w-[70px]"
+            >
+              View
+            </Button>
+            <Button
+              type="primary"
+              size="small"
+              icon={<MessageOutlined />}
+              onClick={() => window.open(`/dashboard/mechanic/requests/${record.id}/chat`, '_blank')}
+              className="min-w-[70px] bg-blue-600 hover:bg-blue-700"
+            >
+              Chat
+            </Button>
+            <Button
+              type="default"
+              size="small"
+              icon={<CheckCircleOutlined />}
+              onClick={() => handleUpdateStatus(record)}
+              className="min-w-[80px] border-purple-300 text-purple-600 hover:border-purple-500 hover:text-purple-700"
+            >
+              Status
+            </Button>
+          </Space>
+          
+          {/* Secondary Action Row - Only show diagnosis button when applicable */}
           {record.status === 'claimed' && (
             <Button
               type="primary"
               size="small"
               icon={<MedicineBoxOutlined />}
               onClick={() => handleCreateDiagnosis(record)}
+              className="w-full bg-green-600 hover:bg-green-700 border-green-600"
+              ghost={false}
             >
               Create Diagnosis
             </Button>
           )}
-          <Button
-            type="primary"
-            size="small"
-            onClick={() => window.open(`/dashboard/mechanic/requests/${record.id}/chat`, '_blank')}
-          >
-            Chat
-          </Button>
-        </Space>
+        </div>
       ),
     },
   ]
@@ -731,6 +779,19 @@ export default function MechanicRequestsPage() {
             </div>
           </Form>
         </Modal>
+
+        {/* Request Status Update Modal */}
+        {selectedRequest && (
+          <RequestStatusUpdate
+            visible={statusUpdateModalVisible}
+            onCancel={() => {
+              setStatusUpdateModalVisible(false)
+              setSelectedRequest(null)
+            }}
+            request={selectedRequest}
+            onUpdate={handleStatusUpdated}
+          />
+        )}
       </div>
     </DashboardLayout>
   )

@@ -116,12 +116,89 @@ match /{document=**} {
 - Use only the specific role-based rules
 - Test thoroughly before deploying
 
-## ✅ **8. Verification Checklist**
+## 🔥 **8. Firebase Indexes Setup**
+
+The application requires composite indexes for optimal query performance. We've automated this process for you.
+
+### **Automated Index Deployment:**
+
+1. **Deploy All Indexes at Once:**
+   ```bash
+   firebase deploy --only firestore:indexes
+   ```
+
+2. **Check Deployment Status:**
+   ```bash
+   firebase firestore:indexes
+   ```
+
+### **Index Configuration:**
+
+The `firestore.indexes.json` file contains all required indexes:
+
+- **parts Collection**: Dealer inventory queries with activity status
+- **transactions Collection**: Analytics and dealer transaction queries  
+- **requests Collection**: Mechanic and owner request queries
+- **chat_messages Collection**: Real-time chat functionality
+- **activity_logs Collection**: System activity tracking
+
+### **Manual Setup (Alternative):**
+If automated deployment fails, manually create these indexes in Firebase Console → Firestore → Indexes:
+
+1. **parts Collection:**
+   ```
+   Field: dealer_id (Ascending)
+   Field: is_active (Ascending) 
+   Field: created_at (Descending)
+   ```
+
+2. **transactions Collection (Analytics):**
+   ```
+   Field: dealer_id (Ascending)
+   Field: created_at (Descending)
+   ```
+
+3. **transactions Collection (Status Filtering):**
+   ```
+   Field: dealer_id (Ascending)
+   Field: status (Ascending)
+   Field: created_at (Descending)
+   ```
+
+4. **requests Collection (Mechanic):**
+   ```
+   Field: mechanic_id (Ascending)
+   Field: status (Ascending)
+   Field: created_at (Descending)
+   ```
+
+5. **requests Collection (Owner):**
+   ```
+   Field: owner_id (Ascending)
+   Field: created_at (Descending)
+   ```
+
+6. **chat_messages Collection:**
+   ```
+   Field: request_id (Ascending)
+   Field: created_at (Ascending)
+   ```
+
+### **Index Status:**
+- ✅ Index building can take a few minutes for large datasets
+- ✅ App functionality is available during index building
+- ✅ Performance improves once indexes are complete
+
+**Note: New Firebase projects require these indexes for optimal performance. The app includes fallback queries but indexes are recommended for production use.**
+
+## ✅ **9. Verification Checklist**
 
 - [ ] Firestore rules deployed
 - [ ] Storage rules deployed
+- [ ] Firebase indexes created
 - [ ] Google login works without permission errors
 - [ ] User avatar appears in navbar
+- [ ] Chat functionality works without index errors
 - [ ] Debug panel shows green status
 - [ ] Image upload component works
 - [ ] No more console warnings

@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
-import { getStorage } from 'firebase/storage'
+import { getAuth, connectAuthEmulator } from 'firebase/auth'
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore'
+import { getStorage, connectStorageEmulator } from 'firebase/storage'
 import { getMessaging, isSupported } from 'firebase/messaging'
 
 const firebaseConfig = {
@@ -21,6 +21,15 @@ const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 export const db = getFirestore(app)
 export const storage = getStorage(app)
+
+// Ensure auth is properly configured for phone authentication
+if (typeof window !== 'undefined') {
+  // Set language code for phone auth (optional)
+  auth.languageCode = 'en';
+  
+  // Configure app verification for phone auth
+  auth.settings.appVerificationDisabledForTesting = false;
+}
 
 // Initialize messaging only in browser environment
 export const getMessagingInstance = async () => {
