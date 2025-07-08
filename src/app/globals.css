@@ -213,3 +213,53 @@
 .animate-particles {
   animation: particles 2s linear infinite;
 }
+
+/* Mobile responsive utilities */
+@media (max-width: 640px) {
+  .ant-table-thead > tr > th {
+    padding: 8px 6px !important;
+    font-size: 12px !important;
+  }
+  
+  .ant-table-tbody > tr > td {
+    padding: 8px 6px !important;
+    font-size: 12px !important;
+  }
+  
+  .ant-statistic-content {
+    font-size: 18px !important;
+  }
+  
+  .ant-statistic-title {
+    font-size: 12px !important;
+  }
+  
+  .ant-card-head-title {
+    font-size: 14px !important;
+  }
+  
+  .ant-btn {
+    font-size: 12px !important;
+  }
+  
+  .ant-btn-large {
+    font-size: 14px !important;
+    height: 40px !important;
+  }
+}
+
+/* Touch-friendly targets */
+@media (hover: none) and (pointer: coarse) {
+  .ant-btn {
+    min-height: 44px !important;
+    padding: 8px 16px !important;
+  }
+  
+  .ant-input {
+    height: 44px !important;
+  }
+  
+  .ant-select-selector {
+    height: 44px !important;
+  }
+}

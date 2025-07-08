@@ -224,6 +224,7 @@ export default function CarOwnerDashboard() {
       dataIndex: 'id',
       key: 'id',
       width: 120,
+      responsive: ['sm'] as const,
       render: (id: string) => (
         <span className="font-mono text-sm">{id.slice(-8)}</span>
       )
@@ -234,7 +235,12 @@ export default function CarOwnerDashboard() {
       width: 150,
       render: (record: Request) => {
         const car = record.car || cars.find(c => c.id === record.car_id)
-        return car ? `${car.make} ${car.model}` : 'Unknown Car'
+        return (
+          <div className="space-y-1">
+            <div className="font-medium text-sm">{car ? `${car.make} ${car.model}` : 'Unknown Car'}</div>
+            <div className="text-xs text-gray-500 sm:hidden">{record.title}</div>
+          </div>
+        )
       }
     },
     {
@@ -242,6 +248,7 @@ export default function CarOwnerDashboard() {
       dataIndex: 'title',
       key: 'title',
       ellipsis: true,
+      responsive: ['sm'] as const,
     },
     {
       title: 'Status',
@@ -249,7 +256,7 @@ export default function CarOwnerDashboard() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <Tag color={getStatusColor(status)}>
+        <Tag color={getStatusColor(status)} className="!text-xs">
           {getStatusText(status)}
         </Tag>
       )
@@ -259,6 +266,7 @@ export default function CarOwnerDashboard() {
       dataIndex: 'created_at',
       key: 'created_at',
       width: 100,
+      responsive: ['md'] as const,
       render: (date: string) => new Date(date).toLocaleDateString()
     },
     {
@@ -266,6 +274,7 @@ export default function CarOwnerDashboard() {
       dataIndex: 'estimated_cost',
       key: 'estimated_cost',
       width: 100,
+      responsive: ['sm'] as const,
       render: (cost: number) => cost ? `GHS ${cost.toFixed(2)}` : '-'
     }
   ]
@@ -295,10 +304,10 @@ export default function CarOwnerDashboard() {
     <DashboardLayout activeKey="dashboard">
       <div className="space-y-6">
         {/* Welcome Section */}
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 sm:gap-0">
           <div>
-            <Title level={2}>Welcome back{user?.name ? `, ${user.name}` : ''}!</Title>
-            <Paragraph className="text-gray-600 dark:text-gray-300">
+            <Title level={2} className="!text-xl sm:!text-2xl !mb-2">Welcome back{user?.name ? `, ${user.name}` : ''}!</Title>
+            <Paragraph className="text-gray-600 dark:text-gray-300 !text-sm sm:!text-base">
               Here's an overview of your vehicle maintenance activities. 
               {stats.totalCars > 0 && ` You have ${stats.totalCars} vehicle${stats.totalCars > 1 ? 's' : ''} registered.`}
               {stats.totalCars === 0 && cars.length > 0 && ` (${cars.length} cars detected)`}
@@ -309,8 +318,10 @@ export default function CarOwnerDashboard() {
             loading={refreshing}
             onClick={handleRefresh}
             title="Refresh Dashboard Data"
+            className="!w-full sm:!w-auto"
           >
-            Refresh
+            <span className="sm:hidden">Refresh Data</span>
+            <span className="hidden sm:inline">Refresh</span>
           </Button>
         </div>
 
@@ -384,12 +395,13 @@ export default function CarOwnerDashboard() {
 
         {/* Quick Actions */}
         <Card title="Quick Actions">
-          <Space size="middle" wrap>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <Button 
               type="primary" 
               icon={<PlusOutlined />}
               onClick={() => router.push('/dashboard/car-owner/cars/add')}
               size="large"
+              className="!w-full sm:!w-auto"
             >
               Add New Car
             </Button>
@@ -399,16 +411,20 @@ export default function CarOwnerDashboard() {
               size="large"
               disabled={cars.length === 0 && stats.totalCars === 0}
               title={(cars.length === 0 && stats.totalCars === 0) ? "Add a car first to create requests" : "Create a service request"}
+              className="!w-full sm:!w-auto"
             >
-              Create Repair Request
+              <span className="hidden sm:inline">Create Repair Request</span>
+              <span className="sm:hidden">Create Request</span>
             </Button>
             <Button 
               onClick={() => router.push('/dashboard/car-owner/cars')}
               size="large"
+              className="!w-full sm:!w-auto"
             >
-              Manage Cars ({Math.max(stats.totalCars, cars.length)})
+              <span className="hidden sm:inline">Manage Cars ({Math.max(stats.totalCars, cars.length)})</span>
+              <span className="sm:hidden">Cars ({Math.max(stats.totalCars, cars.length)})</span>
             </Button>
-          </Space>
+          </div>
         </Card>
 
         {/* Recent Requests */}
@@ -455,9 +471,10 @@ export default function CarOwnerDashboard() {
               columns={requestColumns}
               dataSource={recentRequests}
               pagination={false}
-              scroll={{ x: 800 }}
+              scroll={{ x: 600 }}
               rowKey="id"
               size="small"
+              className="overflow-x-auto"
             />
           )}
         </Card>

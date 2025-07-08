@@ -155,29 +155,29 @@ const OTPVerificationContent: React.FC<OTPVerificationContentProps> = ({
   const isComplete = otpValue.length === 6
 
   return (
-    <div className="text-center space-y-6 py-4">
+    <div className="text-center space-y-4 sm:space-y-6 py-2 sm:py-4">
       {/* Header */}
       <div className="space-y-2">
-        <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <PhoneOutlined className="text-2xl text-brand-600" />
+        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+          <PhoneOutlined className="text-xl sm:text-2xl text-brand-600" />
         </div>
         
-        <Title level={3} className="!mb-2">
+        <Title level={3} className="!mb-2 !text-xl sm:!text-2xl">
           Verify Your Phone
         </Title>
         
-        <Text className="text-gray-600">
+        <Text className="text-gray-600 text-sm sm:text-base">
           We've sent a 6-digit verification code to
         </Text>
         <br />
-        <Text strong className="text-brand-600">
+        <Text strong className="text-brand-600 text-sm sm:text-base">
           {formatPhoneNumber(phoneNumber)}
         </Text>
       </div>
 
       {/* OTP Input */}
       <div className="space-y-4">
-        <div className="flex justify-center space-x-2">
+        <div className="flex justify-center space-x-1.5 sm:space-x-2">
           {otp.map((digit, index) => (
             <Input
               key={index}
@@ -190,7 +190,7 @@ const OTPVerificationContent: React.FC<OTPVerificationContentProps> = ({
               onChange={e => handleOtpChange(index, e.target.value)}
               onKeyDown={e => handleKeyDown(index, e)}
               maxLength={1}
-              className="!w-12 !h-12 !text-center !text-lg !font-semibold"
+              className="!w-10 !h-10 sm:!w-12 sm:!h-12 !text-center !text-base sm:!text-lg !font-semibold"
               style={{
                 borderColor: digit ? '#1890ff' : '#d9d9d9',
                 boxShadow: digit ? '0 0 0 2px rgba(24, 144, 255, 0.2)' : 'none'
@@ -209,15 +209,15 @@ const OTPVerificationContent: React.FC<OTPVerificationContentProps> = ({
           disabled={!isComplete}
           onClick={() => handleVerifyOtp(otpValue)}
           icon={isComplete ? <CheckCircleOutlined /> : undefined}
-          className="!h-12 !text-base font-medium"
+          className="!h-11 sm:!h-12 !text-sm sm:!text-base font-medium"
         >
           {loading ? 'Verifying...' : 'Verify Code'}
         </Button>
       </div>
 
       {/* Resend Section */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-center space-x-2 text-sm">
+      <div className="space-y-2 sm:space-y-3">
+        <div className="flex items-center justify-center space-x-2 text-xs sm:text-sm">
           <Text className="text-gray-500">
             Didn't receive the code?
           </Text>
@@ -228,12 +228,12 @@ const OTPVerificationContent: React.FC<OTPVerificationContentProps> = ({
             type="link"
             onClick={handleResend}
             loading={resendLoading}
-            className="!p-0 !h-auto"
+            className="!p-0 !h-auto !text-sm sm:!text-base"
           >
             Resend Code
           </Button>
         ) : (
-          <Text className="text-sm text-gray-500">
+          <Text className="text-xs sm:text-sm text-gray-500">
             Resend code in {countdown}s
           </Text>
         )}
@@ -244,7 +244,7 @@ const OTPVerificationContent: React.FC<OTPVerificationContentProps> = ({
         type="text"
         icon={<ArrowLeftOutlined />}
         onClick={onCancel}
-        className="!text-gray-500"
+        className="!text-gray-500 !text-xs sm:!text-sm"
         disabled={loading}
       >
         Use Different Number
@@ -308,16 +308,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
 
   return (
     <Modal
-              title="Welcome to Auto Care"
+      title="Welcome to Auto Care"
       open={visible}
       onCancel={onCancel}
       footer={null}
       width={400}
       centered
+      className="!mx-4"
+      styles={{
+        body: {
+          padding: '20px 16px',
+        },
+      }}
     >
-      <div className="space-y-6">
-        <div className="text-center mb-6">
-          <p className="text-gray-600 dark:text-gray-300">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="text-center mb-4 sm:mb-6">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
             Join our community of car owners, mechanics, and dealers
           </p>
         </div>
@@ -328,7 +334,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
               form={form}
               onFinish={handlePhoneAuth}
               layout="vertical"
-              className="space-y-4"
+              className="space-y-3 sm:space-y-4"
             >
               <Form.Item
                 name="phoneNumber"
@@ -359,6 +365,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
                   placeholder="+233244123456"
                   size="large"
                   maxLength={16}
+                  className="!h-11 sm:!h-12"
                 />
               </Form.Item>
 
@@ -368,6 +375,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
                 loading={loading}
                 size="large"
                 block
+                className="!h-11 sm:!h-12 !text-sm sm:!text-base"
               >
                 Send Verification Code
               </Button>
@@ -382,7 +390,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
                 block
                 onClick={handleGoogleAuth}
                 loading={loading}
-                className="!flex !items-center !justify-center"
+                className="!flex !items-center !justify-center !h-11 sm:!h-12 !text-sm sm:!text-base"
               >
                 Continue with Google
               </Button>
@@ -392,7 +400,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
                 size="large"
                 block
                 disabled
-                className="!flex !items-center !justify-center"
+                className="!flex !items-center !justify-center !h-11 sm:!h-12 !text-sm sm:!text-base"
               >
                 Continue with Apple (Coming Soon)
               </Button>
@@ -402,7 +410,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
 
         <Divider />
 
-        <div className="text-center text-sm text-gray-500">
+        <div className="text-center text-xs sm:text-sm text-gray-500">
           <p>
             By continuing, you agree to our{' '}
             <a href="/terms" className="text-blue-600 hover:underline">
@@ -425,6 +433,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
         width={400}
         centered
         destroyOnClose
+        className="!mx-4"
+        styles={{
+          body: {
+            padding: '20px 16px',
+          },
+        }}
       >
         <OTPVerificationContent
           confirmationResult={confirmationResult}

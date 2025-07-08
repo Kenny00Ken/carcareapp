@@ -262,27 +262,27 @@ export const LandingPage: React.FC = () => {
 
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/90 dark:bg-slate-950/80 border-b border-gray-200 dark:border-white/10 theme-transition">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              <CarOutlined className="text-2xl text-brand-500" />
-              <Title level={3} className="!mb-0 text-text-primary dark:!text-white !text-lg font-bold theme-transition">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <CarOutlined className="text-xl sm:text-2xl text-brand-500" />
+              <Title level={3} className="!mb-0 text-text-primary dark:!text-white !text-base sm:!text-lg font-bold theme-transition">
                 Auto Care
               </Title>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <Button
                 type="text"
                 icon={theme === 'light' ? <MoonOutlined /> : <BulbOutlined />}
                 onClick={toggleTheme}
-                className="!border-none text-text-secondary dark:text-slate-400 hover:text-text-primary dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 theme-transition !w-10 !h-10 !p-0 rounded-lg"
+                className="!border-none text-text-secondary dark:text-slate-400 hover:text-text-primary dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 theme-transition !w-9 !h-9 sm:!w-10 sm:!h-10 !p-0 rounded-lg"
               />
               
               {firebaseUser ? (
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2 sm:space-x-3">
                   {user && (
-                    <span className="text-sm text-text-secondary dark:text-slate-300 hidden md:block theme-transition">
+                    <span className="text-xs sm:text-sm text-text-secondary dark:text-slate-300 hidden lg:block theme-transition">
                       Welcome, {user.name || firebaseUser.displayName || 'User'}
                     </span>
                   )}
@@ -291,7 +291,7 @@ export const LandingPage: React.FC = () => {
                     placement="bottomRight"
                     trigger={['click']}
                   >
-                    <div className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 px-3 py-2 rounded-lg transition-all duration-200 theme-transition">
+                    <div className="flex items-center space-x-1 sm:space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 px-2 sm:px-3 py-1 sm:py-2 rounded-lg transition-all duration-200 theme-transition">
                       <Avatar 
                         icon={<UserOutlined />} 
                         src={firebaseUser.photoURL}
@@ -299,7 +299,7 @@ export const LandingPage: React.FC = () => {
                         className="border border-brand-400"
                       />
                       {user && (
-                        <span className="font-medium hidden sm:block text-text-primary dark:text-white theme-transition">
+                        <span className="font-medium hidden md:block text-text-primary dark:text-white theme-transition text-sm truncate max-w-20 sm:max-w-32">
                           {user.name || firebaseUser.displayName || 'User'}
                         </span>
                       )}
@@ -310,9 +310,10 @@ export const LandingPage: React.FC = () => {
                 <Button
                   type="primary"
                   onClick={() => setAuthModalVisible(true)}
-                  className="!h-10 !px-6 !text-sm font-medium bg-brand-500 hover:bg-brand-600 border-none rounded-lg transition-all duration-200 transform hover:scale-105 shadow-soft hover:shadow-medium"
+                  className="!h-9 !px-4 sm:!h-10 sm:!px-6 !text-xs sm:!text-sm font-medium bg-brand-500 hover:bg-brand-600 border-none rounded-lg transition-all duration-200 transform hover:scale-105 shadow-soft hover:shadow-medium"
                 >
-                  Get Started
+                  <span className="hidden sm:inline">Get Started</span>
+                  <span className="sm:hidden">Start</span>
                 </Button>
               )}
             </div>
@@ -475,8 +476,8 @@ export const LandingPage: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-blue-50/90 via-white/80 to-indigo-50/90"></div>
           {/* Professional automotive hero graphics */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {/* Car silhouette */}
-            <div className="absolute top-1/2 right-10 transform -translate-y-1/2">
+            {/* Car silhouette - hidden on mobile */}
+            <div className="absolute top-1/2 right-10 transform -translate-y-1/2 hidden lg:block">
               <div className="w-96 h-48 opacity-10 group-hover:opacity-20 transition-opacity duration-1000">
                 <svg viewBox="0 0 400 200" className="w-full h-full">
                   {/* Car body */}
@@ -509,17 +510,17 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
             
-            {/* Floating elements */}
-            <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-br from-brand-100 to-brand-200 rounded-full opacity-60 animate-float blur-sm"></div>
-            <div className="absolute top-40 right-20 w-16 h-16 bg-gradient-to-br from-secondary-100 to-secondary-200 rounded-full opacity-60 animate-float blur-sm" style={{ animationDelay: '2s' }}></div>
-            <div className="absolute bottom-40 left-20 w-12 h-12 bg-gradient-to-br from-accent-100 to-accent-200 rounded-full opacity-60 animate-float blur-sm" style={{ animationDelay: '4s' }}></div>
+            {/* Floating elements - responsive sizing */}
+            <div className="absolute top-20 left-2 sm:left-10 w-12 h-12 sm:w-20 sm:h-20 bg-gradient-to-br from-brand-100 to-brand-200 rounded-full opacity-60 animate-float blur-sm"></div>
+            <div className="absolute top-40 right-4 sm:right-20 w-10 h-10 sm:w-16 sm:h-16 bg-gradient-to-br from-secondary-100 to-secondary-200 rounded-full opacity-60 animate-float blur-sm" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute bottom-40 left-4 sm:left-20 w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-accent-100 to-accent-200 rounded-full opacity-60 animate-float blur-sm" style={{ animationDelay: '4s' }}></div>
             
-            {/* Tool icons floating */}
-            <div className="absolute top-32 left-1/4 opacity-20 animate-float" style={{ animationDelay: '1s' }}>
-              <ToolOutlined className="text-4xl text-secondary-500" />
+            {/* Tool icons floating - responsive */}
+            <div className="absolute top-32 left-1/4 opacity-20 animate-float hidden sm:block" style={{ animationDelay: '1s' }}>
+              <ToolOutlined className="text-2xl sm:text-4xl text-secondary-500" />
             </div>
-            <div className="absolute bottom-32 right-1/4 opacity-20 animate-float" style={{ animationDelay: '3s' }}>
-              <ShopOutlined className="text-3xl text-accent-500" />
+            <div className="absolute bottom-32 right-1/4 opacity-20 animate-float hidden sm:block" style={{ animationDelay: '3s' }}>
+              <ShopOutlined className="text-xl sm:text-3xl text-accent-500" />
             </div>
           </div>
 
@@ -531,19 +532,20 @@ export const LandingPage: React.FC = () => {
               duration: 0.8,
               ease: "easeInOut",
             }}
-            className="text-center max-w-4xl mx-auto px-4 relative z-10"
+            className="text-center max-w-4xl mx-auto px-4 sm:px-6 relative z-10"
           >
             {/* Professional badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, duration: 0.6 }}
-              className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-brand-100 to-brand-200 text-brand-800 text-sm font-medium mb-6 shadow-soft"
+              className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-gradient-to-r from-brand-100 to-brand-200 text-brand-800 text-xs sm:text-sm font-medium mb-4 sm:mb-6 shadow-soft"
             >
-              <CarOutlined className="mr-2" />
-              Ghana's #1 Automotive Platform
+              <CarOutlined className="mr-1 sm:mr-2 text-sm sm:text-base" />
+              <span className="hidden sm:inline">Ghana's #1 Automotive Platform</span>
+              <span className="sm:hidden">#1 Auto Platform</span>
             </motion.div>
-            <Title level={1} className="!text-5xl md:!text-7xl !mb-8 !leading-tight !font-bold">
+            <Title level={1} className="!text-3xl sm:!text-5xl md:!text-7xl !mb-6 sm:!mb-8 !leading-tight !font-bold">
               <span className="text-transparent bg-clip-text bg-gradient-to-br from-brand-600 via-brand-700 to-brand-800">
                 <TypingText 
                   texts={['Connect', 'Connect • Diagnose', 'Connect • Diagnose • Fix']}
@@ -564,7 +566,7 @@ export const LandingPage: React.FC = () => {
                 ease: "easeInOut",
               }}
             >
-              <Paragraph className="!text-lg md:!text-xl text-text-secondary max-w-3xl mx-auto !mb-12 !leading-relaxed">
+              <Paragraph className="!text-base sm:!text-lg md:!text-xl text-text-secondary max-w-3xl mx-auto !mb-8 sm:!mb-12 !leading-relaxed px-4 sm:px-0">
                 Ghana's premier automotive platform connecting car owners with trusted mechanics and reliable parts dealers
               </Paragraph>
             </motion.div>
@@ -577,7 +579,7 @@ export const LandingPage: React.FC = () => {
                 duration: 0.6,
                 ease: "easeInOut",
               }}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4 sm:px-0"
             >
               {firebaseUser ? (
                 user ? (
@@ -586,18 +588,22 @@ export const LandingPage: React.FC = () => {
                     size="large"
                     icon={getRoleIcon(user.role)}
                     onClick={navigateToDashboard}
-                    className="!h-12 !px-8 !text-base font-medium shadow-medium hover:shadow-hard transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl"
+                    className="!h-11 !px-6 sm:!h-12 sm:!px-8 !text-sm sm:!text-base font-medium shadow-medium hover:shadow-hard transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl w-full sm:w-auto"
                   >
-                    Go to Dashboard <ArrowRightOutlined />
+                    <span className="hidden sm:inline">Go to Dashboard</span>
+                    <span className="sm:hidden">Dashboard</span>
+                    <ArrowRightOutlined />
                   </Button>
                 ) : (
                   <Button
                     type="primary"
                     size="large"
                     onClick={() => router.push('/auth/role-selection')}
-                    className="!h-12 !px-8 !text-base font-medium shadow-medium hover:shadow-hard transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl"
+                    className="!h-11 !px-6 sm:!h-12 sm:!px-8 !text-sm sm:!text-base font-medium shadow-medium hover:shadow-hard transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl w-full sm:w-auto"
                   >
-                    Complete Your Profile <ArrowRightOutlined />
+                    <span className="hidden sm:inline">Complete Your Profile</span>
+                    <span className="sm:hidden">Complete Profile</span>
+                    <ArrowRightOutlined />
                   </Button>
                 )
               ) : (
@@ -606,14 +612,14 @@ export const LandingPage: React.FC = () => {
                     type="primary"
                     size="large"
                     onClick={() => setAuthModalVisible(true)}
-                    className="!h-12 !px-8 !text-base font-medium shadow-medium hover:shadow-hard transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl"
+                    className="!h-11 !px-6 sm:!h-12 sm:!px-8 !text-sm sm:!text-base font-medium shadow-medium hover:shadow-hard transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl w-full sm:w-auto"
                   >
                     Get Started <ArrowRightOutlined />
                   </Button>
                   <Button
                     size="large"
                     onClick={() => setAuthModalVisible(true)}
-                    className="!h-12 !px-8 !text-base font-medium text-text-secondary hover:text-text-primary border-gray-300 hover:border-brand-400 bg-transparent hover:bg-brand-50 rounded-xl transition-all duration-300"
+                    className="!h-11 !px-6 sm:!h-12 sm:!px-8 !text-sm sm:!text-base font-medium text-text-secondary hover:text-text-primary border-gray-300 hover:border-brand-400 bg-transparent hover:bg-brand-50 rounded-xl transition-all duration-300 w-full sm:w-auto"
                   >
                     Learn More
                   </Button>
@@ -623,24 +629,24 @@ export const LandingPage: React.FC = () => {
           </motion.div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 dark:-mt-20 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 dark:-mt-20 relative z-10">
 
           {/* Role Cards Section */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="mb-20"
+            className="mb-12 sm:mb-20"
           >
-            <Title level={2} className="text-center text-text-primary dark:!text-white !mb-4 !text-3xl md:!text-4xl theme-transition">
+            <Title level={2} className="text-center text-text-primary dark:!text-white !mb-3 sm:!mb-4 !text-2xl sm:!text-3xl md:!text-4xl theme-transition">
               Choose Your Professional Role
             </Title>
-            <Paragraph className="text-center text-text-secondary dark:!text-slate-400 !mb-8 !text-lg max-w-2xl mx-auto theme-transition">
+            <Paragraph className="text-center text-text-secondary dark:!text-slate-400 !mb-6 sm:!mb-8 !text-base sm:!text-lg max-w-2xl mx-auto theme-transition px-4 sm:px-0">
               Join Ghana's most trusted automotive platform designed for professionals at every level of the industry
             </Paragraph>
             
             {/* Role Selector */}
-            <div className="flex justify-center mb-12">
+            <div className="flex justify-center mb-8 sm:mb-12 px-4 sm:px-0">
               <RoleSelector 
                 onRoleSelect={setSelectedRole} 
                 selectedRole={selectedRole}
@@ -648,7 +654,7 @@ export const LandingPage: React.FC = () => {
             </div>
             
             {/* Professional Role Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
               {/* Car Owner Card */}
               <motion.div
                 initial={{ opacity: 0, y: 40, rotateX: 20 }}
@@ -663,7 +669,7 @@ export const LandingPage: React.FC = () => {
                 {/* Gradient background glow */}
                 <div className="absolute inset-0 bg-gradient-to-r from-brand-400/20 via-brand-500/20 to-brand-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
                 
-                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border border-brand-200/50 dark:border-brand-300/20 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:border-brand-300 dark:hover:border-brand-400/60 theme-transition cursor-pointer overflow-hidden"
+                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border border-brand-200/50 dark:border-brand-300/20 rounded-2xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:border-brand-300 dark:hover:border-brand-400/60 theme-transition cursor-pointer overflow-hidden"
                      onClick={() => setAuthModalVisible(true)}
                      style={{ filter: selectedRole === 'car-owner' ? 'url("#radio-glass")' : 'none' }}>
                   {/* Animated background pattern */}
@@ -673,14 +679,14 @@ export const LandingPage: React.FC = () => {
                   
                   {/* Floating icon container */}
                   <motion.div 
-                    className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-900/50 dark:to-brand-800/50 rounded-2xl mb-6 group-hover:from-brand-200 group-hover:to-brand-300 dark:group-hover:from-brand-800/60 dark:group-hover:to-brand-700/60 transition-all duration-500 relative shadow-lg"
+                    className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-900/50 dark:to-brand-800/50 rounded-2xl mb-4 sm:mb-6 group-hover:from-brand-200 group-hover:to-brand-300 dark:group-hover:from-brand-800/60 dark:group-hover:to-brand-700/60 transition-all duration-500 relative shadow-lg"
                     whileHover={{ 
                       scale: 1.1, 
                       rotate: 5,
                       transition: { duration: 0.3 } 
                     }}
                   >
-                    <CarOutlined className="text-3xl text-brand-600 dark:text-brand-400 theme-transition" />
+                    <CarOutlined className="text-2xl sm:text-3xl text-brand-600 dark:text-brand-400 theme-transition" />
                     {/* Floating particles */}
                     <div className="absolute -inset-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                       <div className="absolute top-0 left-0 w-2 h-2 bg-brand-400 rounded-full animate-ping"></div>
@@ -751,7 +757,7 @@ export const LandingPage: React.FC = () => {
                 {/* Gradient background glow */}
                 <div className="absolute inset-0 bg-gradient-to-r from-secondary-400/20 via-secondary-500/20 to-secondary-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
                 
-                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border border-secondary-200/50 dark:border-secondary-300/20 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:border-secondary-300 dark:hover:border-secondary-400/60 theme-transition cursor-pointer overflow-hidden"
+                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border border-secondary-200/50 dark:border-secondary-300/20 rounded-2xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:border-secondary-300 dark:hover:border-secondary-400/60 theme-transition cursor-pointer overflow-hidden"
                      onClick={() => setAuthModalVisible(true)}
                      style={{ filter: selectedRole === 'mechanic' ? 'url("#radio-glass")' : 'none' }}>
                   {/* Animated background pattern */}
@@ -761,14 +767,14 @@ export const LandingPage: React.FC = () => {
                   
                   {/* Floating icon container */}
                   <motion.div 
-                    className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-secondary-100 to-secondary-200 dark:from-secondary-900/50 dark:to-secondary-800/50 rounded-2xl mb-6 group-hover:from-secondary-200 group-hover:to-secondary-300 dark:group-hover:from-secondary-800/60 dark:group-hover:to-secondary-700/60 transition-all duration-500 relative shadow-lg"
+                    className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-secondary-100 to-secondary-200 dark:from-secondary-900/50 dark:to-secondary-800/50 rounded-2xl mb-4 sm:mb-6 group-hover:from-secondary-200 group-hover:to-secondary-300 dark:group-hover:from-secondary-800/60 dark:group-hover:to-secondary-700/60 transition-all duration-500 relative shadow-lg"
                     whileHover={{ 
                       scale: 1.1, 
                       rotate: -5,
                       transition: { duration: 0.3 } 
                     }}
                   >
-                    <ToolOutlined className="text-3xl text-secondary-600 dark:text-secondary-400 theme-transition" />
+                    <ToolOutlined className="text-2xl sm:text-3xl text-secondary-600 dark:text-secondary-400 theme-transition" />
                     {/* Floating particles */}
                     <div className="absolute -inset-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                       <div className="absolute top-0 right-0 w-2 h-2 bg-secondary-400 rounded-full animate-ping"></div>
@@ -839,7 +845,7 @@ export const LandingPage: React.FC = () => {
                 {/* Gradient background glow */}
                 <div className="absolute inset-0 bg-gradient-to-r from-accent-400/20 via-accent-500/20 to-accent-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
                 
-                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border border-accent-200/50 dark:border-accent-300/20 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:border-accent-300 dark:hover:border-accent-400/60 theme-transition cursor-pointer overflow-hidden"
+                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border border-accent-200/50 dark:border-accent-300/20 rounded-2xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:border-accent-300 dark:hover:border-accent-400/60 theme-transition cursor-pointer overflow-hidden"
                      onClick={() => setAuthModalVisible(true)}
                      style={{ filter: selectedRole === 'dealer' ? 'url("#radio-glass")' : 'none' }}>
                   {/* Animated background pattern */}
@@ -849,14 +855,14 @@ export const LandingPage: React.FC = () => {
                   
                   {/* Floating icon container */}
                   <motion.div 
-                    className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-accent-100 to-accent-200 dark:from-accent-900/50 dark:to-accent-800/50 rounded-2xl mb-6 group-hover:from-accent-200 group-hover:to-accent-300 dark:group-hover:from-accent-800/60 dark:group-hover:to-accent-700/60 transition-all duration-500 relative shadow-lg"
+                    className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-accent-100 to-accent-200 dark:from-accent-900/50 dark:to-accent-800/50 rounded-2xl mb-4 sm:mb-6 group-hover:from-accent-200 group-hover:to-accent-300 dark:group-hover:from-accent-800/60 dark:group-hover:to-accent-700/60 transition-all duration-500 relative shadow-lg"
                     whileHover={{ 
                       scale: 1.1, 
                       rotate: 3,
                       transition: { duration: 0.3 } 
                     }}
                   >
-                    <ShopOutlined className="text-3xl text-accent-600 dark:text-accent-400 theme-transition" />
+                    <ShopOutlined className="text-2xl sm:text-3xl text-accent-600 dark:text-accent-400 theme-transition" />
                     {/* Floating particles */}
                     <div className="absolute -inset-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                       <div className="absolute top-0 left-0 w-2 h-2 bg-accent-400 rounded-full animate-ping"></div>
@@ -953,21 +959,21 @@ export const LandingPage: React.FC = () => {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-20"
+            className="text-center mb-12 sm:mb-20"
           >
-            <div className="bg-gradient-to-br from-brand-50 to-brand-100 dark:bg-white/5 backdrop-blur-sm border border-brand-200 dark:border-white/10 rounded-3xl p-8 md:p-12 theme-transition">
-              <Title level={2} className="text-text-primary dark:!text-white !mb-8 !text-2xl md:!text-3xl theme-transition">
+            <div className="bg-gradient-to-br from-brand-50 to-brand-100 dark:bg-white/5 backdrop-blur-sm border border-brand-200 dark:border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 theme-transition">
+              <Title level={2} className="text-text-primary dark:!text-white !mb-6 sm:!mb-8 !text-xl sm:!text-2xl md:!text-3xl theme-transition">
                 Trusted by automotive professionals across Ghana
               </Title>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.2, duration: 0.5 }}
                   className="text-center"
                 >
-                  <Title level={1} className="!text-brand-600 dark:!text-brand-400 !mb-2 !text-4xl md:!text-5xl font-bold theme-transition">10K+</Title>
-                  <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-0 !text-base theme-transition">Active Users</Paragraph>
+                  <Title level={1} className="!text-brand-600 dark:!text-brand-400 !mb-1 sm:!mb-2 !text-3xl sm:!text-4xl md:!text-5xl font-bold theme-transition">10K+</Title>
+                  <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-0 !text-sm sm:!text-base theme-transition">Active Users</Paragraph>
                 </motion.div>
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -975,9 +981,9 @@ export const LandingPage: React.FC = () => {
                   transition={{ delay: 0.4, duration: 0.5 }}
                   className="text-center"
                 >
-                  <Title level={1} className="!text-secondary-600 dark:!text-secondary-400 !mb-2 !text-4xl md:!text-5xl font-bold theme-transition">5K+</Title>
-                  <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-0 !text-base theme-transition">Repairs Completed</Paragraph>
-                  <Text className="text-text-tertiary dark:!text-slate-400 text-sm theme-transition">All currencies in GHS</Text>
+                  <Title level={1} className="!text-secondary-600 dark:!text-secondary-400 !mb-1 sm:!mb-2 !text-3xl sm:!text-4xl md:!text-5xl font-bold theme-transition">5K+</Title>
+                  <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-0 !text-sm sm:!text-base theme-transition">Repairs Completed</Paragraph>
+                  <Text className="text-text-tertiary dark:!text-slate-400 text-xs sm:text-sm theme-transition">All currencies in GHS</Text>
                 </motion.div>
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -985,8 +991,8 @@ export const LandingPage: React.FC = () => {
                   transition={{ delay: 0.6, duration: 0.5 }}
                   className="text-center"
                 >
-                  <Title level={1} className="!text-accent-600 dark:!text-accent-400 !mb-2 !text-4xl md:!text-5xl font-bold theme-transition">1K+</Title>
-                  <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-0 !text-base theme-transition">Parts Available</Paragraph>
+                  <Title level={1} className="!text-accent-600 dark:!text-accent-400 !mb-1 sm:!mb-2 !text-3xl sm:!text-4xl md:!text-5xl font-bold theme-transition">1K+</Title>
+                  <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-0 !text-sm sm:!text-base theme-transition">Parts Available</Paragraph>
                 </motion.div>
               </div>
             </div>
@@ -995,57 +1001,57 @@ export const LandingPage: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-50 dark:bg-slate-950/90 backdrop-blur-sm border-t border-gray-200 dark:border-white/10 py-12 theme-transition">
+      <footer className="bg-gray-50 dark:bg-slate-950/90 backdrop-blur-sm border-t border-gray-200 dark:border-white/10 py-8 sm:py-12 theme-transition">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="flex items-center justify-center space-x-3 mb-4">
-            <CarOutlined className="text-2xl text-brand-500" />
-            <Title level={3} className="text-text-primary dark:!text-white !mb-0 !text-xl theme-transition">Auto Care</Title>
+          <div className="flex items-center justify-center space-x-2 sm:space-x-3 mb-3 sm:mb-4">
+            <CarOutlined className="text-xl sm:text-2xl text-brand-500" />
+            <Title level={3} className="text-text-primary dark:!text-white !mb-0 !text-lg sm:!text-xl theme-transition">Auto Care</Title>
           </div>
           
-          <Paragraph className="text-text-secondary dark:!text-slate-400 !text-base !mb-6 theme-transition">
+          <Paragraph className="text-text-secondary dark:!text-slate-400 !text-sm sm:!text-base !mb-4 sm:!mb-6 theme-transition">
             Connecting automotive professionals across Ghana
           </Paragraph>
           
           {/* Social Media Icons */}
-          <div className="flex items-center justify-center space-x-4 mb-6">
+          <div className="flex items-center justify-center space-x-3 sm:space-x-4 mb-4 sm:mb-6">
             <a 
               href="#" 
-              className="w-10 h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+              className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
               aria-label="Facebook"
             >
-              <FacebookOutlined className="text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+              <FacebookOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
             </a>
             <a 
               href="#" 
-              className="w-10 h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+              className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
               aria-label="Twitter"
             >
-              <TwitterOutlined className="text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+              <TwitterOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
             </a>
             <a 
               href="#" 
-              className="w-10 h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+              className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
               aria-label="Instagram"
             >
-              <InstagramOutlined className="text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+              <InstagramOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
             </a>
             <a 
               href="#" 
-              className="w-10 h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+              className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
               aria-label="LinkedIn"
             >
-              <LinkedinOutlined className="text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+              <LinkedinOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
             </a>
             <a 
               href="#" 
-              className="w-10 h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+              className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
               aria-label="YouTube"
             >
-              <YoutubeOutlined className="text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+              <YoutubeOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
             </a>
           </div>
           
-          <div className="text-sm text-text-tertiary dark:text-slate-500 theme-transition">
+          <div className="text-xs sm:text-sm text-text-tertiary dark:text-slate-500 theme-transition">
             © 2024 Auto Care • All rights reserved
           </div>
         </div>

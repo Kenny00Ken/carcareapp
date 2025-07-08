@@ -200,7 +200,24 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         trigger={null} 
         collapsible 
         collapsed={collapsed}
-        className="!bg-white dark:!bg-gray-800 border-r border-gray-200 dark:border-gray-700"
+        breakpoint="lg"
+        collapsedWidth="0"
+        className="!bg-white dark:!bg-gray-800 border-r border-gray-200 dark:border-gray-700 !fixed !left-0 !top-0 !bottom-0 !z-50 lg:!relative lg:!z-auto"
+        style={{
+          overflow: 'auto',
+          height: '100vh',
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          transform: collapsed ? 'translateX(-100%)' : 'translateX(0)',
+          transition: 'transform 0.3s ease',
+        }}
+        onBreakpoint={(broken) => {
+          if (broken) {
+            setCollapsed(true);
+          }
+        }}
       >
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-2">
@@ -221,24 +238,34 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         />
       </Sider>
       
-      <Layout>
-        <Header className="!bg-white dark:!bg-gray-800 !px-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+      {/* Mobile overlay */}
+      {!collapsed && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setCollapsed(true)}
+        />
+      )}
+      
+      <Layout className="ml-0 lg:ml-0 transition-all duration-300">
+        <Header className="!bg-white dark:!bg-gray-800 !px-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between !sticky !top-0 !z-30">
+          <div className="flex items-center space-x-2 md:space-x-4">
             <Button
               type="text"
               icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
               onClick={() => setCollapsed(!collapsed)}
+              className="!w-10 !h-10 !p-0 flex items-center justify-center"
             />
-            <Title level={4} className="!mb-0">
+            <Title level={4} className="!mb-0 !text-sm md:!text-base lg:!text-lg truncate">
               {getRoleTitle(user.role)}
             </Title>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
             <Button
               type="text"
               icon={theme === 'light' ? <MoonOutlined /> : <BulbOutlined />}
               onClick={toggleTheme}
+              className="!w-10 !h-10 !p-0 flex items-center justify-center"
             />
             
             <Badge count={notificationCount} showZero={false}>
@@ -246,23 +273,29 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 type="text"
                 icon={<BellOutlined />}
                 onClick={() => router.push('/notifications')}
+                className="!w-10 !h-10 !p-0 flex items-center justify-center"
               />
             </Badge>
             
             <Dropdown
               menu={{ items: userMenuItems }}
               placement="bottomRight"
+              trigger={['click']}
             >
               <div className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded">
-                <Avatar icon={<UserOutlined />} />
-                <span className="font-medium">{user.name}</span>
+                <Avatar icon={<UserOutlined />} size="small" />
+                <span className="font-medium hidden sm:inline-block text-sm truncate max-w-24 md:max-w-32">
+                  {user.name}
+                </span>
               </div>
             </Dropdown>
           </div>
         </Header>
         
-        <Content className="!p-6 !bg-gray-50 dark:!bg-gray-900">
-          {children}
+        <Content className="!p-4 sm:!p-6 !bg-gray-50 dark:!bg-gray-900 !min-h-screen">
+          <div className="max-w-full overflow-x-auto">
+            {children}
+          </div>
         </Content>
       </Layout>
     </Layout>
