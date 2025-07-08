@@ -165,7 +165,7 @@ export default function MechanicDiagnosesPage() {
       setIsEditing(true)
       
       // Handle both string and array formats for parts_needed
-      const partsData = diagnosis.parts_needed
+      const partsData: string[] | PartNeeded[] | string | null | undefined = diagnosis.parts_needed
       let convertedParts: PartNeeded[] = []
       
       // Debug logging to understand the data structure
@@ -189,10 +189,10 @@ export default function MechanicDiagnosesPage() {
           }
           return part
         })
-      } else if (typeof partsData === 'string' && partsData.trim()) {
+      } else if (typeof partsData === 'string' && (partsData as string).trim()) {
         // Handle string case - split by newlines or commas
         console.log('Parts data is string, splitting...')
-        const partNames = partsData.split(/[,\n]+/).map(p => p.trim()).filter(p => p.length > 0)
+        const partNames = (partsData as string).split(/[,\n]+/).map(p => p.trim()).filter(p => p.length > 0)
         convertedParts = partNames.map(name => ({
           name,
           quantity: 1,
@@ -827,7 +827,7 @@ export default function MechanicDiagnosesPage() {
                       )
                     ) : (
                       // Handle string case - split by newlines or commas and display as list
-                      selectedDiagnosis.parts_needed.trim() ? (
+                      (selectedDiagnosis.parts_needed as string).trim() ? (
                         <Card size="small">
                           <Paragraph className="!mb-0 whitespace-pre-line">
                             {selectedDiagnosis.parts_needed}

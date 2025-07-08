@@ -181,7 +181,11 @@ const OTPVerificationContent: React.FC<OTPVerificationContentProps> = ({
           {otp.map((digit, index) => (
             <Input
               key={index}
-              ref={el => inputRefs.current[index] = el?.input || null}
+              ref={el => {
+                if (el?.input) {
+                  inputRefs.current[index] = el.input
+                }
+              }}
               value={digit}
               onChange={e => handleOtpChange(index, e.target.value)}
               onKeyDown={e => handleKeyDown(index, e)}

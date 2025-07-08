@@ -193,7 +193,7 @@ export default function MechanicPartsPage() {
             : (part.name || '').toLowerCase().split(' ')
         )
       : typeof partsNeeded === 'string' 
-        ? partsNeeded.toLowerCase().split(/[,\n\s]+/)
+        ? (partsNeeded as string).toLowerCase().split(/[,\n\s]+/)
         : []
     
     const allKeywords = [...diagnosisKeywords, ...partsNeededKeywords]
@@ -598,7 +598,7 @@ export default function MechanicPartsPage() {
                       const partsCount = Array.isArray(record.parts_needed) 
                         ? record.parts_needed.length 
                         : typeof record.parts_needed === 'string' 
-                          ? record.parts_needed.split(/[,\n]+/).filter(p => p.trim()).length
+                          ? (record.parts_needed as string).split(/[,\n]+/).filter(p => p.trim()).length
                           : 0
                       return (
                         <Badge count={partsCount} showZero style={{ backgroundColor: '#52c41a' }} />
@@ -868,8 +868,8 @@ export default function MechanicPartsPage() {
                           )}
                         </div>
                       ))
-                    } else if (typeof partsNeeded === 'string' && partsNeeded.trim()) {
-                      return partsNeeded.split(/[,\n]+/).map((part, index) => (
+                    } else if (typeof partsNeeded === 'string' && (partsNeeded as string).trim()) {
+                      return (partsNeeded as string).split(/[,\n]+/).map((part, index) => (
                         <div key={index} className="p-2 border rounded">
                           {part.trim()}
                         </div>

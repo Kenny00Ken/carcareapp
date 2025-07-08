@@ -148,6 +148,7 @@ export const RequestStatusUpdate: React.FC<RequestStatusUpdateProps> = ({
           title: 'Request Status Updated',
           message: `Your request "${request.title}" status has been updated to: ${selectedStatus.replace('_', ' ')}`,
           type: 'request_update',
+          timestamp: new Date().toISOString(),
           read: false,
           data: {
             request_id: request.id,

@@ -203,6 +203,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       if (!user) throw new Error('User not authenticated')
       
       await SettingsService.updateLocationSettings(user.id, {
+        location_enabled: enabled,
         auto_update_location: enabled
       })
       
