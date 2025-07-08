@@ -38,8 +38,11 @@ export default function ChatPage() {
           return
         }
 
-        // Verify user is the owner of this request
-        if (requestData.owner_id !== user.id) {
+        // Verify user is authorized (owner or assigned mechanic)
+        const isOwner = requestData.owner_id === user.id
+        const isAssignedMechanic = requestData.mechanic_id === user.id
+        
+        if (!isOwner && !isAssignedMechanic) {
           setError('You are not authorized to view this chat')
           return
         }

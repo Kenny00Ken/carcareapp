@@ -38,15 +38,18 @@ export default function MechanicChatPage() {
           return
         }
 
-        // Verify user is the mechanic assigned to this request or request is claimed by this mechanic
-        if (requestData.mechanic_id !== user.id && requestData.status === 'pending') {
-          setError('You are not authorized to view this chat. Request must be claimed first.')
+        // Verify user is authorized (assigned mechanic or request owner for cross-platform access)
+        const isAssignedMechanic = requestData.mechanic_id === user.id
+        const isOwner = requestData.owner_id === user.id
+        
+        if (!isAssignedMechanic && !isOwner) {
+          setError('You are not authorized to view this chat')
           return
         }
         
-        // Allow access if request is claimed by this mechanic
-        if (requestData.mechanic_id !== user.id && requestData.status !== 'pending') {
-          setError('You are not authorized to view this chat')
+        // Check if mechanic needs to claim the request first
+        if (!requestData.mechanic_id && requestData.status === 'pending') {
+          setError('You need to claim this request first before accessing the chat')
           return
         }
 

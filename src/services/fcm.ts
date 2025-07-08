@@ -8,7 +8,7 @@ export class FCMService {
   private static messaging: any = null
   private static vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY || 'BLU9PEgJczPp8nKOADTXOK8H3_MNjJ6cBgA_y5r5A-K9jgW-ufb3w8JNQAq-k-Zz4d8gSs6w3-K6-o0y6MaQ'
 
-  static async initialize(): Promise<void> {
+  static async initialize(autoRequest: boolean = true): Promise<void> {
     try {
       this.messaging = await getMessagingInstance()
       if (!this.messaging) {
@@ -16,17 +16,44 @@ export class FCMService {
         return
       }
 
-      // Request permission
-      const permission = await Notification.requestPermission()
+      // Check current permission status
+      const permission = Notification.permission
+      console.log('Current notification permission:', permission)
+
       if (permission === 'granted') {
-        console.log('Notification permission granted.')
+        console.log('Notification permission already granted.')
         await this.getToken()
+      } else if (permission === 'default' && autoRequest) {
+        // Only auto-request if permission is default (not explicitly denied)
+        console.log('Auto-requesting notification permission...')
+        await this.requestPermission()
       } else {
-        console.log('Unable to get permission to notify.')
+        console.log('Notification permission denied by user')
       }
     } catch (error) {
       console.error('Error initializing FCM:', error)
     }
+  }
+
+  static async requestPermission(): Promise<NotificationPermission> {
+    try {
+      const permission = await Notification.requestPermission()
+      console.log('Notification permission result:', permission)
+      
+      if (permission === 'granted') {
+        console.log('Notification permission granted!')
+        await this.getToken()
+      }
+      
+      return permission
+    } catch (error) {
+      console.error('Error requesting notification permission:', error)
+      return 'denied'
+    }
+  }
+
+  static getPermissionStatus(): NotificationPermission {
+    return Notification.permission
   }
 
   static async getToken(userId?: string): Promise<string | null> {

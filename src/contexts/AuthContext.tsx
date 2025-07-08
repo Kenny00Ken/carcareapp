@@ -82,8 +82,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Register service worker
         await registerServiceWorker()
         
-        // Initialize FCM
-        await FCMService.initialize()
+        // Initialize FCM with automatic permission request
+        await FCMService.initialize(true)
         
         // Get and update FCM token only if permission is granted
         if (permission === 'granted') {
