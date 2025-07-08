@@ -239,7 +239,7 @@ export const getBestMatch = (partName: string): PartTemplate | null => {
   const searchTerm = partName.toLowerCase().trim()
   
   // Exact name match first
-  let exactMatch = PARTS_DATABASE.find(part => 
+  const exactMatch = PARTS_DATABASE.find(part => 
     part.name.toLowerCase() === searchTerm
   )
   if (exactMatch) return exactMatch
