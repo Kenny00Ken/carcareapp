@@ -285,6 +285,17 @@ export const LandingPage: React.FC = () => {
             </div>
             
             <div className="flex items-center space-x-2 sm:space-x-4">
+              {/* Know More link - only visible when user is not logged in */}
+              {!firebaseUser && (
+                <Button
+                  type="text"
+                  onClick={() => router.push('/know-more')}
+                  className="!border-none text-text-secondary dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/30 theme-transition !px-3 !py-1 sm:!px-4 sm:!py-2 rounded-lg text-sm sm:text-base font-medium"
+                >
+                  Know More
+                </Button>
+              )}
+              
               <Button
                 type="text"
                 icon={theme === 'light' ? <MoonOutlined /> : <BulbOutlined />}
@@ -1015,57 +1026,149 @@ export const LandingPage: React.FC = () => {
 
       {/* Footer */}
       <footer className="bg-gray-50 dark:bg-slate-950/90 backdrop-blur-sm border-t border-gray-200 dark:border-white/10 py-8 sm:py-12 theme-transition">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="flex items-center justify-center space-x-2 sm:space-x-3 mb-3 sm:mb-4">
-            <CarOutlined className="text-xl sm:text-2xl text-brand-500" />
-            <Title level={3} className="text-text-primary dark:!text-white !mb-0 !text-lg sm:!text-xl theme-transition">Auto Care</Title>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
+            {/* Company Info */}
+            <div className="md:col-span-1">
+              <div className="flex items-center space-x-2 sm:space-x-3 mb-3 sm:mb-4">
+                <CarOutlined className="text-xl sm:text-2xl text-brand-500" />
+                <Title level={3} className="text-text-primary dark:!text-white !mb-0 !text-lg sm:!text-xl theme-transition">Auto Care</Title>
+              </div>
+              <Paragraph className="text-text-secondary dark:!text-slate-400 !text-sm sm:!text-base !mb-4 theme-transition">
+                Connecting automotive professionals across Ghana through our innovative platform.
+              </Paragraph>
+              {/* Social Media Icons */}
+              <div className="flex items-center space-x-3 sm:space-x-4">
+                <a 
+                  href="#" 
+                  className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+                  aria-label="Facebook"
+                >
+                  <FacebookOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+                </a>
+                <a 
+                  href="#" 
+                  className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+                  aria-label="Twitter"
+                >
+                  <TwitterOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+                </a>
+                <a 
+                  href="#" 
+                  className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+                  aria-label="Instagram"
+                >
+                  <InstagramOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+                </a>
+                <a 
+                  href="#" 
+                  className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+                  aria-label="LinkedIn"
+                >
+                  <LinkedinOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+                </a>
+                <a 
+                  href="#" 
+                  className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
+                  aria-label="YouTube"
+                >
+                  <YoutubeOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+                </a>
+              </div>
+            </div>
+
+            {/* Platform Links */}
+            <div>
+              <Title level={4} className="text-text-primary dark:!text-white !mb-3 sm:!mb-4 !text-base sm:!text-lg theme-transition">Platform</Title>
+              <ul className="space-y-2 sm:space-y-3">
+                <li>
+                  <a href="/know-more" className="text-text-secondary dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors text-sm sm:text-base">
+                    How It Works
+                  </a>
+                </li>
+                <li>
+                  <a href="/auth/role-selection" className="text-text-secondary dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors text-sm sm:text-base">
+                    Get Started
+                  </a>
+                </li>
+                <li>
+                  <span className="text-text-secondary dark:text-slate-400 text-sm sm:text-base cursor-not-allowed opacity-60">
+                    For Car Owners
+                  </span>
+                </li>
+                <li>
+                  <span className="text-text-secondary dark:text-slate-400 text-sm sm:text-base cursor-not-allowed opacity-60">
+                    For Mechanics
+                  </span>
+                </li>
+                <li>
+                  <span className="text-text-secondary dark:text-slate-400 text-sm sm:text-base cursor-not-allowed opacity-60">
+                    For Dealers
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Support Links */}
+            <div>
+              <Title level={4} className="text-text-primary dark:!text-white !mb-3 sm:!mb-4 !text-base sm:!text-lg theme-transition">Support</Title>
+              <ul className="space-y-2 sm:space-y-3">
+                <li>
+                  <span className="text-text-secondary dark:text-slate-400 text-sm sm:text-base cursor-not-allowed opacity-60">
+                    Help Center
+                  </span>
+                </li>
+                <li>
+                  <span className="text-text-secondary dark:text-slate-400 text-sm sm:text-base cursor-not-allowed opacity-60">
+                    Contact Us
+                  </span>
+                </li>
+                <li>
+                  <span className="text-text-secondary dark:text-slate-400 text-sm sm:text-base cursor-not-allowed opacity-60">
+                    Safety Guidelines
+                  </span>
+                </li>
+                <li>
+                  <span className="text-text-secondary dark:text-slate-400 text-sm sm:text-base cursor-not-allowed opacity-60">
+                    Report Issue
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Legal Links */}
+            <div>
+              <Title level={4} className="text-text-primary dark:!text-white !mb-3 sm:!mb-4 !text-base sm:!text-lg theme-transition">Legal</Title>
+              <ul className="space-y-2 sm:space-y-3">
+                <li>
+                  <span className="text-text-secondary dark:text-slate-400 text-sm sm:text-base cursor-not-allowed opacity-60">
+                    Terms of Service
+                  </span>
+                </li>
+                <li>
+                  <span className="text-text-secondary dark:text-slate-400 text-sm sm:text-base cursor-not-allowed opacity-60">
+                    Privacy Policy
+                  </span>
+                </li>
+                <li>
+                  <span className="text-text-secondary dark:text-slate-400 text-sm sm:text-base cursor-not-allowed opacity-60">
+                    Cookie Policy
+                  </span>
+                </li>
+                <li>
+                  <span className="text-text-secondary dark:text-slate-400 text-sm sm:text-base cursor-not-allowed opacity-60">
+                    Disclaimer
+                  </span>
+                </li>
+              </ul>
+            </div>
           </div>
-          
-          <Paragraph className="text-text-secondary dark:!text-slate-400 !text-sm sm:!text-base !mb-4 sm:!mb-6 theme-transition">
-            Connecting automotive professionals across Ghana
-          </Paragraph>
-          
-          {/* Social Media Icons */}
-          <div className="flex items-center justify-center space-x-3 sm:space-x-4 mb-4 sm:mb-6">
-            <a 
-              href="#" 
-              className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
-              aria-label="Facebook"
-            >
-              <FacebookOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
-            </a>
-            <a 
-              href="#" 
-              className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
-              aria-label="Twitter"
-            >
-              <TwitterOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
-            </a>
-            <a 
-              href="#" 
-              className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
-              aria-label="Instagram"
-            >
-              <InstagramOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
-            </a>
-            <a 
-              href="#" 
-              className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
-              aria-label="LinkedIn"
-            >
-              <LinkedinOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
-            </a>
-            <a 
-              href="#" 
-              className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 group"
-              aria-label="YouTube"
-            >
-              <YoutubeOutlined className="text-sm sm:text-base text-brand-600 dark:text-slate-400 group-hover:text-white transition-colors" />
-            </a>
-          </div>
-          
-          <div className="text-xs sm:text-sm text-text-tertiary dark:text-slate-500 theme-transition">
-            © 2024 Auto Care • All rights reserved
+
+          {/* Footer Bottom */}
+          <div className="pt-6 sm:pt-8 border-t border-gray-200 dark:border-white/10 text-center">
+            <div className="text-xs sm:text-sm text-text-tertiary dark:text-slate-500 theme-transition">
+              © {new Date().getFullYear()} Auto Care Connect • All rights reserved
+            </div>
           </div>
         </div>
       </footer>
