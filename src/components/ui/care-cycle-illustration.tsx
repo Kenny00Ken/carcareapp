@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { motion } from 'framer-motion'
+import { motion, Variants } from 'framer-motion'
 import { 
   CarOutlined, 
   ToolOutlined, 
@@ -22,7 +22,7 @@ interface CareCycleIllustrationProps {
 }
 
 export const CareCycleIllustration: React.FC<CareCycleIllustrationProps> = ({ className = "" }) => {
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -33,27 +33,19 @@ export const CareCycleIllustration: React.FC<CareCycleIllustrationProps> = ({ cl
     }
   }
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        ease: [0.25, 0.46, 0.45, 0.94]
-      }
+      y: 0
     }
   }
 
-  const arrowVariants = {
+  const arrowVariants: Variants = {
     hidden: { opacity: 0, pathLength: 0 },
     visible: {
       opacity: 1,
-      pathLength: 1,
-      transition: {
-        duration: 1.5,
-        ease: [0.42, 0, 0.58, 1]
-      }
+      pathLength: 1
     }
   }
 
@@ -73,6 +65,7 @@ export const CareCycleIllustration: React.FC<CareCycleIllustrationProps> = ({ cl
           {/* Title */}
           <motion.div 
             variants={itemVariants}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             className="text-center mb-8 sm:mb-12"
           >
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
@@ -86,7 +79,7 @@ export const CareCycleIllustration: React.FC<CareCycleIllustrationProps> = ({ cl
           {/* Main cycle illustration */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 mb-8 sm:mb-12">
             {/* Car Owner */}
-            <motion.div variants={itemVariants} className="relative">
+            <motion.div variants={itemVariants} transition={{ duration: 0.8, ease: "easeOut" }} className="relative">
               <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-lg border border-gray-200 dark:border-slate-700 hover:shadow-xl transition-all duration-300 h-full">
                 {/* Header */}
                 <div className="text-center mb-6">
@@ -147,7 +140,7 @@ export const CareCycleIllustration: React.FC<CareCycleIllustrationProps> = ({ cl
             </motion.div>
 
             {/* Mechanic */}
-            <motion.div variants={itemVariants} className="relative">
+            <motion.div variants={itemVariants} transition={{ duration: 0.8, ease: "easeOut" }} className="relative">
               <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-lg border border-gray-200 dark:border-slate-700 hover:shadow-xl transition-all duration-300 h-full">
                 {/* Header */}
                 <div className="text-center mb-6">
@@ -208,7 +201,7 @@ export const CareCycleIllustration: React.FC<CareCycleIllustrationProps> = ({ cl
             </motion.div>
 
             {/* Parts Dealer */}
-            <motion.div variants={itemVariants} className="relative">
+            <motion.div variants={itemVariants} transition={{ duration: 0.8, ease: "easeOut" }} className="relative">
               <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-lg border border-gray-200 dark:border-slate-700 hover:shadow-xl transition-all duration-300 h-full">
                 {/* Header */}
                 <div className="text-center mb-6">
@@ -270,7 +263,7 @@ export const CareCycleIllustration: React.FC<CareCycleIllustrationProps> = ({ cl
           </div>
 
           {/* Connection Flow */}
-          <motion.div variants={itemVariants} className="relative">
+          <motion.div variants={itemVariants} transition={{ duration: 0.8, ease: "easeOut" }} className="relative">
             <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-lg border border-gray-200 dark:border-slate-700">
               <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
                 Seamless Integration Flow
