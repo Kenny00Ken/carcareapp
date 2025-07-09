@@ -401,7 +401,7 @@ const KnowMorePage: React.FC = () => {
                 onClick={() => router.push('/')}
                 className="!text-white !border-white/30 !bg-transparent hover:!bg-white/10 hover:!border-white !h-12 !px-8 !text-base font-medium rounded-lg transition-all duration-300"
               >
-                Learn More <HomeOutlined />
+                Back to Home <HomeOutlined />
               </Button>
             </Space>
           </motion.div>

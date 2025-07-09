@@ -478,7 +478,7 @@ export const LandingPage: React.FC = () => {
                     </Button>
                     <Button
                       size="large"
-                      onClick={() => setAuthModalVisible(true)}
+                      onClick={() => router.push('/know-more')}
                       className="!h-12 !px-8 !text-base font-medium text-slate-300 hover:text-white border-slate-600 hover:border-slate-400 bg-transparent hover:bg-slate-800/30 rounded-xl transition-all duration-300"
                     >
                       Learn More
@@ -642,7 +642,7 @@ export const LandingPage: React.FC = () => {
                   </Button>
                   <Button
                     size="large"
-                    onClick={() => setAuthModalVisible(true)}
+                    onClick={() => router.push('/know-more')}
                     className="!h-11 !px-6 sm:!h-12 sm:!px-8 !text-sm sm:!text-base font-medium text-text-secondary hover:text-text-primary border-gray-300 hover:border-brand-400 bg-transparent hover:bg-brand-50 rounded-xl transition-all duration-300 w-full sm:w-auto"
                   >
                     Learn More
