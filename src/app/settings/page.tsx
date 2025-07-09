@@ -91,18 +91,19 @@ export default function SettingsPage() {
     <DashboardLayout activeKey="settings">
       <div className="max-w-4xl mx-auto space-y-6">
         <div>
-          <Title level={2} className="!text-xl sm:!text-2xl !mb-2">Settings</Title>
-          <Paragraph className="!text-sm sm:!text-base">
+          <Title level={2} className="!text-xl sm:!text-2xl !mb-2 dark:!text-slate-200">Settings</Title>
+          <Paragraph className="!text-sm sm:!text-base dark:!text-slate-400">
             Manage your preferences, location settings, and notifications.
           </Paragraph>
         </div>
 
         {/* Notification Settings */}
         <Card 
+          className="dark:bg-slate-800 dark:border-slate-600"
           title={
             <Space>
               <BellOutlined />
-              <span className="text-sm sm:text-base">Notification Settings</span>
+              <span className="text-sm sm:text-base dark:text-slate-200">Notification Settings</span>
             </Space>
           }
         >
@@ -111,12 +112,12 @@ export default function SettingsPage() {
               <Row justify="space-between" align="middle" gutter={[16, 16]}>
                 <Col xs={18} sm={20}>
                   <Space direction="vertical" size="small">
-                    <Text strong className="text-sm sm:text-base">Push Notifications</Text>
-                    <Text type="secondary" className="text-xs sm:text-sm">
+                    <Text strong className="text-sm sm:text-base dark:text-slate-200">Push Notifications</Text>
+                    <Text type="secondary" className="text-xs sm:text-sm dark:text-slate-400">
                       Receive notifications for new requests, messages, and updates
                     </Text>
                     <Space>
-                      <Text className="text-xs sm:text-sm">Status:</Text>
+                      <Text className="text-xs sm:text-sm dark:text-slate-300">Status:</Text>
                       <Tag color={permissionStatus.color} icon={permissionStatus.icon} className="text-xs">
                         {permissionStatus.status}
                       </Tag>
@@ -173,16 +174,19 @@ export default function SettingsPage() {
         </Card>
 
         {/* Notification Types */}
-        <Card title={<span className="text-sm sm:text-base">Notification Types</span>}>
+        <Card 
+          className="dark:bg-slate-800 dark:border-slate-600"
+          title={<span className="text-sm sm:text-base dark:text-slate-200">Notification Types</span>}
+        >
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <Row justify="space-between" align="middle" gutter={[16, 16]}>
               <Col xs={18} sm={20}>
                 <Space>
                   <MessageOutlined className="text-blue-500" />
                   <div>
-                    <Text strong className="text-sm sm:text-base">New Messages</Text>
+                    <Text strong className="text-sm sm:text-base dark:text-slate-200">New Messages</Text>
                     <br />
-                    <Text type="secondary" className="text-xs sm:text-sm">Chat messages from customers or mechanics</Text>
+                    <Text type="secondary" className="text-xs sm:text-sm dark:text-slate-400">Chat messages from customers or mechanics</Text>
                   </div>
                 </Space>
               </Col>
@@ -198,9 +202,9 @@ export default function SettingsPage() {
                 <Space>
                   <SettingOutlined className="text-green-500" />
                   <div>
-                    <Text strong className="text-sm sm:text-base">Request Updates</Text>
+                    <Text strong className="text-sm sm:text-base dark:text-slate-200">Request Updates</Text>
                     <br />
-                    <Text type="secondary" className="text-xs sm:text-sm">Status changes on your service requests</Text>
+                    <Text type="secondary" className="text-xs sm:text-sm dark:text-slate-400">Status changes on your service requests</Text>
                   </div>
                 </Space>
               </Col>
@@ -216,9 +220,9 @@ export default function SettingsPage() {
                 <Space>
                   <PhoneOutlined className="text-purple-500" />
                   <div>
-                    <Text strong className="text-sm sm:text-base">New Requests</Text>
+                    <Text strong className="text-sm sm:text-base dark:text-slate-200">New Requests</Text>
                     <br />
-                    <Text type="secondary" className="text-xs sm:text-sm">New service requests in your area (Mechanics only)</Text>
+                    <Text type="secondary" className="text-xs sm:text-sm dark:text-slate-400">New service requests in your area (Mechanics only)</Text>
                   </div>
                 </Space>
               </Col>
@@ -230,9 +234,12 @@ export default function SettingsPage() {
         </Card>
 
         {/* Additional Settings */}
-        <Card title={<span className="text-sm sm:text-base">Other Settings</span>}>
+        <Card 
+          className="dark:bg-slate-800 dark:border-slate-600"
+          title={<span className="text-sm sm:text-base dark:text-slate-200">Other Settings</span>}
+        >
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            <Text type="secondary" className="text-xs sm:text-sm">
+            <Text type="secondary" className="text-xs sm:text-sm dark:text-slate-400">
               More settings coming soon. You can manage your profile, location preferences, 
               and other options from the profile page.
             </Text>

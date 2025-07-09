@@ -115,9 +115,9 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 via-purple-600 to-green-600 p-4 sm:p-8 text-white"
+          className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 via-purple-600 to-green-600 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800 p-4 sm:p-8 text-white"
         >
-          <div className="absolute inset-0 bg-black/20"></div>
+          <div className="absolute inset-0 bg-black/20 dark:bg-black/40"></div>
           <div className="relative z-10">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
               <div>
@@ -157,7 +157,7 @@ export default function ProfilePage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <Card className="text-center shadow-lg border-0 bg-gradient-to-br from-slate-50 to-blue-50">
+              <Card className="text-center shadow-lg border-0 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 dark:border dark:border-slate-600">
                 <div className="space-y-6">
                   {/* Profile Image Section */}
                   <div className="relative inline-block">
@@ -215,17 +215,18 @@ export default function ProfilePage() {
                   />
 
                   {/* Quick Stats */}
-                  <div className="bg-white/80 rounded-lg p-4 space-y-3">
-                    <Title level={5} className="!mb-3 text-gray-700">
+                  <div className="bg-white/80 dark:bg-slate-700/50 rounded-lg p-4 space-y-3">
+                    <Title level={5} className="!mb-3 text-gray-700 dark:!text-gray-200">
                       Account Status
                     </Title>
                     <Row gutter={[16, 16]}>
                       <Col span={12}>
                         <Statistic
                           title="Member Since"
-                          value={user.created_at ? new Date(user.created_at).getFullYear() : 'N/A'}
+                          value={user.created_at ? new Date(user.created_at).getFullYear().toString() : 'N/A'}
                           prefix={<CalendarOutlined />}
                           valueStyle={{ fontSize: '18px', color: '#1890ff' }}
+                          className="dark:[&_.ant-statistic-content-value]:!text-blue-400 dark:[&_.ant-statistic-title]:!text-slate-300"
                         />
                       </Col>
                       <Col span={12}>
@@ -234,6 +235,7 @@ export default function ProfilePage() {
                           value="Verified"
                           prefix={<SafetyOutlined />}
                           valueStyle={{ fontSize: '14px', color: '#52c41a' }}
+                          className="dark:[&_.ant-statistic-content-value]:!text-green-400 dark:[&_.ant-statistic-title]:!text-slate-300"
                         />
                       </Col>
                     </Row>
@@ -251,11 +253,11 @@ export default function ProfilePage() {
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               <Card 
-                className="shadow-lg border-0"
+                className="shadow-lg border-0 dark:bg-slate-800 dark:border dark:border-slate-600"
                 title={
                   <div className="flex items-center gap-2">
                     <EditOutlined className="text-blue-500" />
-                    <span>Personal Information</span>
+                    <span className="dark:text-slate-200">Personal Information</span>
                   </div>
                 }
               >
@@ -270,7 +272,7 @@ export default function ProfilePage() {
                       <Form.Item
                         name="name"
                         label={
-                          <span className="font-medium text-gray-700">
+                          <span className="font-medium text-gray-700 dark:text-slate-300">
                             <UserOutlined className="mr-2" />
                             Full Name
                           </span>
@@ -280,7 +282,7 @@ export default function ProfilePage() {
                         <Input 
                           placeholder="Enter your full name"
                           size="large"
-                          className="rounded-lg"
+                          className="rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200 dark:placeholder-slate-400"
                         />
                       </Form.Item>
                     </Col>
@@ -289,7 +291,7 @@ export default function ProfilePage() {
                       <Form.Item
                         name="email"
                         label={
-                          <span className="font-medium text-gray-700">
+                          <span className="font-medium text-gray-700 dark:text-slate-300">
                             <MailOutlined className="mr-2" />
                             Email Address
                           </span>
@@ -302,7 +304,7 @@ export default function ProfilePage() {
                         <Input 
                           placeholder="Enter your email"
                           size="large"
-                          className="rounded-lg"
+                          className="rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200 dark:placeholder-slate-400"
                         />
                       </Form.Item>
                     </Col>
@@ -313,7 +315,7 @@ export default function ProfilePage() {
                       <Form.Item
                         name="phone"
                         label={
-                          <span className="font-medium text-gray-700">
+                          <span className="font-medium text-gray-700 dark:text-slate-300">
                             <PhoneOutlined className="mr-2" />
                             Phone Number
                           </span>
@@ -323,7 +325,7 @@ export default function ProfilePage() {
                         <Input 
                           placeholder="Enter your phone number"
                           size="large"
-                          className="rounded-lg"
+                          className="rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200 dark:placeholder-slate-400"
                         />
                       </Form.Item>
                     </Col>
@@ -331,7 +333,7 @@ export default function ProfilePage() {
                     <Col xs={24} md={12}>
                       <Form.Item
                         label={
-                          <span className="font-medium text-gray-700">
+                          <span className="font-medium text-gray-700 dark:text-slate-300">
                             {getRoleIcon(user.role)}
                             <span className="ml-2">Account Type</span>
                           </span>
@@ -341,7 +343,7 @@ export default function ProfilePage() {
                           value={user.role?.replace('CarOwner', 'Car Owner')}
                           disabled
                           size="large"
-                          className="rounded-lg bg-gray-50"
+                          className="rounded-lg bg-gray-50 dark:bg-slate-600 dark:border-slate-500 dark:text-slate-200"
                           suffix={
                             <Tooltip title="Account type cannot be changed">
                               <SafetyOutlined className="text-green-500" />
@@ -414,20 +416,20 @@ export default function ProfilePage() {
           transition={{ duration: 0.5, delay: 0.3 }}
         >
           <Card 
-            className="shadow-lg border-0"
+            className="shadow-lg border-0 dark:bg-slate-800 dark:border dark:border-slate-600"
             title={
               <div className="flex items-center gap-2">
                 <SafetyOutlined className="text-green-500" />
-                <span>Account Details</span>
+                <span className="dark:text-slate-200">Account Details</span>
               </div>
             }
           >
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={8}>
-                <div className="text-center p-3 sm:p-4 bg-blue-50 rounded-lg">
+                <div className="text-center p-3 sm:p-4 bg-blue-50 dark:bg-slate-700 rounded-lg">
                   <CalendarOutlined className="text-xl sm:text-2xl text-blue-500 mb-2" />
                   <div>
-                    <Text strong className="block text-gray-700 text-sm sm:text-base">Account Created</Text>
+                    <Text strong className="block text-gray-700 dark:text-slate-200 text-sm sm:text-base">Account Created</Text>
                     <Text type="secondary" className="text-xs sm:text-sm">
                       {user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -440,20 +442,20 @@ export default function ProfilePage() {
               </Col>
               
               <Col xs={24} sm={8}>
-                <div className="text-center p-3 sm:p-4 bg-green-50 rounded-lg">
+                <div className="text-center p-3 sm:p-4 bg-green-50 dark:bg-slate-700 rounded-lg">
                   <CheckCircleOutlined className="text-xl sm:text-2xl text-green-500 mb-2" />
                   <div>
-                    <Text strong className="block text-gray-700 text-sm sm:text-base">Profile Status</Text>
+                    <Text strong className="block text-gray-700 dark:text-slate-200 text-sm sm:text-base">Profile Status</Text>
                     <Badge status="success" text="Verified & Active" />
                   </div>
                 </div>
               </Col>
               
               <Col xs={24} sm={8}>
-                <div className="text-center p-3 sm:p-4 bg-purple-50 rounded-lg">
+                <div className="text-center p-3 sm:p-4 bg-purple-50 dark:bg-slate-700 rounded-lg">
                   <StarFilled className="text-xl sm:text-2xl text-purple-500 mb-2" />
                   <div>
-                    <Text strong className="block text-gray-700 text-sm sm:text-base">Member Tier</Text>
+                    <Text strong className="block text-gray-700 dark:text-slate-200 text-sm sm:text-base">Member Tier</Text>
                     <Badge color="purple" text="Standard Member" />
                   </div>
                 </div>
