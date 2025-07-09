@@ -40,7 +40,7 @@ export const CareCycleIllustration: React.FC<CareCycleIllustrationProps> = ({ cl
       y: 0,
       transition: {
         duration: 0.8,
-        ease: "easeOut"
+        ease: [0.25, 0.46, 0.45, 0.94]
       }
     }
   }
@@ -52,7 +52,7 @@ export const CareCycleIllustration: React.FC<CareCycleIllustrationProps> = ({ cl
       pathLength: 1,
       transition: {
         duration: 1.5,
-        ease: "easeInOut"
+        ease: [0.42, 0, 0.58, 1]
       }
     }
   }

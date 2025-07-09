@@ -50,7 +50,7 @@ export const HeroCarAnimation: React.FC<HeroCarAnimationProps> = ({ className = 
           opacity="0.3"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
-          transition={{ duration: 1, ease: "easeOut" }}
+          transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
         />
         
         {/* Road lines */}
@@ -72,7 +72,7 @@ export const HeroCarAnimation: React.FC<HeroCarAnimationProps> = ({ className = 
         <motion.g
           initial={{ x: -200, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 1.2, delay: 0.3, ease: "easeOut" }}
+          transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
           {/* Main car body */}
           <path
@@ -109,7 +109,7 @@ export const HeroCarAnimation: React.FC<HeroCarAnimationProps> = ({ className = 
         <motion.g
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.8, delay: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
           <circle cx="200" cy="200" r="25" fill="url(#wheelGradient)" />
           <circle cx="200" cy="200" r="15" fill="#6B7280" />
@@ -123,7 +123,7 @@ export const HeroCarAnimation: React.FC<HeroCarAnimationProps> = ({ className = 
         {/* Wheel rotation animation */}
         <motion.g
           animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 2, repeat: Infinity, ease: [0, 0, 1, 1] }}
           style={{ transformOrigin: "200px 200px" }}
         >
           <rect x="192" y="185" width="16" height="2" fill="#374151" />
@@ -134,7 +134,7 @@ export const HeroCarAnimation: React.FC<HeroCarAnimationProps> = ({ className = 
         
         <motion.g
           animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 2, repeat: Infinity, ease: [0, 0, 1, 1] }}
           style={{ transformOrigin: "400px 200px" }}
         >
           <rect x="392" y="185" width="16" height="2" fill="#374151" />
@@ -152,7 +152,7 @@ export const HeroCarAnimation: React.FC<HeroCarAnimationProps> = ({ className = 
           {/* Wrench icon */}
           <motion.g
             animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 2, repeat: Infinity, ease: [0.42, 0, 0.58, 1] }}
           >
             <circle cx="100" cy="80" r="20" fill="#059669" opacity="0.9" />
             <path d="M90 75 L110 75 L105 85 L95 85 Z" fill="white" />
@@ -162,7 +162,7 @@ export const HeroCarAnimation: React.FC<HeroCarAnimationProps> = ({ className = 
           {/* Parts icon */}
           <motion.g
             animate={{ y: [0, -8, 0] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: [0.42, 0, 0.58, 1], delay: 0.5 }}
           >
             <circle cx="500" cy="90" r="18" fill="#DC2626" opacity="0.9" />
             <rect x="490" y="82" width="20" height="16" fill="white" opacity="0.8" rx="2" />
@@ -204,7 +204,7 @@ export const HeroCarAnimation: React.FC<HeroCarAnimationProps> = ({ className = 
           fill="#3B82F6"
           opacity="0.4"
           animate={{ scale: [1, 1.5, 1], opacity: [0.4, 0.8, 0.4] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 3, repeat: Infinity, ease: [0.42, 0, 0.58, 1] }}
         />
         <motion.circle
           cx="520"
@@ -213,7 +213,7 @@ export const HeroCarAnimation: React.FC<HeroCarAnimationProps> = ({ className = 
           fill="#059669"
           opacity="0.4"
           animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.6, 0.4] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: [0.42, 0, 0.58, 1], delay: 1 }}
         />
       </svg>
     </div>

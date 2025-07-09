@@ -143,7 +143,7 @@ export const WorkflowIllustration: React.FC<WorkflowIllustrationProps> = ({ clas
           fill="#3B82F6"
           opacity="0.4"
           animate={{ y: [0, -10, 0], opacity: [0.4, 0.8, 0.4] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 2, repeat: Infinity, ease: [0.42, 0, 0.58, 1] }}
         />
         <motion.circle
           cx="700"
@@ -152,7 +152,7 @@ export const WorkflowIllustration: React.FC<WorkflowIllustrationProps> = ({ clas
           fill="#059669"
           opacity="0.4"
           animate={{ y: [0, -8, 0], opacity: [0.4, 0.7, 0.4] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: [0.42, 0, 0.58, 1], delay: 0.5 }}
         />
         <motion.circle
           cx="500"
@@ -161,7 +161,7 @@ export const WorkflowIllustration: React.FC<WorkflowIllustrationProps> = ({ clas
           fill="#DC2626"
           opacity="0.4"
           animate={{ y: [0, -6, 0], opacity: [0.4, 0.6, 0.4] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          transition={{ duration: 3, repeat: Infinity, ease: [0.42, 0, 0.58, 1], delay: 1 }}
         />
       </svg>
     </div>
