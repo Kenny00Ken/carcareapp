@@ -16,10 +16,6 @@ import {
   PhoneOutlined,
   HomeOutlined,
   StarFilled,
-  SafetyOutlined,
-  ClockCircleOutlined,
-  DollarOutlined,
-  TeamOutlined,
   BarChartOutlined,
   SettingOutlined,
   BellOutlined
@@ -182,85 +178,6 @@ const KnowMorePage: React.FC = () => {
             >
               <CareCycleIllustration className="max-w-6xl mx-auto" />
             </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Platform Benefits Section */}
-      <section className="py-12 sm:py-16 bg-gray-50 dark:bg-slate-900/50 theme-transition">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div {...fadeInUp} className="text-center mb-12">
-            <Title level={2} className="!text-2xl sm:!text-3xl !mb-4 text-text-primary dark:!text-white theme-transition">
-              Why Choose Auto Care Connect?
-            </Title>
-            <Paragraph className="!text-base sm:!text-lg text-text-secondary dark:!text-slate-400 max-w-3xl mx-auto theme-transition">
-              Our platform revolutionizes Ghana's automotive industry by creating a unified ecosystem 
-              where quality meets convenience, transparency meets trust, and efficiency meets excellence.
-            </Paragraph>
-          </motion.div>
-
-          <motion.div variants={staggerChildren} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {[
-              {
-                icon: <SafetyOutlined className="text-3xl text-brand-600" />,
-                title: "Verified Professionals",
-                description: "Every mechanic and parts dealer undergoes thorough verification. View ratings, reviews, and certifications before making your choice.",
-                bgColor: "bg-blue-50 dark:bg-blue-900/20",
-                borderColor: "border-blue-200 dark:border-blue-800"
-              },
-              {
-                icon: <ClockCircleOutlined className="text-3xl text-secondary-600" />,
-                title: "Real-time Transparency",
-                description: "Get live updates on your repair progress with photos, messages, and estimated completion times. No more wondering about your car's status.",
-                bgColor: "bg-green-50 dark:bg-green-900/20",
-                borderColor: "border-green-200 dark:border-green-800"
-              },
-              {
-                icon: <DollarOutlined className="text-3xl text-accent-600" />,
-                title: "Fair & Transparent Pricing",
-                description: "Compare quotes from multiple professionals. No hidden fees, no surprise costs. Know exactly what you're paying for before any work begins.",
-                bgColor: "bg-purple-50 dark:bg-purple-900/20",
-                borderColor: "border-purple-200 dark:border-purple-800"
-              },
-              {
-                icon: <MessageOutlined className="text-3xl text-brand-600" />,
-                title: "Seamless Communication",
-                description: "Built-in chat system connects all parties. Ask questions, share photos, and get instant responses from your mechanic or parts dealer.",
-                bgColor: "bg-blue-50 dark:bg-blue-900/20",
-                borderColor: "border-blue-200 dark:border-blue-800"
-              },
-              {
-                icon: <StarFilled className="text-3xl text-secondary-600" />,
-                title: "Quality Assurance",
-                description: "Every completed job comes with quality guarantees. Rate your experience and help build a community of trusted professionals.",
-                bgColor: "bg-green-50 dark:bg-green-900/20",
-                borderColor: "border-green-200 dark:border-green-800"
-              },
-              {
-                icon: <TeamOutlined className="text-3xl text-accent-600" />,
-                title: "Community-Driven",
-                description: "Built by Ghanaians for Ghanaians. Our platform understands local needs, challenges, and automotive culture.",
-                bgColor: "bg-purple-50 dark:bg-purple-900/20",
-                borderColor: "border-purple-200 dark:border-purple-800"
-              }
-            ].map((benefit, index) => (
-              <motion.div key={index} variants={fadeInUp}>
-                <Card
-                  className={`h-full ${benefit.bgColor} ${benefit.borderColor} border-2 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 theme-transition`}
-                  bodyStyle={{ padding: '24px' }}
-                >
-                  <div className="text-center mb-4">
-                    {benefit.icon}
-                  </div>
-                  <Title level={4} className="!text-lg !mb-3 text-text-primary dark:!text-white theme-transition text-center">
-                    {benefit.title}
-                  </Title>
-                  <Paragraph className="!text-sm text-text-secondary dark:!text-slate-400 theme-transition text-center">
-                    {benefit.description}
-                  </Paragraph>
-                </Card>
-              </motion.div>
-            ))}
           </motion.div>
         </div>
       </section>

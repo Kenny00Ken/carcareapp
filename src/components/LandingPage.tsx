@@ -292,7 +292,7 @@ export const LandingPage: React.FC = () => {
                   onClick={() => router.push('/know-more')}
                   className="!border-none text-text-secondary dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/30 theme-transition !px-3 !py-1 sm:!px-4 sm:!py-2 rounded-lg text-sm sm:text-base font-medium"
                 >
-                  Know More
+                  Know More?
                 </Button>
               )}
               
@@ -1083,7 +1083,7 @@ export const LandingPage: React.FC = () => {
               <ul className="space-y-2 sm:space-y-3">
                 <li>
                   <a href="/know-more" className="text-text-secondary dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors text-sm sm:text-base">
-                    How It Works
+                    How It Works?
                   </a>
                 </li>
                 <li>
