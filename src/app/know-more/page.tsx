@@ -16,6 +16,10 @@ import {
   PhoneOutlined,
   HomeOutlined,
   StarFilled,
+  SafetyOutlined,
+  ClockCircleOutlined,
+  DollarOutlined,
+  TeamOutlined,
   BarChartOutlined,
   SettingOutlined,
   BellOutlined
