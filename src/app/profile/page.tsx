@@ -27,6 +27,32 @@ import type { Address } from '@/types/location'
 
 const { Title, Text, Paragraph } = Typography
 
+// Helper function to remove undefined fields recursively
+const removeUndefinedFields = (obj: any): any => {
+  if (obj === null || obj === undefined) {
+    return obj
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(removeUndefinedFields).filter(item => item !== undefined)
+  }
+  
+  if (typeof obj === 'object') {
+    const cleaned: any = {}
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        const cleanedValue = removeUndefinedFields(value)
+        if (cleanedValue !== undefined) {
+          cleaned[key] = cleanedValue
+        }
+      }
+    }
+    return cleaned
+  }
+  
+  return obj
+}
+
 export default function ProfilePage() {
   const { user, firebaseUser, updateUserProfile } = useAuth()
   const [loading, setLoading] = useState(false)
@@ -55,15 +81,27 @@ export default function ProfilePage() {
       if (values.address && typeof values.address === 'object') {
         const addressObj = values.address as Address
         processedValues.address = addressObj.formatted_address
+        
+        // Only include location_data fields that are not undefined
         processedValues.location_data = {
-          coordinates: addressObj.coordinates,
-          address_components: addressObj.address_components,
-          place_id: addressObj.place_id
+          ...(addressObj.coordinates && { coordinates: addressObj.coordinates }),
+          ...(addressObj.address_components && { address_components: addressObj.address_components }),
+          ...(addressObj.place_id && { place_id: addressObj.place_id })
+        }
+        
+        // Remove location_data if it's empty
+        if (Object.keys(processedValues.location_data).length === 0) {
+          delete processedValues.location_data
         }
       }
 
+      // Remove any undefined values from the processed values recursively
+      const cleanedValues = removeUndefinedFields(processedValues)
+
+      console.log('Updating user profile:', cleanedValues)
+
       await updateUserProfile({
-        ...processedValues,
+        ...cleanedValues,
         updated_at: new Date().toISOString(),
       })
       message.success('Profile updated successfully!')
