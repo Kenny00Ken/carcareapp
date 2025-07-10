@@ -29,25 +29,34 @@ const { Title, Text, Paragraph } = Typography
 
 // Helper function to remove undefined fields recursively
 const removeUndefinedFields = (obj: any): any => {
-  if (obj === null || obj === undefined) {
-    return obj
+  if (obj === null) {
+    return null
+  }
+  
+  if (obj === undefined) {
+    return undefined
   }
   
   if (Array.isArray(obj)) {
-    return obj.map(removeUndefinedFields).filter(item => item !== undefined)
+    const cleanedArray = obj.map(removeUndefinedFields).filter(item => item !== undefined)
+    return cleanedArray.length > 0 ? cleanedArray : undefined
   }
   
-  if (typeof obj === 'object') {
+  if (typeof obj === 'object' && obj !== null) {
     const cleaned: any = {}
+    let hasValidFields = false
+    
     for (const [key, value] of Object.entries(obj)) {
       if (value !== undefined) {
         const cleanedValue = removeUndefinedFields(value)
         if (cleanedValue !== undefined) {
           cleaned[key] = cleanedValue
+          hasValidFields = true
         }
       }
     }
-    return cleaned
+    
+    return hasValidFields ? cleaned : undefined
   }
   
   return obj
@@ -82,28 +91,42 @@ export default function ProfilePage() {
         const addressObj = values.address as Address
         processedValues.address = addressObj.formatted_address
         
-        // Only include location_data fields that are not undefined
-        processedValues.location_data = {
-          ...(addressObj.coordinates && { coordinates: addressObj.coordinates }),
-          ...(addressObj.address_components && { address_components: addressObj.address_components }),
-          ...(addressObj.place_id && { place_id: addressObj.place_id })
+        // Build location_data object carefully, only adding defined fields
+        const locationData: any = {}
+        
+        if (addressObj.coordinates) {
+          locationData.coordinates = addressObj.coordinates
         }
         
-        // Remove location_data if it's empty
-        if (Object.keys(processedValues.location_data).length === 0) {
-          delete processedValues.location_data
+        if (addressObj.address_components) {
+          locationData.address_components = addressObj.address_components
+        }
+        
+        if (addressObj.place_id) {
+          locationData.place_id = addressObj.place_id
+        }
+        
+        // Only add location_data if it has content
+        if (Object.keys(locationData).length > 0) {
+          processedValues.location_data = locationData
         }
       }
 
       // Remove any undefined values from the processed values recursively
       const cleanedValues = removeUndefinedFields(processedValues)
 
-      console.log('Updating user profile:', cleanedValues)
+      console.log('Processed values before cleaning:', processedValues)
+      console.log('Cleaned values for update:', cleanedValues)
 
-      await updateUserProfile({
+      // Final safety check: ensure no undefined values in the final object
+      const finalValues = JSON.parse(JSON.stringify({
         ...cleanedValues,
         updated_at: new Date().toISOString(),
-      })
+      }))
+
+      console.log('Final values after JSON serialization:', finalValues)
+
+      await updateUserProfile(finalValues)
       message.success('Profile updated successfully!')
     } catch (error) {
       console.error('Error updating profile:', error)
