@@ -18,6 +18,8 @@ export interface User {
     coordinates?: { lat: number; lng: number }
     address_components?: any[]
     place_id?: string
+    city?: string
+    country?: string
   }
 }
 
