@@ -399,7 +399,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
                 loadingText="Signing in..."
               >
                 Continue with Google
-              </Button>
+              </LoadingButton>
 
               <Button
                 icon={<AppleOutlined />}
