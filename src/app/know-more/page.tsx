@@ -420,6 +420,26 @@ const KnowMorePage: React.FC = () => {
             Connecting automotive professionals across Ghana
           </Paragraph>
           
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mb-4">
+            <a 
+              href="/terms" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs sm:text-sm text-text-secondary dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+            >
+              Terms & Conditions
+            </a>
+            <span className="hidden sm:inline text-text-tertiary dark:text-slate-500">•</span>
+            <a 
+              href="/privacy" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs sm:text-sm text-text-secondary dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+            >
+              Privacy Policy
+            </a>
+          </div>
+          
           <div className="text-xs sm:text-sm text-text-tertiary dark:text-slate-500 theme-transition">
             © {new Date().getFullYear()} AutoCare Connect • All rights reserved
           </div>

@@ -1141,14 +1141,24 @@ export const LandingPage: React.FC = () => {
               <Title level={4} className="text-text-primary dark:!text-white !mb-3 sm:!mb-4 !text-base sm:!text-lg theme-transition">Legal</Title>
               <ul className="space-y-2 sm:space-y-3">
                 <li>
-                  <span className="text-text-secondary dark:text-slate-400 text-sm sm:text-base cursor-not-allowed opacity-60">
-                    Terms of Service
-                  </span>
+                  <a 
+                    href="/terms" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-text-secondary dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 text-sm sm:text-base transition-colors"
+                  >
+                    Terms & Conditions
+                  </a>
                 </li>
                 <li>
-                  <span className="text-text-secondary dark:text-slate-400 text-sm sm:text-base cursor-not-allowed opacity-60">
+                  <a 
+                    href="/privacy" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-text-secondary dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 text-sm sm:text-base transition-colors"
+                  >
                     Privacy Policy
-                  </span>
+                  </a>
                 </li>
                 <li>
                   <span className="text-text-secondary dark:text-slate-400 text-sm sm:text-base cursor-not-allowed opacity-60">
