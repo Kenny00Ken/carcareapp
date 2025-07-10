@@ -31,7 +31,7 @@ export function CarHero3D({ onGetStarted, onLearnMore, user, firebaseUser }: Car
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white via-blue-100 to-blue-300 mb-6 leading-tight">
-              Auto Care
+              AutoCare
               <span className="block text-2xl md:text-3xl mt-2 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                 Connect • Diagnose • Fix
               </span>

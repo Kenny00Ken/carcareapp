@@ -251,7 +251,7 @@ export const LandingPage: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
-          <Text className="text-gray-600 dark:text-gray-300">Loading Auto Care...</Text>
+          <Text className="text-gray-600 dark:text-gray-300">Loading AutoCare...</Text>
         </div>
       </div>
     )
@@ -280,7 +280,7 @@ export const LandingPage: React.FC = () => {
             <div className="flex items-center space-x-2 sm:space-x-3">
               <CarOutlined className="text-xl sm:text-2xl text-brand-500" />
               <Title level={3} className="!mb-0 text-text-primary dark:!text-white !text-base sm:!text-lg font-bold theme-transition">
-                Auto Care
+                AutoCare
               </Title>
             </div>
             
@@ -1032,7 +1032,7 @@ export const LandingPage: React.FC = () => {
             <div className="md:col-span-1">
               <div className="flex items-center space-x-2 sm:space-x-3 mb-3 sm:mb-4">
                 <CarOutlined className="text-xl sm:text-2xl text-brand-500" />
-                <Title level={3} className="text-text-primary dark:!text-white !mb-0 !text-lg sm:!text-xl theme-transition">Auto Care</Title>
+                <Title level={3} className="text-text-primary dark:!text-white !mb-0 !text-lg sm:!text-xl theme-transition">AutoCare</Title>
               </div>
               <Paragraph className="text-text-secondary dark:!text-slate-400 !text-sm sm:!text-base !mb-4 theme-transition">
                 Connecting automotive professionals across Ghana through our innovative platform.
@@ -1167,7 +1167,7 @@ export const LandingPage: React.FC = () => {
           {/* Footer Bottom */}
           <div className="pt-6 sm:pt-8 border-t border-gray-200 dark:border-white/10 text-center">
             <div className="text-xs sm:text-sm text-text-tertiary dark:text-slate-500 theme-transition">
-              © {new Date().getFullYear()} Auto Care Connect • All rights reserved
+              © {new Date().getFullYear()} AutoCare Connect • All rights reserved
             </div>
           </div>
         </div>

@@ -573,7 +573,7 @@ export class EnhancedLocationService {
 
       const response = await fetch(url, {
         headers: {
-          'User-Agent': 'CarCareApp/1.0'
+          'User-Agent': 'AutoCareApp/1.0'
         }
       })
 

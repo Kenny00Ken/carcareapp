@@ -2,7 +2,7 @@
 
 ## Overview
 
-The CarCare app now features a unified, professional loading system that provides consistent loading experiences across the entire application. This system replaces all previous loading implementations with a cohesive set of components and utilities.
+The AutoCare app now features a unified, professional loading system that provides consistent loading experiences across the entire application. This system replaces all previous loading implementations with a cohesive set of components and utilities.
 
 ## Key Features
 

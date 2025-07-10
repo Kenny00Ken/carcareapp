@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "carcare-app",
+  "name": "autocare-app",
   "functions": {
     "app/api/**": {
       "maxDuration": 30

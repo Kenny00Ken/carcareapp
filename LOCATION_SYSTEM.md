@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the comprehensive location-based system implemented for the CarCare application, featuring professional GPS integration, proximity-based mechanic matching, and enhanced address management capabilities.
+This document outlines the comprehensive location-based system implemented for the AutoCare application, featuring professional GPS integration, proximity-based mechanic matching, and enhanced address management capabilities.
 
 ## Architecture
 
@@ -193,7 +193,7 @@ Map components loaded only when needed.
 - Address format validation
 - XSS prevention in search queries
 
-## Integration with CarCare App
+## Integration with AutoCare App
 
 ### 1. User Profile
 

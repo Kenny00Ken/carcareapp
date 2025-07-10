@@ -28,7 +28,7 @@ export const GlobalLoader: FC<GlobalLoaderProps> = ({
             transition={{ delay: 0.1 }}
             className="text-2xl font-bold text-blue-600"
           >
-            CarCare
+            AutoCare
           </motion.div>
         )}
         

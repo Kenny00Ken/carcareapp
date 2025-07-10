@@ -143,7 +143,7 @@ const KnowMorePage: React.FC = () => {
             <div className="flex items-center space-x-2 sm:space-x-3">
               <CarOutlined className="text-xl sm:text-2xl text-brand-500" />
               <Title level={3} className="!mb-0 text-text-primary dark:!text-white !text-base sm:!text-lg font-bold theme-transition">
-                Auto Care
+                AutoCare
               </Title>
             </div>
             
@@ -166,7 +166,7 @@ const KnowMorePage: React.FC = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div {...fadeInUp}>
             <Title level={1} className="!text-3xl sm:!text-4xl md:!text-5xl !mb-6 !font-bold text-text-primary dark:!text-white theme-transition">
-              How Auto Care <span className="text-brand-600 dark:text-brand-400">Works</span>
+              How AutoCare <span className="text-brand-600 dark:text-brand-400">Works</span>
             </Title>
             <Paragraph className="!text-lg sm:!text-xl text-text-secondary dark:!text-slate-400 !mb-8 max-w-3xl mx-auto theme-transition">
               Discover how Ghana's premier automotive platform connects car owners, mechanics, and parts dealers 
@@ -194,7 +194,7 @@ const KnowMorePage: React.FC = () => {
               Choose Your Role
             </Title>
             <Paragraph className="!text-base sm:!text-lg text-text-secondary dark:!text-slate-400 max-w-2xl mx-auto theme-transition">
-              Auto Care serves three key players in Ghana's automotive ecosystem, each with specialized dashboards and tools
+              AutoCare serves three key players in Ghana's automotive ecosystem, each with specialized dashboards and tools
             </Paragraph>
           </motion.div>
 
@@ -256,7 +256,7 @@ const KnowMorePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-12">
             <Title level={2} className="!text-2xl sm:!text-3xl !mb-4 text-text-primary dark:!text-white theme-transition">
-              The Auto Care Cycle
+              The AutoCare Cycle
             </Title>
             <Paragraph className="!text-base sm:!text-lg text-text-secondary dark:!text-slate-400 max-w-2xl mx-auto theme-transition">
               Our platform follows a simple 3-step process that ensures quality automotive care
@@ -316,7 +316,7 @@ const KnowMorePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-12">
             <Title level={2} className="!text-2xl sm:!text-3xl !mb-4 text-text-primary dark:!text-white theme-transition">
-              Why Choose Auto Care?
+              Why Choose AutoCare?
             </Title>
             <Paragraph className="!text-base sm:!text-lg text-text-secondary dark:!text-slate-400 max-w-2xl mx-auto theme-transition">
               Built specifically for Ghana's automotive ecosystem with local needs in mind
@@ -385,7 +385,7 @@ const KnowMorePage: React.FC = () => {
               Ready to Get Started?
             </Title>
             <Paragraph className="!text-base sm:!text-lg !text-white/90 !mb-8 max-w-2xl mx-auto">
-              Join thousands of satisfied users who trust Auto Care for their automotive needs
+              Join thousands of satisfied users who trust AutoCare for their automotive needs
             </Paragraph>
             <Space size="large" className="flex-wrap justify-center">
               <Button
@@ -413,7 +413,7 @@ const KnowMorePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex items-center justify-center space-x-2 sm:space-x-3 mb-3 sm:mb-4">
             <CarOutlined className="text-xl sm:text-2xl text-brand-500" />
-            <Title level={3} className="text-text-primary dark:!text-white !mb-0 !text-lg sm:!text-xl theme-transition">Auto Care</Title>
+            <Title level={3} className="text-text-primary dark:!text-white !mb-0 !text-lg sm:!text-xl theme-transition">AutoCare</Title>
           </div>
           
           <Paragraph className="text-text-secondary dark:!text-slate-400 !text-sm sm:!text-base !mb-4 theme-transition">
@@ -421,7 +421,7 @@ const KnowMorePage: React.FC = () => {
           </Paragraph>
           
           <div className="text-xs sm:text-sm text-text-tertiary dark:text-slate-500 theme-transition">
-            © {new Date().getFullYear()} Auto Care Connect • All rights reserved
+            © {new Date().getFullYear()} AutoCare Connect • All rights reserved
           </div>
         </div>
       </footer>

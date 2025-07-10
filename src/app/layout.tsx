@@ -7,10 +7,10 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Auto Care Connect',
+  title: 'AutoCare Connect',
   description: 'Connecting Car Owners, Mechanics, and Dealers in one ecosystem',
-  keywords: 'auto care, car repair, mechanics, dealers, car parts',
-  authors: [{ name: 'Auto Care Connect Team' }],
+  keywords: 'autocare, car repair, mechanics, dealers, car parts',
+  authors: [{ name: 'AutoCare Connect Team' }],
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
 }
 

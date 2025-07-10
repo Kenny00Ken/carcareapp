@@ -1,4 +1,4 @@
-# Car Care Connect
+# AutoCare Connect
 
 A comprehensive full-stack web application that connects Car Owners, Mechanics, and Dealers in a single ecosystem for automotive diagnostics, part listings, repairs, and maintenance insights.
 
@@ -63,7 +63,7 @@ Before you begin, ensure you have:
 
 ```bash
 git clone <repository-url>
-cd car-care-connect
+cd autocare-connect
 ```
 
 ### 2. Install Dependencies
@@ -119,7 +119,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## 📁 Project Structure
 
 ```
-car-care-connect/
+autocare-connect/
 ├── src/
 │   ├── app/                    # Next.js app directory
 │   │   ├── auth/              # Authentication pages
@@ -233,7 +233,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🆘 Support
 
-For support, email support@carcareconnect.com or join our Slack channel.
+For support, email support@autocareconnect.com or join our Slack channel.
 
 ## 🗺️ Roadmap
 

@@ -45,7 +45,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
 
   return (
     <Modal
-      title="Welcome to Auto Care"
+      title="Welcome to AutoCare"
       open={visible}
       onCancel={onCancel}
       footer={null}

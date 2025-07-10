@@ -616,7 +616,7 @@ export default function CarOwnerDashboard() {
 
         {/* Cars Quick Overview - Only show if no cars */}
         {cars.length === 0 && stats.totalCars === 0 && (
-                          <Card title="Get Started with Auto Care">
+                          <Card title="Get Started with AutoCare">
             <div className="text-center py-8">
               <CarOutlined className="text-6xl text-blue-400 mb-4" />
               <Title level={4}>Add Your First Vehicle</Title>

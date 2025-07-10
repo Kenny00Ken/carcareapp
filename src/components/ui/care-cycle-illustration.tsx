@@ -69,7 +69,7 @@ export const CareCycleIllustration: React.FC<CareCycleIllustrationProps> = ({ cl
             className="text-center mb-8 sm:mb-12"
           >
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Complete Auto Care Ecosystem
+              Complete AutoCare Ecosystem
             </h2>
             <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               See how our platform seamlessly connects car owners, mechanics, and parts dealers in one unified system

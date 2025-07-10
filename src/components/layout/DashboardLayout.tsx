@@ -224,7 +224,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             {getRoleIcon(user.role)}
             {!collapsed && (
               <Title level={4} className="!mb-0 !text-blue-600">
-                Auto Care
+                AutoCare
               </Title>
             )}
           </div>

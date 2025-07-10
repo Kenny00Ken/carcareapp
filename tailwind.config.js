@@ -14,7 +14,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Auto Care Brand Colors (Light theme optimized)
+        // AutoCare Brand Colors (Light theme optimized)
         brand: {
           50: '#eff6ff',
           100: '#dbeafe',

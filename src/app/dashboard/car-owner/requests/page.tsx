@@ -658,50 +658,282 @@ export default function CarOwnerRequestsPage() {
 
         {/* View Request Modal */}
         <Modal
-          title="Request Details"
+          title={
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                <EyeOutlined className="text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <div className="font-semibold text-gray-900 dark:text-gray-100">Request Details</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  {selectedRequest && `Request #${selectedRequest.id.slice(-8)}`}
+                </div>
+              </div>
+            </div>
+          }
           open={viewModalVisible}
           onCancel={() => setViewModalVisible(false)}
           footer={null}
-          width={600}
+          width={700}
+          className="request-details-modal"
         >
           {selectedRequest && (
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-semibold">Request Information</h4>
-                <p><strong>ID:</strong> {selectedRequest.id}</p>
-                <p><strong>Title:</strong> {selectedRequest.title}</p>
-                <p><strong>Description:</strong> {selectedRequest.description}</p>
-                <p><strong>Urgency:</strong> <Tag color={getUrgencyColor(selectedRequest.urgency)}>{selectedRequest.urgency}</Tag></p>
-                <p><strong>Location:</strong> {selectedRequest.location}</p>
-                <p><strong>Status:</strong> <Tag color={getStatusColor(selectedRequest.status)}>{selectedRequest.status}</Tag></p>
-                <p><strong>Created:</strong> {new Date(selectedRequest.created_at).toLocaleString()}</p>
-              </div>
+            <div className="space-y-6 max-h-96 overflow-y-auto">
+              {/* Request Information */}
+              <Card size="small" className="border-l-4 border-l-blue-500">
+                <Title level={5} className="!mb-3 flex items-center gap-2">
+                  <SettingOutlined className="text-blue-500" />
+                  Request Information
+                </Title>
+                <Row gutter={[16, 8]}>
+                  <Col span={12}>
+                    <Text type="secondary" className="text-xs">Request ID</Text>
+                    <div className="font-mono text-sm bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                      {selectedRequest.id}
+                    </div>
+                  </Col>
+                  <Col span={12}>
+                    <Text type="secondary" className="text-xs">Status</Text>
+                    <div>
+                      <Tag color={getStatusColor(selectedRequest.status)} className="mt-1">
+                        {selectedRequest.status.replace('_', ' ').toUpperCase()}
+                      </Tag>
+                    </div>
+                  </Col>
+                  <Col span={24}>
+                    <Text type="secondary" className="text-xs">Issue Title</Text>
+                    <div className="font-semibold text-base mt-1">{selectedRequest.title}</div>
+                  </Col>
+                  <Col span={24}>
+                    <Text type="secondary" className="text-xs">Description</Text>
+                    <div className="mt-1 text-sm bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                      {selectedRequest.description}
+                    </div>
+                  </Col>
+                  <Col span={12}>
+                    <Text type="secondary" className="text-xs">Urgency Level</Text>
+                    <div>
+                      <Tag color={getUrgencyColor(selectedRequest.urgency)} className="mt-1">
+                        {selectedRequest.urgency.toUpperCase()}
+                      </Tag>
+                    </div>
+                  </Col>
+                  <Col span={12}>
+                    <Text type="secondary" className="text-xs">Created</Text>
+                    <div className="text-sm mt-1">
+                      {new Date(selectedRequest.created_at).toLocaleString()}
+                    </div>
+                  </Col>
+                  <Col span={24}>
+                    <Text type="secondary" className="text-xs">Service Location</Text>
+                    <div className="flex items-center gap-2 mt-1">
+                      <EnvironmentOutlined className="text-blue-500" />
+                      <span className="text-sm">{selectedRequest.location}</span>
+                    </div>
+                  </Col>
+                </Row>
+              </Card>
 
-              <div>
-                <h4 className="font-semibold">Vehicle Information</h4>
-                <p><strong>Make/Model:</strong> {selectedRequest.car?.make} {selectedRequest.car?.model}</p>
-                <p><strong>Year:</strong> {selectedRequest.car?.year}</p>
-                <p><strong>License Plate:</strong> {selectedRequest.car?.license_plate || 'N/A'}</p>
-              </div>
+              {/* Vehicle Information */}
+              <Card size="small" className="border-l-4 border-l-green-500">
+                <Title level={5} className="!mb-3 flex items-center gap-2">
+                  <CarOutlined className="text-green-500" />
+                  Vehicle Information
+                </Title>
+                {selectedRequest.car ? (
+                  <Row gutter={[16, 8]}>
+                    <Col span={12}>
+                      <Text type="secondary" className="text-xs">Make & Model</Text>
+                      <div className="font-semibold text-base mt-1">
+                        {selectedRequest.car.make} {selectedRequest.car.model}
+                      </div>
+                    </Col>
+                    <Col span={12}>
+                      <Text type="secondary" className="text-xs">Year</Text>
+                      <div className="font-semibold text-base mt-1">
+                        {selectedRequest.car.year}
+                      </div>
+                    </Col>
+                    <Col span={12}>
+                      <Text type="secondary" className="text-xs">License Plate</Text>
+                      <div className="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm mt-1">
+                        {selectedRequest.car.license_plate || 'Not provided'}
+                      </div>
+                    </Col>
+                    <Col span={12}>
+                      <Text type="secondary" className="text-xs">Color</Text>
+                      <div className="text-sm mt-1">
+                        {selectedRequest.car.color || 'Not specified'}
+                      </div>
+                    </Col>
+                    {selectedRequest.car.vin && (
+                      <Col span={24}>
+                        <Text type="secondary" className="text-xs">VIN</Text>
+                        <div className="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded mt-1">
+                          {selectedRequest.car.vin}
+                        </div>
+                      </Col>
+                    )}
+                  </Row>
+                ) : (
+                  // Fallback: Get car details from cars list using car_id
+                  (() => {
+                    const requestCar = cars.find(car => car.id === selectedRequest.car_id)
+                    return requestCar ? (
+                      <Row gutter={[16, 8]}>
+                        <Col span={12}>
+                          <Text type="secondary" className="text-xs">Make & Model</Text>
+                          <div className="font-semibold text-base mt-1">
+                            {requestCar.make} {requestCar.model}
+                          </div>
+                        </Col>
+                        <Col span={12}>
+                          <Text type="secondary" className="text-xs">Year</Text>
+                          <div className="font-semibold text-base mt-1">
+                            {requestCar.year}
+                          </div>
+                        </Col>
+                        <Col span={12}>
+                          <Text type="secondary" className="text-xs">License Plate</Text>
+                          <div className="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm mt-1">
+                            {requestCar.license_plate || 'Not provided'}
+                          </div>
+                        </Col>
+                        <Col span={12}>
+                          <Text type="secondary" className="text-xs">Color</Text>
+                          <div className="text-sm mt-1">
+                            {requestCar.color || 'Not specified'}
+                          </div>
+                        </Col>
+                        {requestCar.vin && (
+                          <Col span={24}>
+                            <Text type="secondary" className="text-xs">VIN</Text>
+                            <div className="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded mt-1">
+                              {requestCar.vin}
+                            </div>
+                          </Col>
+                        )}
+                      </Row>
+                    ) : (
+                      <Alert 
+                        message="Vehicle information not available" 
+                        description="Unable to load vehicle details for this request."
+                        type="warning" 
+                        showIcon 
+                        className="text-sm"
+                      />
+                    )
+                  })()
+                )}
+              </Card>
 
+              {/* Assigned Mechanic */}
               {selectedRequest.mechanic && (
-                <div>
-                  <h4 className="font-semibold">Assigned Mechanic</h4>
-                  <p><strong>Name:</strong> {selectedRequest.mechanic.name}</p>
-                  <p><strong>Phone:</strong> {selectedRequest.mechanic.phone}</p>
-                  <p><strong>Rating:</strong> {selectedRequest.mechanic.rating || 'N/A'}</p>
-                </div>
+                <Card size="small" className="border-l-4 border-l-purple-500">
+                  <Title level={5} className="!mb-3 flex items-center gap-2">
+                    <UserOutlined className="text-purple-500" />
+                    Assigned Mechanic
+                  </Title>
+                  <Row gutter={[16, 8]}>
+                    <Col span={12}>
+                      <Text type="secondary" className="text-xs">Name</Text>
+                      <div className="font-semibold text-base mt-1">
+                        {selectedRequest.mechanic.name}
+                      </div>
+                    </Col>
+                    <Col span={12}>
+                      <Text type="secondary" className="text-xs">Phone</Text>
+                      <div className="text-sm mt-1">
+                        {selectedRequest.mechanic.phone}
+                      </div>
+                    </Col>
+                    <Col span={12}>
+                      <Text type="secondary" className="text-xs">Rating</Text>
+                      <div className="flex items-center gap-1 mt-1">
+                        {selectedRequest.mechanic.rating ? (
+                          <>
+                            <span className="font-semibold">{selectedRequest.mechanic.rating.toFixed(1)}</span>
+                            <span className="text-yellow-500">★</span>
+                          </>
+                        ) : (
+                          <span className="text-gray-500">Not rated</span>
+                        )}
+                      </div>
+                    </Col>
+                    <Col span={12}>
+                      <Text type="secondary" className="text-xs">Total Reviews</Text>
+                      <div className="text-sm mt-1">
+                        {selectedRequest.mechanic.total_reviews || 0} reviews
+                      </div>
+                    </Col>
+                  </Row>
+                </Card>
               )}
 
-              {selectedRequest.estimated_cost && (
-                <div>
-                  <h4 className="font-semibold">Cost Information</h4>
-                  <p><strong>Estimated Cost:</strong> GHS {selectedRequest.estimated_cost.toFixed(2)}</p>
-                  {selectedRequest.actual_hours && (
-                    <p><strong>Actual Hours:</strong> {selectedRequest.actual_hours} hrs</p>
-                  )}
-                </div>
+              {/* Cost Information */}
+              {(selectedRequest.estimated_cost || selectedRequest.final_cost || selectedRequest.estimated_hours || selectedRequest.actual_hours) && (
+                <Card size="small" className="border-l-4 border-l-orange-500">
+                  <Title level={5} className="!mb-3 flex items-center gap-2">
+                    <span className="text-orange-500">GHS</span>
+                    Cost & Time Information
+                  </Title>
+                  <Row gutter={[16, 8]}>
+                    {selectedRequest.estimated_cost && (
+                      <Col span={12}>
+                        <Text type="secondary" className="text-xs">Estimated Cost</Text>
+                        <div className="font-semibold text-lg text-green-600 mt-1">
+                          GHS {selectedRequest.estimated_cost.toFixed(2)}
+                        </div>
+                      </Col>
+                    )}
+                    {selectedRequest.final_cost && (
+                      <Col span={12}>
+                        <Text type="secondary" className="text-xs">Final Cost</Text>
+                        <div className="font-semibold text-lg text-blue-600 mt-1">
+                          GHS {selectedRequest.final_cost.toFixed(2)}
+                        </div>
+                      </Col>
+                    )}
+                    {selectedRequest.estimated_hours && (
+                      <Col span={12}>
+                        <Text type="secondary" className="text-xs">Estimated Hours</Text>
+                        <div className="text-sm mt-1">
+                          {selectedRequest.estimated_hours} hours
+                        </div>
+                      </Col>
+                    )}
+                    {selectedRequest.actual_hours && (
+                      <Col span={12}>
+                        <Text type="secondary" className="text-xs">Actual Hours</Text>
+                        <div className="text-sm mt-1">
+                          {selectedRequest.actual_hours} hours
+                        </div>
+                      </Col>
+                    )}
+                  </Row>
+                </Card>
               )}
+
+              {/* Additional Actions */}
+              <div className="flex gap-3 pt-4 border-t">
+                {selectedRequest.mechanic && (
+                  <Button 
+                    type="primary" 
+                    icon={<MessageOutlined />}
+                    onClick={() => {
+                      setViewModalVisible(false)
+                      window.location.href = `/dashboard/car-owner/requests/${selectedRequest.id}/chat`
+                    }}
+                  >
+                    Chat with Mechanic
+                  </Button>
+                )}
+                <Button 
+                  onClick={() => setViewModalVisible(false)}
+                >
+                  Close
+                </Button>
+              </div>
             </div>
           )}
         </Modal>

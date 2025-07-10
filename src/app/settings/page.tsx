@@ -156,7 +156,7 @@ export default function SettingsPage() {
           {notificationPermission === 'default' && (
             <Alert
               message="Enable Notifications"
-              description="Turn on notifications to stay updated with new requests, messages, and important updates from the Auto Care platform."
+              description="Turn on notifications to stay updated with new requests, messages, and important updates from the AutoCare platform."
               type="info"
               showIcon
             />
