@@ -66,15 +66,35 @@ export default function ProfilePage() {
   const { user, firebaseUser, updateUserProfile } = useAuth()
   const [loading, setLoading] = useState(false)
   const [profileImage, setProfileImage] = useState<string | null>(null)
+  const [currentAddress, setCurrentAddress] = useState<Address | null>(null)
   const [form] = Form.useForm()
 
   React.useEffect(() => {
     if (user) {
+      // Reconstruct address object from user data if location_data exists
+      let addressValue: Address | string | null = null
+      
+      if (user.location_data && user.location_data.coordinates) {
+        // Create Address object from stored location_data
+        addressValue = {
+          formatted_address: user.address || '',
+          coordinates: user.location_data.coordinates,
+          address_components: user.location_data.address_components,
+          place_id: user.location_data.place_id,
+          city: user.location_data.city,
+          country: user.location_data.country
+        }
+        setCurrentAddress(addressValue)
+      } else if (user.address) {
+        // Handle legacy string addresses
+        addressValue = user.address
+      }
+
       form.setFieldsValue({
         name: user.name,
         email: user.email || firebaseUser?.email,
         phone: user.phone,
-        address: user.address,
+        address: addressValue,
       })
       setProfileImage(firebaseUser?.photoURL || null)
     }
@@ -104,6 +124,14 @@ export default function ProfilePage() {
         
         if (addressObj.place_id) {
           locationData.place_id = addressObj.place_id
+        }
+        
+        if (addressObj.city) {
+          locationData.city = addressObj.city
+        }
+        
+        if (addressObj.country) {
+          locationData.country = addressObj.country
         }
         
         // Only add location_data if it has content
@@ -278,6 +306,15 @@ export default function ProfilePage() {
                         <Text type="secondary">{user.phone}</Text>
                       </div>
                     )}
+                    
+                    {user.address && (
+                      <div className="flex items-center justify-center gap-2 text-gray-600 max-w-xs mx-auto">
+                        <EnvironmentOutlined />
+                        <Text type="secondary" className="text-center text-xs leading-relaxed">
+                          {user.address}
+                        </Text>
+                      </div>
+                    )}
                   </div>
 
                   {/* Profile Image Upload */}
@@ -445,11 +482,11 @@ export default function ProfilePage() {
                         if (!value) {
                           return Promise.reject('Please select your address')
                         }
-                        if (typeof value === 'string') {
+                        if (typeof value === 'string' && value.trim().length > 0) {
                           // Handle legacy string addresses
                           return Promise.resolve()
                         }
-                        if (typeof value === 'object' && value.formatted_address) {
+                        if (typeof value === 'object' && value !== null && value.formatted_address) {
                           return Promise.resolve()
                         }
                         return Promise.reject('Please select a valid address')
@@ -461,9 +498,9 @@ export default function ProfilePage() {
                       placeholder="Search for your address or use current location"
                       showCurrentLocation={true}
                       allowManualEntry={true}
-                      value={typeof form.getFieldValue('address') === 'string' ? 
-                        null : form.getFieldValue('address')}
+                      value={currentAddress}
                       onChange={(address) => {
+                        setCurrentAddress(address)
                         form.setFieldValue('address', address)
                       }}
                       className="w-full"
@@ -522,7 +559,7 @@ export default function ProfilePage() {
               </div>
             }
           >
-            <Row gutter={[16, 16]}>
+            <Row gutter={[16, 16]} className="mb-6">
               <Col xs={24} sm={8}>
                 <div className="text-center p-3 sm:p-4 bg-blue-50 dark:bg-slate-700 rounded-lg">
                   <CalendarOutlined className="text-xl sm:text-2xl text-blue-500 mb-2" />
@@ -559,6 +596,33 @@ export default function ProfilePage() {
                 </div>
               </Col>
             </Row>
+
+            {/* Address Information */}
+            {user.address && (
+              <div className="bg-orange-50 dark:bg-slate-700 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <EnvironmentOutlined className="text-xl text-orange-500 mt-1" />
+                  <div className="flex-1">
+                    <Text strong className="block text-gray-700 dark:text-slate-200 text-sm sm:text-base mb-2">
+                      Current Address
+                    </Text>
+                    <Text className="text-sm text-gray-600 dark:text-slate-300 leading-relaxed">
+                      {user.address}
+                    </Text>
+                    {user.location_data && (user.location_data.city || user.location_data.country) && (
+                      <div className="flex gap-2 mt-2">
+                        {user.location_data.city && (
+                          <Badge color="blue" text={user.location_data.city} />
+                        )}
+                        {user.location_data.country && (
+                          <Badge color="green" text={user.location_data.country} />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </Card>
         </motion.div>
       </div>
