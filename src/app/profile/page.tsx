@@ -21,7 +21,9 @@ import {
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { ImageUpload } from '@/components/common/ImageUpload'
+import { AddressSelector } from '@/components/location/AddressSelector'
 import { motion } from 'framer-motion'
+import type { Address } from '@/types/location'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -48,8 +50,20 @@ export default function ProfilePage() {
 
     setLoading(true)
     try {
+      // Handle address object if present
+      const processedValues = { ...values }
+      if (values.address && typeof values.address === 'object') {
+        const addressObj = values.address as Address
+        processedValues.address = addressObj.formatted_address
+        processedValues.location_data = {
+          coordinates: addressObj.coordinates,
+          address_components: addressObj.address_components,
+          place_id: addressObj.place_id
+        }
+      }
+
       await updateUserProfile({
-        ...values,
+        ...processedValues,
         updated_at: new Date().toISOString(),
       })
       message.success('Profile updated successfully!')
@@ -223,9 +237,10 @@ export default function ProfilePage() {
                       <Col span={12}>
                         <Statistic
                           title="Member Since"
-                          value={user.created_at ? new Date(user.created_at).getFullYear().toString() : 'N/A'}
+                          value={user.created_at ? new Date(user.created_at).getFullYear() : 'N/A'}
                           prefix={<CalendarOutlined />}
                           valueStyle={{ fontSize: '18px', color: '#1890ff' }}
+                          formatter={(value) => value?.toString() || 'N/A'}
                           className="dark:[&_.ant-statistic-content-value]:!text-blue-400 dark:[&_.ant-statistic-title]:!text-slate-300"
                         />
                       </Col>
@@ -357,18 +372,20 @@ export default function ProfilePage() {
                   <Form.Item
                     name="address"
                     label={
-                      <span className="font-medium text-gray-700">
+                      <span className="font-medium text-gray-700 dark:text-slate-300">
                         <EnvironmentOutlined className="mr-2" />
                         Address
                       </span>
                     }
                     rules={[{ required: true, message: 'Please enter your address' }]}
                   >
-                    <Input.TextArea 
-                      placeholder="Enter your full address"
-                      rows={4}
-                      size="large"
-                      className="rounded-lg"
+                    <AddressSelector
+                      placeholder="Search for your address or use current location"
+                      showCurrentLocation={true}
+                      allowManualEntry={true}
+                      onChange={(address) => {
+                        form.setFieldValue('address', address)
+                      }}
                     />
                   </Form.Item>
 

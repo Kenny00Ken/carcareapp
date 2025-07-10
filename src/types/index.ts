@@ -13,6 +13,12 @@ export interface User {
   fcm_token?: string
   created_at: string
   updated_at?: string
+  specializations?: string[] // For mechanics
+  location_data?: {
+    coordinates?: { lat: number; lng: number }
+    address_components?: any[]
+    place_id?: string
+  }
 }
 
 export interface Car {
@@ -349,19 +355,14 @@ export interface MechanicSettings {
   }
 }
 
-export interface LocationPermissionStatus {
-  granted: boolean
-  denied: boolean
-  prompt: boolean
-  unavailable: boolean
-}
-
-export interface GeolocationCoords {
-  lat: number
-  lng: number
-  accuracy?: number
-  altitude?: number
-  altitudeAccuracy?: number
-  heading?: number
-  speed?: number
-} 
+// Re-export location types for backward compatibility
+export type { 
+  LocationPermissionStatus, 
+  GeolocationCoords,
+  Address,
+  LocationSearchResult,
+  ProximitySearch,
+  ProximityResult,
+  LocationBasedRequestMatch,
+  EnhancedMechanicAvailability
+} from './location' 
