@@ -22,6 +22,8 @@ import {
   Select,
   DatePicker
 } from 'antd'
+import { LoadingOverlay } from '@/components/ui'
+import { useLoading } from '@/hooks/useLoading'
 import { 
   FileTextOutlined, 
   CarOutlined, 
@@ -51,7 +53,7 @@ interface DiagnosisWithDetails extends Diagnosis {
 export default function CarOwnerDiagnosesPage() {
   const { user } = useAuth()
   const [diagnoses, setDiagnoses] = useState<DiagnosisWithDetails[]>([])
-  const [loading, setLoading] = useState(true)
+  const { loading, setLoading } = useLoading({ initialState: true })
   const [selectedDiagnosis, setSelectedDiagnosis] = useState<DiagnosisWithDetails | null>(null)
   const [detailsModalVisible, setDetailsModalVisible] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -263,9 +265,13 @@ export default function CarOwnerDiagnosesPage() {
   if (loading) {
     return (
       <DashboardLayout activeKey="diagnoses">
-        <div className="flex items-center justify-center h-64">
-          <Spin size="large" />
-        </div>
+        <LoadingOverlay 
+          loading={true} 
+          text="Loading diagnoses..."
+          className="h-64"
+        >
+          <div />
+        </LoadingOverlay>
       </DashboardLayout>
     )
   }
@@ -491,23 +497,34 @@ export default function CarOwnerDiagnosesPage() {
               </div>
 
               {/* Parts Needed */}
-              {selectedDiagnosis.parts_needed && selectedDiagnosis.parts_needed.length > 0 && (
+              {selectedDiagnosis.parts_needed && Array.isArray(selectedDiagnosis.parts_needed) && selectedDiagnosis.parts_needed.length > 0 && (
                 <div>
                   <Title level={5}>Parts Needed</Title>
                   <div className="space-y-2">
-                    {selectedDiagnosis.parts_needed.map((part, index) => (
-                      <Card key={index} size="small">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <div className="font-medium">{part.name}</div>
-                            <div className="text-sm text-gray-500">Qty: {part.quantity}</div>
-                          </div>
-                          <div className="text-right">
-                            <div className="font-semibold">GHS {part.estimated_price?.toFixed(2)}</div>
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
+                    {selectedDiagnosis.parts_needed.map((part, index) => {
+                      // Handle both string[] and PartNeeded[] formats
+                      if (typeof part === 'string') {
+                        return (
+                          <Card key={index} size="small">
+                            <div className="font-medium">{part}</div>
+                          </Card>
+                        );
+                      } else {
+                        return (
+                          <Card key={index} size="small">
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <div className="font-medium">{part.name}</div>
+                                <div className="text-sm text-gray-500">Qty: {part.quantity}</div>
+                              </div>
+                              <div className="text-right">
+                                <div className="font-semibold">GHS {part.estimated_price?.toFixed(2)}</div>
+                              </div>
+                            </div>
+                          </Card>
+                        );
+                      }
+                    })}
                   </div>
                 </div>
               )}
