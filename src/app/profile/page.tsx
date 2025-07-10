@@ -377,15 +377,35 @@ export default function ProfilePage() {
                         Address
                       </span>
                     }
-                    rules={[{ required: true, message: 'Please enter your address' }]}
+                    rules={[{ 
+                      required: true, 
+                      message: 'Please enter your address',
+                      validator: (_, value) => {
+                        if (!value) {
+                          return Promise.reject('Please select your address')
+                        }
+                        if (typeof value === 'string') {
+                          // Handle legacy string addresses
+                          return Promise.resolve()
+                        }
+                        if (typeof value === 'object' && value.formatted_address) {
+                          return Promise.resolve()
+                        }
+                        return Promise.reject('Please select a valid address')
+                      }
+                    }]}
+                    tooltip="Enter your primary address for better service recommendations"
                   >
                     <AddressSelector
                       placeholder="Search for your address or use current location"
                       showCurrentLocation={true}
                       allowManualEntry={true}
+                      value={typeof form.getFieldValue('address') === 'string' ? 
+                        null : form.getFieldValue('address')}
                       onChange={(address) => {
                         form.setFieldValue('address', address)
                       }}
+                      className="w-full"
                     />
                   </Form.Item>
 

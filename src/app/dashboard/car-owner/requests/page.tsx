@@ -23,13 +23,18 @@ import {
   EyeOutlined,
   DeleteOutlined,
   MessageOutlined,
-  CarOutlined
+  CarOutlined,
+  EnvironmentOutlined
 } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { Request, RequestStatus, Car } from '@/types'
 import { DatabaseService } from '@/services/database'
 import { FCMService } from '@/services/fcm'
+import { AddressSelector } from '@/components/location/AddressSelector'
+import { EnhancedLocationService } from '@/services/enhancedLocation'
+import { MechanicMatchingService } from '@/services/mechanicMatching'
+import type { Address } from '@/types/location'
 
 const { Title, Text } = Typography
 const { TextArea } = Input
@@ -40,7 +45,7 @@ interface CreateRequestFormValues {
   title: string
   description: string
   urgency: 'low' | 'medium' | 'high'
-  location: string
+  service_location: Address
 }
 
 export default function CarOwnerRequestsPage() {
@@ -51,6 +56,8 @@ export default function CarOwnerRequestsPage() {
   const [modalVisible, setModalVisible] = useState(false)
   const [viewModalVisible, setViewModalVisible] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null)
+  const [creatingRequest, setCreatingRequest] = useState(false)
   const [form] = Form.useForm()
 
   useEffect(() => {
@@ -115,8 +122,19 @@ export default function CarOwnerRequestsPage() {
   }
 
   const handleCreateRequest = async (values: CreateRequestFormValues) => {
-    if (!user) return
+    if (!user || !values.service_location) return
 
+    // Validate that we have proper location coordinates
+    if (!values.service_location.coordinates || 
+        !EnhancedLocationService.isValidCoordinates(
+          values.service_location.coordinates.lat, 
+          values.service_location.coordinates.lng
+        )) {
+      message.error('Please select a valid service location with precise coordinates')
+      return
+    }
+
+    setCreatingRequest(true)
     try {
       const selectedCar = cars.find(car => car.id === values.car_id)
       if (!selectedCar) {
@@ -124,8 +142,20 @@ export default function CarOwnerRequestsPage() {
         return
       }
 
+      // Prepare request data with enhanced location information
       const requestData = {
-        ...values,
+        car_id: values.car_id,
+        title: values.title,
+        description: values.description,
+        urgency: values.urgency,
+        location: values.service_location.formatted_address,
+        location_coords: values.service_location.coordinates,
+        location_data: {
+          address: values.service_location,
+          place_id: values.service_location.place_id,
+          city: values.service_location.city,
+          country: values.service_location.country
+        },
         owner_id: user.id,
         status: 'pending' as RequestStatus,
         created_at: new Date().toISOString(),
@@ -135,33 +165,82 @@ export default function CarOwnerRequestsPage() {
       // Create request in database
       const requestId = await DatabaseService.createRequest(requestData)
       
-      // Send notifications to available mechanics
+      // Find and notify nearby mechanics using enhanced location matching
       try {
-        const availableMechanics = await DatabaseService.getUsersByRole('Mechanic')
-        const carInfo = `${selectedCar.make} ${selectedCar.model} (${selectedCar.year})`
+        console.log('🔍 Finding nearby mechanics for service request...')
         
-        // Send notification to all available mechanics
-        for (const mechanic of availableMechanics) {
-          await FCMService.sendRequestNotificationToMechanic(mechanic.id, {
-            requestId,
-            title: values.title,
-            carInfo,
-            urgency: values.urgency,
-            location: values.location
-          })
+        const nearbyMechanics = await MechanicMatchingService.findBestMatches({
+          requestLocation: values.service_location.coordinates,
+          urgencyLevel: values.urgency,
+          maxDistance: values.urgency === 'high' ? 50 : 30, // Larger radius for urgent requests
+          maxResults: 10,
+          serviceType: [values.title.toLowerCase()] // Use title as service type hint
+        })
+
+        console.log(`📍 Found ${nearbyMechanics.length} nearby mechanics`)
+
+        if (nearbyMechanics.length === 0) {
+          // Fallback to all available mechanics if no nearby ones found
+          console.log('⚠️ No nearby mechanics found, notifying all available mechanics')
+          const allMechanics = await DatabaseService.getUsersByRole('Mechanic')
+          const carInfo = `${selectedCar.make} ${selectedCar.model} (${selectedCar.year})`
+          
+          for (const mechanic of allMechanics.slice(0, 5)) { // Limit to 5 mechanics
+            await FCMService.sendRequestNotificationToMechanic(mechanic.id, {
+              requestId,
+              title: values.title,
+              carInfo,
+              urgency: values.urgency,
+              location: values.service_location.formatted_address
+            })
+          }
+        } else {
+          // Send targeted notifications to nearby mechanics
+          const carInfo = `${selectedCar.make} ${selectedCar.model} (${selectedCar.year})`
+          
+          for (const mechanicMatch of nearbyMechanics.slice(0, 5)) { // Top 5 matches
+            await FCMService.sendRequestNotificationToMechanic(mechanicMatch.user.id, {
+              requestId,
+              title: values.title,
+              carInfo,
+              urgency: values.urgency,
+              location: values.service_location.formatted_address
+            })
+            
+            console.log(`📧 Notified ${mechanicMatch.user.name} (${mechanicMatch.distance.toFixed(1)}km away, score: ${mechanicMatch.compatibilityScore.toFixed(1)})`)
+          }
         }
+
+        // Notify nearby mechanics using the enhanced service
+        const notifiedMechanics = await MechanicMatchingService.notifyNearbyMechanics(
+          { 
+            id: requestId, 
+            urgency: values.urgency,
+            location: values.service_location.formatted_address,
+            location_coords: values.service_location.coordinates
+          } as Request,
+          values.service_location.coordinates,
+          values.urgency === 'high' ? 50 : 30
+        )
+
+        console.log(`🎯 Successfully notified ${notifiedMechanics.length} mechanics about the service request`)
+        
       } catch (notificationError) {
-        console.error('Error sending notifications:', notificationError)
+        console.error('Error in enhanced mechanic notification:', notificationError)
         // Don't fail the request creation if notifications fail
+        message.warning('Request created successfully, but there may have been issues notifying mechanics')
       }
 
-      message.success('Service request created successfully!')
+      message.success('Service request created and sent to nearby mechanics!')
       setModalVisible(false)
+      setSelectedAddress(null)
       form.resetFields()
       // Removed fetchRequests() call - real-time subscription will handle the update
     } catch (error) {
       console.error('Error creating request:', error)
       message.error('Failed to create request')
+    } finally {
+      setCreatingRequest(false)
     }
   }
 
@@ -413,15 +492,21 @@ export default function CarOwnerRequestsPage() {
         <Modal
           title="Create Service Request"
           open={modalVisible}
+          confirmLoading={creatingRequest}
           onOk={() => {
             if (cars.length === 0) {
               message.warning('Please add a vehicle first before creating a request')
+              return
+            }
+            if (!selectedAddress) {
+              message.warning('Please select a service location')
               return
             }
             form.submit()
           }}
           onCancel={() => {
             setModalVisible(false)
+            setSelectedAddress(null)
             form.resetFields()
           }}
           width={600}
@@ -506,30 +591,67 @@ export default function CarOwnerRequestsPage() {
               />
             </Form.Item>
 
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  name="urgency"
-                  label="Urgency Level"
-                  rules={[{ required: true, message: 'Please select urgency' }]}
-                >
-                  <Select>
-                    <Select.Option value="low">Low - Can wait</Select.Option>
-                    <Select.Option value="medium">Medium - Soon as possible</Select.Option>
-                    <Select.Option value="high">High - Urgent</Select.Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  name="location"
-                  label="Service Location"
-                  rules={[{ required: true, message: 'Please enter location' }]}
-                >
-                  <Input placeholder="Where should the mechanic come?" />
-                </Form.Item>
-              </Col>
-            </Row>
+            <Form.Item
+              name="urgency"
+              label="Urgency Level"
+              rules={[{ required: true, message: 'Please select urgency' }]}
+            >
+              <Select>
+                <Select.Option value="low">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Low - Can wait (flexible scheduling)</span>
+                  </div>
+                </Select.Option>
+                <Select.Option value="medium">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                    <span>Medium - Soon as possible (within 24 hours)</span>
+                  </div>
+                </Select.Option>
+                <Select.Option value="high">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <span>High - Urgent (immediate attention)</span>
+                  </div>
+                </Select.Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="service_location"
+              label={
+                <span className="flex items-center gap-2">
+                  <EnvironmentOutlined />
+                  Service Location
+                  <span className="text-red-500">*</span>
+                </span>
+              }
+              rules={[{ 
+                required: true, 
+                message: 'Please select a service location',
+                validator: (_, value) => {
+                  if (!value || !value.coordinates) {
+                    return Promise.reject('Please select a valid location with coordinates')
+                  }
+                  return Promise.resolve()
+                }
+              }]}
+              tooltip="Select where you need the mechanic to provide service. Use current location or search for an address."
+            >
+              <AddressSelector
+                placeholder="Search for service location or use current location"
+                showCurrentLocation={true}
+                allowManualEntry={true}
+                label=""
+                value={selectedAddress}
+                onChange={(address) => {
+                  setSelectedAddress(address)
+                  form.setFieldValue('service_location', address)
+                }}
+                className="w-full"
+              />
+            </Form.Item>
           </Form>
           )}
         </Modal>
