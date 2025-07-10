@@ -17,6 +17,7 @@ interface LoadingButtonProps {
   loadingText?: string;
   icon?: ReactNode;
   block?: boolean;
+  title?: string;
 }
 
 export const LoadingButton: FC<LoadingButtonProps> = ({
@@ -30,7 +31,8 @@ export const LoadingButton: FC<LoadingButtonProps> = ({
   className,
   loadingText,
   icon,
-  block = false
+  block = false,
+  title
 }) => {
   const isDisabled = loading || disabled;
   const displayText = loading && loadingText ? loadingText : children;
@@ -43,6 +45,7 @@ export const LoadingButton: FC<LoadingButtonProps> = ({
       onClick={onClick}
       disabled={isDisabled}
       block={block}
+      title={title}
       className={cn(
         'flex items-center justify-center gap-2',
         loading && 'cursor-not-allowed',
