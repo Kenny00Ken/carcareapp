@@ -15,6 +15,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/services/firebase'
 import { User, UserRole } from '@/types'
 import { App } from 'antd'
+import { GlobalLoader } from '@/components/ui/GlobalLoader'
 
 interface MessageApi {
   error: (message: string) => void
@@ -352,6 +353,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
+      {loading && <GlobalLoader message="Authenticating..." />}
       {children}
     </AuthContext.Provider>
   )

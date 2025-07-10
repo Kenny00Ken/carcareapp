@@ -12,6 +12,8 @@ import {
 } from '@ant-design/icons'
 import { useAuth } from '@/contexts/AuthContext'
 import { ConfirmationResult } from 'firebase/auth'
+import { LoadingButton } from '@/components/ui'
+import { useLoading } from '@/hooks/useLoading'
 
 const { TabPane } = Tabs
 const { Title, Text } = Typography
@@ -38,8 +40,8 @@ const OTPVerificationContent: React.FC<OTPVerificationContentProps> = ({
 }) => {
   const { message: messageApi } = App.useApp()
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
-  const [loading, setLoading] = useState(false)
-  const [resendLoading, setResendLoading] = useState(false)
+  const { loading, setLoading } = useLoading()
+  const { loading: resendLoading, setLoading: setResendLoading } = useLoading()
   const [countdown, setCountdown] = useState(60)
   const [canResend, setCanResend] = useState(false)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
@@ -201,7 +203,7 @@ const OTPVerificationContent: React.FC<OTPVerificationContentProps> = ({
         </div>
         
         {/* Verify Button */}
-        <Button
+        <LoadingButton
           type="primary"
           size="large"
           block
@@ -210,9 +212,10 @@ const OTPVerificationContent: React.FC<OTPVerificationContentProps> = ({
           onClick={() => handleVerifyOtp(otpValue)}
           icon={isComplete ? <CheckCircleOutlined /> : undefined}
           className="!h-11 sm:!h-12 !text-sm sm:!text-base font-medium"
+          loadingText="Verifying..."
         >
-          {loading ? 'Verifying...' : 'Verify Code'}
-        </Button>
+          Verify Code
+        </LoadingButton>
       </div>
 
       {/* Resend Section */}
@@ -224,14 +227,15 @@ const OTPVerificationContent: React.FC<OTPVerificationContentProps> = ({
         </div>
         
         {canResend ? (
-          <Button
+          <LoadingButton
             type="link"
             onClick={handleResend}
             loading={resendLoading}
             className="!p-0 !h-auto !text-sm sm:!text-base"
+            loadingText="Sending..."
           >
             Resend Code
-          </Button>
+          </LoadingButton>
         ) : (
           <Text className="text-xs sm:text-sm text-gray-500">
             Resend code in {countdown}s
@@ -256,7 +260,7 @@ const OTPVerificationContent: React.FC<OTPVerificationContentProps> = ({
 export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
   const { signInWithGoogle, signInWithPhone } = useAuth()
   const { message } = App.useApp()
-  const [loading, setLoading] = useState(false)
+  const { loading, setLoading } = useLoading()
   const [activeTab, setActiveTab] = useState('phone')
   const [form] = Form.useForm()
   const [otpModalVisible, setOtpModalVisible] = useState(false)
@@ -369,28 +373,30 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
                 />
               </Form.Item>
 
-              <Button
+              <LoadingButton
                 type="primary"
                 htmlType="submit"
                 loading={loading}
                 size="large"
                 block
                 className="!h-11 sm:!h-12 !text-sm sm:!text-base"
+                loadingText="Sending..."
               >
                 Send Verification Code
-              </Button>
+              </LoadingButton>
             </Form>
           </TabPane>
 
           <TabPane tab="Social Login" key="social">
             <div className="space-y-3">
-              <Button
+              <LoadingButton
                 icon={<GoogleOutlined />}
                 size="large"
                 block
                 onClick={handleGoogleAuth}
                 loading={loading}
                 className="!flex !items-center !justify-center !h-11 sm:!h-12 !text-sm sm:!text-base"
+                loadingText="Signing in..."
               >
                 Continue with Google
               </Button>

@@ -17,6 +17,8 @@ import { useAuth } from '@/contexts/AuthContext'
 import { DatabaseService } from '@/services/database'
 import { Request, Car, MaintenanceRecord } from '@/types'
 import { useRouter } from 'next/navigation'
+import { LoadingOverlay, LoadingButton, LoadingCard } from '@/components/ui'
+import { useLoading } from '@/hooks/useLoading'
 
 const { Title, Paragraph } = Typography
 
@@ -31,8 +33,8 @@ export default function CarOwnerDashboard() {
   const { user } = useAuth()
   const router = useRouter()
 
-  const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
+  const { loading, setLoading } = useLoading({ initialState: true })
+  const { loading: refreshing, setLoading: setRefreshing } = useLoading()
   const [stats, setStats] = useState<DashboardStats>({
     totalCars: 0,
     activeRequests: 0,
@@ -291,12 +293,13 @@ export default function CarOwnerDashboard() {
   if (loading) {
     return (
       <DashboardLayout activeKey="dashboard">
-        <div className="flex items-center justify-center h-64">
-          <Spin size="large" />
-          <div className="ml-4">
-            <Paragraph>Loading your dashboard...</Paragraph>
-          </div>
-        </div>
+        <LoadingOverlay 
+          loading={true} 
+          text="Loading your dashboard..."
+          className="h-64"
+        >
+          <div />
+        </LoadingOverlay>
       </DashboardLayout>
     )
   }
@@ -314,16 +317,17 @@ export default function CarOwnerDashboard() {
               {stats.totalCars === 0 && cars.length > 0 && ` (${cars.length} cars detected)`}
             </Paragraph>
           </div>
-          <Button 
+          <LoadingButton 
             icon={<ReloadOutlined />} 
             loading={refreshing}
             onClick={handleRefresh}
             title="Refresh Dashboard Data"
             className="!w-full sm:!w-auto"
+            loadingText="Refreshing..."
           >
             <span className="sm:hidden">Refresh Data</span>
             <span className="hidden sm:inline">Refresh</span>
-          </Button>
+          </LoadingButton>
         </div>
 
         {/* Debug Info - Remove in production */}

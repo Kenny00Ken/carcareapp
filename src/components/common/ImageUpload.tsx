@@ -5,6 +5,8 @@ import { Upload, Button, Image, Progress, Space, Typography } from 'antd'
 import { UploadOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons'
 import { StorageService } from '@/services/storage'
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface'
+import { LoadingButton, ProgressBar } from '@/components/ui'
+import { useLoading } from '@/hooks/useLoading'
 
 const { Text } = Typography
 
@@ -37,7 +39,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   maxWidth = 800,
   maxHeight = 600,
 }) => {
-  const [uploading, setUploading] = useState(false)
+  const { loading: uploading, setLoading: setUploading } = useLoading()
   const [progress, setProgress] = useState(0)
   const [fileList, setFileList] = useState<UploadFile[]>([])
   const [previewVisible, setPreviewVisible] = useState(false)
@@ -123,21 +125,24 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       <Space direction="vertical" size="middle" className="w-full">
         {/* Upload Button */}
         <Upload {...uploadProps}>
-          <Button 
+          <LoadingButton 
             icon={<UploadOutlined />} 
             loading={uploading}
             disabled={disabled || (!!value && maxCount === 1)}
+            loadingText={`Uploading... ${progress}%`}
           >
-            {uploading ? `Uploading... ${progress}%` : buttonText}
-          </Button>
+            {buttonText}
+          </LoadingButton>
         </Upload>
 
         {/* Progress Bar */}
         {uploading && (
-          <Progress 
-            percent={progress} 
-            size="small" 
-            status={progress === 100 ? 'success' : 'active'}
+          <ProgressBar 
+            progress={progress} 
+            size="sm" 
+            color={progress === 100 ? 'success' : 'primary'}
+            showPercentage
+            animated
           />
         )}
 

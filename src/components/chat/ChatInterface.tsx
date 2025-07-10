@@ -16,6 +16,8 @@ import { ChatMessage, Request, User } from '@/types'
 import { useChat } from '@/services/chat'
 import { useAuth } from '@/contexts/AuthContext'
 import { formatDateTime } from '@/lib/utils'
+import { LoadingSpinner, LoadingButton, LoadingDots } from '@/components/ui'
+import { useLoading } from '@/hooks/useLoading'
 
 const { Text, Title } = Typography
 const { TextArea } = Input
@@ -114,7 +116,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ request, otherUser
   const { user } = useAuth()
   const { messages, loading, sendMessage, unreadCount, error } = useChat(request.id || '', request)
   const [newMessage, setNewMessage] = useState('')
-  const [sending, setSending] = useState(false)
+  const { loading: sending, setLoading: setSending } = useLoading()
   const [retryCount, setRetryCount] = useState(0)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<any>(null)
@@ -179,11 +181,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ request, otherUser
   if (!user) {
     return (
       <Card className="h-96 flex items-center justify-center">
-        <div className="text-center">
-          <Spin size="large" />
-          <div className="mt-4">
-            <Text type="secondary">Authenticating...</Text>
-          </div>
+        <div className="text-center flex flex-col items-center gap-4">
+          <LoadingSpinner size="xl" />
+          <Text type="secondary">Authenticating...</Text>
         </div>
       </Card>
     )
@@ -287,7 +287,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ request, otherUser
       >
         {loading ? (
           <div className="flex flex-col justify-center items-center h-40 space-y-4">
-            <Spin size="large" />
+            <LoadingSpinner size="xl" />
             <Text type="secondary">Loading conversation...</Text>
           </div>
         ) : error && messages.length === 0 ? (
@@ -343,6 +343,22 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ request, otherUser
                 />
               )
             })}
+            {/* Typing Indicator */}
+            {sending && (
+              <div className="flex gap-3 mb-4 justify-start animate-fadeIn">
+                <Avatar 
+                  icon={<UserOutlined />} 
+                  size="small" 
+                  className="mt-1 flex-shrink-0"
+                  style={{ backgroundColor: '#1890ff' }}
+                />
+                <div className="max-w-xs lg:max-w-md">
+                  <div className="bg-gray-200 dark:bg-gray-700 rounded-2xl rounded-tl-sm px-4 py-2">
+                    <LoadingDots size="sm" color="gray" />
+                  </div>
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </>
         )}
@@ -362,17 +378,18 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ request, otherUser
             className="flex-1 resize-none"
             style={{ border: 'none', boxShadow: 'none' }}
           />
-          <Button
+          <LoadingButton
             type="primary"
-            icon={sending ? <Spin size="small" /> : <SendOutlined />}
+            icon={<SendOutlined />}
             onClick={handleSendMessage}
             loading={sending}
             disabled={!newMessage.trim() || sending || !!error}
             size="large"
             className="px-6"
+            loadingText="Sending..."
           >
-            {sending ? 'Sending...' : 'Send'}
-          </Button>
+            Send
+          </LoadingButton>
         </div>
         
         <div className="flex justify-between items-center mt-2">
