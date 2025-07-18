@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useState, useEffect } from 'react'
 import { 
@@ -561,104 +561,431 @@ export default function MechanicPartsPage() {
   // Browse tab content component
   const BrowseTabContent = () => (
     <div>
-          {/* Enhanced Search and Filter - Collapsible */}
-          <Card className="mb-4 shadow-sm">
-            {/* Header with Collapse Toggle */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
-                <Text strong className="text-lg">
-                  <SearchOutlined className="mr-2" />
-                  Search & Filter Parts
-                </Text>
-                <Text type="secondary" className="ml-2 hidden sm:inline">
-                  Find the exact parts you need for your diagnosis
-                </Text>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Badge 
-                  count={filteredParts.length} 
-                  style={{ backgroundColor: '#1890ff' }}
-                  title="Filtered results"
-                />
+      {/* Enhanced Search and Filter - Collapsible */}
+      <Card className="mb-4 shadow-sm">
+        {/* Header with Collapse Toggle */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <Text strong className="text-lg">
+              <SearchOutlined className="mr-2" />
+              Search & Filter Parts
+            </Text>
+            <Text type="secondary" className="ml-2 hidden sm:inline">
+              Find the exact parts you need for your diagnosis
+            </Text>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Badge 
+              count={filteredParts.length} 
+              style={{ backgroundColor: '#1890ff' }}
+              title="Filtered results"
+            />
+            <Button 
+              type="text" 
+              icon={
+                <span className="transition-transform duration-200 ease-in-out inline-block">
+                  {searchExpanded ? <UpOutlined /> : <DownOutlined />}
+                </span>
+              }
+              onClick={() => setSearchExpanded(!searchExpanded)}
+              size="small"
+              className="flex items-center hover:bg-blue-50 transition-colors duration-200"
+            >
+              <span className="hidden sm:inline">
+                {searchExpanded ? 'Collapse' : 'Expand'}
+              </span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Quick Search Bar - Always Visible */}
+        <div className="mb-4">
+          <Row gutter={[12, 12]} align="middle">
+            <Col xs={24} sm={16} md={12} lg={14}>
+              <Search
+                placeholder="Quick search by name, brand, or part number..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value)
+                  // Auto-search after 500ms delay
+                  if (e.target.value.length > 2 || e.target.value.length === 0) {
+                    setTimeout(() => handleSearch(), 500)
+                  }
+                }}
+                onSearch={handleSearch}
+                enterButton={<SearchOutlined />}
+                size="large"
+                allowClear
+                className="w-full transition-all duration-200 hover:shadow-md focus-within:shadow-lg"
+              />
+            </Col>
+            <Col xs={12} sm={4} md={6} lg={5}>
+              <Select
+                placeholder="Category"
+                style={{ width: '100%' }}
+                value={selectedCategory}
+                onChange={setSelectedCategory}
+                allowClear
+                size="large"
+                showSearch
+                optionFilterProp="children"
+                className="transition-all duration-200 hover:shadow-md"
+              >
+                {categories.map(category => (
+                  <Option key={category} value={category}>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">{category}</span>
+                      <Badge 
+                        count={parts.filter(p => p.category === category).length} 
+                        size="small"
+                        style={{ backgroundColor: '#1890ff' }}
+                      />
+                    </div>
+                  </Option>
+                ))}
+              </Select>
+            </Col>
+            <Col xs={12} sm={4} md={6} lg={5}>
+              <Space.Compact block>
                 <Button 
-                  type="text" 
                   icon={
                     <span className="transition-transform duration-200 ease-in-out inline-block">
-                      {searchExpanded ? <UpOutlined /> : <DownOutlined />}
+                      <FilterOutlined />
                     </span>
                   }
-                  onClick={() => setSearchExpanded(!searchExpanded)}
-                  size="small"
-                  className="flex items-center hover:bg-blue-50 transition-colors duration-200"
+                  onClick={() => setFiltersExpanded(!filtersExpanded)}
+                  size="large"
+                  type={filtersExpanded ? "primary" : "default"}
+                  className="flex-1 transition-all duration-200 hover:shadow-md"
                 >
-                  <span className="hidden sm:inline">
-                    {searchExpanded ? 'Collapse' : 'Expand'}
-                  </span>
+                  <span className="hidden sm:inline">Filters</span>
                 </Button>
-              </div>
-            </div>
+                <Button 
+                  onClick={() => {
+                    setSearchTerm('')
+                    setSelectedCategory('')
+                    setSelectedBrand('')
+                    setSelectedDealer('')
+                    setStockFilter('all')
+                    setPriceRange([0, 10000])
+                    setSortBy('name')
+                    setFilteredParts(parts)
+                  }}
+                  size="large"
+                  title="Clear all filters"
+                  className="transition-all duration-200 hover:shadow-md hover:bg-red-50 hover:border-red-300"
+                >
+                  <span className="hidden sm:inline">Clear</span>
+                  <span className="sm:hidden">✕</span>
+                </Button>
+              </Space.Compact>
+            </Col>
+          </Row>
+        </div>
 
-            {/* Quick Search Bar - Always Visible */}
-            <div className="mb-4">
-              <Row gutter={[12, 12]} align="middle">
-                <Col xs={24} sm={16} md={12} lg={14}>
-                  <Search
-                    placeholder="Quick search by name, brand, or part number..."
-                    value={searchTerm}
-                    onChange={(e) => {
-                      setSearchTerm(e.target.value)
-                      // Auto-search after 500ms delay
-                      if (e.target.value.length > 2 || e.target.value.length === 0) {
-                        setTimeout(() => handleSearch(), 500)
-                      }
-                    }}
-                    onSearch={handleSearch}
-                    enterButton={<SearchOutlined />}
-                    size="large"
-                    allowClear
-                    className="w-full transition-all duration-200 hover:shadow-md focus-within:shadow-lg"
+        {/* Advanced Filters - Collapsible Section with Animation */}
+        <div 
+          className={`border-t transition-all duration-300 ease-in-out overflow-hidden ${
+            (searchExpanded || filtersExpanded) 
+              ? 'max-h-[500px] opacity-100 pt-4' 
+              : 'max-h-0 opacity-0 pt-0'
+          }`}
+          style={{
+            transition: 'max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-in-out, padding 0.3s ease-in-out'
+          }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <Text type="secondary" className="flex items-center">
+              <FilterOutlined className="mr-2" />
+              Advanced Filters
+            </Text>
+            <Button 
+              type="text" 
+              size="small"
+              onClick={() => setFiltersExpanded(!filtersExpanded)}
+              className="sm:hidden"
+            >
+              {filtersExpanded ? 'Less' : 'More'}
+            </Button>
+          </div>
+          
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} lg={6}>
+              <div className="space-y-2">
+                <Text strong className="text-sm">Brand:</Text>
+                <Select
+                  placeholder="Any brand"
+                  style={{ width: '100%' }}
+                  value={selectedBrand}
+                  onChange={setSelectedBrand}
+                  allowClear
+                  showSearch
+                  optionFilterProp="children"
+                >
+                  {uniqueBrands.map(brand => (
+                    <Option key={brand} value={brand}>
+                      <div className="flex items-center justify-between">
+                        <span>{brand}</span>
+                        <Badge 
+                          count={parts.filter(p => p.brand === brand).length} 
+                          size="small"
+                          style={{ backgroundColor: '#722ed1' }}
+                        />
+                      </div>
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+            </Col>
+            
+            <Col xs={24} sm={12} lg={6}>
+              <div className="space-y-2">
+                <Text strong className="text-sm">Dealer:</Text>
+                <Select
+                  placeholder="Any dealer"
+                  style={{ width: '100%' }}
+                  value={selectedDealer}
+                  onChange={setSelectedDealer}
+                  allowClear
+                  showSearch
+                  optionFilterProp="children"
+                >
+                  {uniqueDealerOptions.map(dealer => (
+                    <Option key={dealer.id} value={dealer.name}>
+                      <div className="flex items-center justify-between">
+                        <span>{dealer.name}</span>
+                        <Badge 
+                          count={parts.filter(p => p.dealer_id === dealer.id).length} 
+                          size="small"
+                          style={{ backgroundColor: '#52c41a' }}
+                        />
+                      </div>
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+            </Col>
+            
+            <Col xs={24} sm={12} lg={6}>
+              <div className="space-y-2">
+                <Text strong className="text-sm">Stock Status:</Text>
+                <Select
+                  value={stockFilter}
+                  onChange={setStockFilter}
+                  style={{ width: '100%' }}
+                >
+                  <Option value="all">All Levels</Option>
+                  <Option value="in_stock">
+                    <div className="flex items-center">
+                      <CheckCircleOutlined className="text-green-500 mr-2" />
+                      In Stock (&gt;5)
+                    </div>
+                  </Option>
+                  <Option value="low_stock">
+                    <div className="flex items-center">
+                      <ExclamationCircleOutlined className="text-orange-500 mr-2" />
+                      Low Stock (1-5)
+                    </div>
+                  </Option>
+                  <Option value="out_of_stock">
+                    <div className="flex items-center">
+                      <ClockCircleOutlined className="text-red-500 mr-2" />
+                      Out of Stock
+                    </div>
+                  </Option>
+                </Select>
+              </div>
+            </Col>
+            
+            <Col xs={24} sm={12} lg={6}>
+              <div className="space-y-2">
+                <Text strong className="text-sm">Sort By:</Text>
+                <Select
+                  value={sortBy}
+                  onChange={setSortBy}
+                  style={{ width: '100%' }}
+                >
+                  <Option value="name">Name (A-Z)</Option>
+                  <Option value="price_asc">Price ↑</Option>
+                  <Option value="price_desc">Price ↓</Option>
+                  <Option value="stock">Stock ↓</Option>
+                  <Option value="brand">Brand (A-Z)</Option>
+                </Select>
+              </div>
+            </Col>
+          </Row>
+          
+          <Row gutter={[16, 16]} align="middle" className="mt-4">
+            <Col xs={24} md={12}>
+              <div className="space-y-2">
+                <Text strong className="text-sm">Price Range (GHS):</Text>
+                <div className="flex items-center space-x-2">
+                  <InputNumber
+                    min={0}
+                    max={priceRange[1]}
+                    value={priceRange[0]}
+                    onChange={(value) => setPriceRange([value || 0, priceRange[1]])}
+                    placeholder="Min"
+                    size="small"
+                    className="flex-1"
                   />
-                </Col>
-                <Col xs={12} sm={4} md={6} lg={5}>
-                  <Select
-                    placeholder="Category"
-                    style={{ width: '100%' }}
-                    value={selectedCategory}
-                    onChange={setSelectedCategory}
-                    allowClear
-                    size="large"
-                    showSearch
-                    optionFilterProp="children"
-                    className="transition-all duration-200 hover:shadow-md"
-                  >
-                    {categories.map(category => (
-                      <Option key={category} value={category}>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm">{category}</span>
-                          <Badge 
-                            count={parts.filter(p => p.category === category).length} 
-                            size="small"
-                            style={{ backgroundColor: '#1890ff' }}
-                          />
-                        </div>
-                      </Option>
-                    ))}
-                  </Select>
-                </Col>
-                <Col xs={12} sm={4} md={6} lg={5}>
-                  <Space.Compact block>
-                    <Button 
-                      icon={
-                        <span className="transition-transform duration-200 ease-in-out inline-block">
-                          <FilterOutlined />
-                        </span>
-                      }
-                      onClick={() => setFiltersExpanded(!filtersExpanded)}
-                      size="large"
-                      type={filtersExpanded ? "primary" : "default"}
-                      className="flex-1 transition-all duration-200 hover:shadow-md"
+                  <span className="text-gray-400">to</span>
+                  <InputNumber
+                    min={priceRange[0]}
+                    max={50000}
+                    value={priceRange[1]}
+                    onChange={(value) => setPriceRange([priceRange[0], value || 10000])}
+                    placeholder="Max"
+                    size="small"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+            </Col>
+            
+            <Col xs={24} md={12}>
+              <div className="flex items-center justify-end space-x-2">
+                <Text type="secondary" className="text-sm">Showing:</Text>
+                <Badge 
+                  count={filteredParts.length}
+                  style={{ backgroundColor: '#1890ff' }}
+                />
+                <Text type="secondary" className="text-sm">of {parts.length} parts</Text>
+              </div>
+            </Col>
+          </Row>
+        </div>
+      </Card>
+
+      <Card className="shadow-sm">
+        <div className="mb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <Text strong className="text-lg">
+                <InboxOutlined className="mr-2" />
+                Available Parts from Dealers
+              </Text>
+              <Text type="secondary" className="ml-2">
+                ({filteredParts.length} of {parts.length} parts from {uniqueDealers} dealers)
+              </Text>
+            </div>
+            
+            {/* Active Filters Summary */}
+            <div className="flex items-center space-x-2">
+              {(searchTerm || selectedCategory || selectedBrand || selectedDealer || stockFilter !== 'all' || priceRange[0] > 0 || priceRange[1] < 10000) && (
+                <div className="flex items-center space-x-2">
+                  <Text type="secondary">Active filters:</Text>
+                  {searchTerm && (
+                    <Tag 
+                      color="blue" 
+                      closable 
+                      onClose={() => setSearchTerm('')}
+                      className="transition-all duration-200 hover:shadow-md cursor-pointer"
                     >
-                      <span className="hidden sm:inline">Filters</span>
+                      Search: {searchTerm}
+                    </Tag>
+                  )}
+                  {selectedCategory && (
+                    <Tag 
+                      color="green" 
+                      closable 
+                      onClose={() => setSelectedCategory('')}
+                      className="transition-all duration-200 hover:shadow-md cursor-pointer"
+                    >
+                      Category: {selectedCategory}
+                    </Tag>
+                  )}
+                  {selectedBrand && (
+                    <Tag 
+                      color="purple" 
+                      closable 
+                      onClose={() => setSelectedBrand('')}
+                      className="transition-all duration-200 hover:shadow-md cursor-pointer"
+                    >
+                      Brand: {selectedBrand}
+                    </Tag>
+                  )}
+                  {selectedDealer && (
+                    <Tag 
+                      color="orange" 
+                      closable 
+                      onClose={() => setSelectedDealer('')}
+                      className="transition-all duration-200 hover:shadow-md cursor-pointer"
+                    >
+                      Dealer: {selectedDealer}
+                    </Tag>
+                  )}
+                  {stockFilter !== 'all' && (
+                    <Tag 
+                      color="red" 
+                      closable 
+                      onClose={() => setStockFilter('all')}
+                      className="transition-all duration-200 hover:shadow-md cursor-pointer"
+                    >
+                      Stock: {stockFilter.replace('_', ' ')}
+                    </Tag>
+                  )}
+                  {(priceRange[0] > 0 || priceRange[1] < 10000) && (
+                    <Tag 
+                      color="gold" 
+                      closable 
+                      onClose={() => setPriceRange([0, 10000])}
+                      className="transition-all duration-200 hover:shadow-md cursor-pointer"
+                    >
+                      Price: GHS {priceRange[0]}-{priceRange[1]}
+                    </Tag>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        <Table
+          columns={partsColumns}
+          dataSource={filteredParts}
+          rowKey="id"
+          loading={{
+            spinning: loading,
+            indicator: (
+              <div className="flex flex-col items-center space-y-2">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="text-sm text-gray-500">Loading parts...</span>
+              </div>
+            )
+          }}
+          pagination={{ 
+            pageSize: 10,
+            showSizeChanger: true,
+            showQuickJumper: false, // Disable on mobile for better UX
+            showTotal: (total, range) => (
+              <span className="text-sm">
+                <span className="hidden sm:inline">{range[0]}-{range[1]} of {total} parts</span>
+                <span className="sm:hidden">{range[0]}-{range[1]}/{total}</span>
+              </span>
+            ),
+            pageSizeOptions: ['5', '10', '20', '50'],
+            size: 'default',
+            responsive: true,
+            className: 'mb-0'
+          }}
+          scroll={{ x: 1200 }}
+          size="middle"
+          className="overflow-auto transition-all duration-200"
+          locale={{
+            emptyText: (
+              <Empty
+                description={
+                  <span className="text-gray-500">
+                    <span className="hidden sm:inline">No parts found matching your criteria</span>
+                    <span className="sm:hidden">No parts found</span>
+                  </span>
+                }
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              >
+                <div className="space-y-2">
+                  <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                    <Button type="primary" onClick={loadData} icon={<ReloadOutlined />} size="small">
+                      Refresh
                     </Button>
                     <Button 
                       onClick={() => {
@@ -671,346 +998,18 @@ export default function MechanicPartsPage() {
                         setSortBy('name')
                         setFilteredParts(parts)
                       }}
-                      size="large"
-                      title="Clear all filters"
-                      className="transition-all duration-200 hover:shadow-md hover:bg-red-50 hover:border-red-300"
+                      size="small"
                     >
-                      <span className="hidden sm:inline">Clear</span>
-                      <span className="sm:hidden">✕</span>
+                      Clear Filters
                     </Button>
-                  </Space.Compact>
-                </Col>
-              </Row>
-            </div>
-
-            {/* Advanced Filters - Collapsible Section with Animation */}
-            <div 
-              className={`border-t transition-all duration-300 ease-in-out overflow-hidden ${
-                (searchExpanded || filtersExpanded) 
-                  ? 'max-h-[500px] opacity-100 pt-4' 
-                  : 'max-h-0 opacity-0 pt-0'
-              }`}
-              style={{
-                transition: 'max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-in-out, padding 0.3s ease-in-out'
-              }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <Text type="secondary" className="flex items-center">
-                  <FilterOutlined className="mr-2" />
-                  Advanced Filters
-                </Text>
-                <Button 
-                  type="text" 
-                  size="small"
-                  onClick={() => setFiltersExpanded(!filtersExpanded)}
-                  className="sm:hidden"
-                >
-                  {filtersExpanded ? 'Less' : 'More'}
-                </Button>
-              </div>
-                
-                <Row gutter={[16, 16]}>
-                  <Col xs={24} sm={12} lg={6}>
-                    <div className="space-y-2">
-                      <Text strong className="text-sm">Brand:</Text>
-                      <Select
-                        placeholder="Any brand"
-                        style={{ width: '100%' }}
-                        value={selectedBrand}
-                        onChange={setSelectedBrand}
-                        allowClear
-                        showSearch
-                        optionFilterProp="children"
-                      >
-                        {uniqueBrands.map(brand => (
-                          <Option key={brand} value={brand}>
-                            <div className="flex items-center justify-between">
-                              <span>{brand}</span>
-                              <Badge 
-                                count={parts.filter(p => p.brand === brand).length} 
-                                size="small"
-                                style={{ backgroundColor: '#722ed1' }}
-                              />
-                            </div>
-                          </Option>
-                        ))}
-                      </Select>
-                    </div>
-                  </Col>
-                  
-                  <Col xs={24} sm={12} lg={6}>
-                    <div className="space-y-2">
-                      <Text strong className="text-sm">Dealer:</Text>
-                      <Select
-                        placeholder="Any dealer"
-                        style={{ width: '100%' }}
-                        value={selectedDealer}
-                        onChange={setSelectedDealer}
-                        allowClear
-                        showSearch
-                        optionFilterProp="children"
-                      >
-                        {uniqueDealerOptions.map(dealer => (
-                          <Option key={dealer.id} value={dealer.name}>
-                            <div className="flex items-center justify-between">
-                              <span>{dealer.name}</span>
-                              <Badge 
-                                count={parts.filter(p => p.dealer_id === dealer.id).length} 
-                                size="small"
-                                style={{ backgroundColor: '#52c41a' }}
-                              />
-                            </div>
-                          </Option>
-                        ))}
-                      </Select>
-                    </div>
-                  </Col>
-                  
-                  <Col xs={24} sm={12} lg={6}>
-                    <div className="space-y-2">
-                      <Text strong className="text-sm">Stock Status:</Text>
-                      <Select
-                        value={stockFilter}
-                        onChange={setStockFilter}
-                        style={{ width: '100%' }}
-                      >
-                        <Option value="all">All Levels</Option>
-                        <Option value="in_stock">
-                          <div className="flex items-center">
-                            <CheckCircleOutlined className="text-green-500 mr-2" />
-                            In Stock (>5)
-                          </div>
-                        </Option>
-                        <Option value="low_stock">
-                          <div className="flex items-center">
-                            <ExclamationCircleOutlined className="text-orange-500 mr-2" />
-                            Low Stock (1-5)
-                          </div>
-                        </Option>
-                        <Option value="out_of_stock">
-                          <div className="flex items-center">
-                            <ClockCircleOutlined className="text-red-500 mr-2" />
-                            Out of Stock
-                          </div>
-                        </Option>
-                      </Select>
-                    </div>
-                  </Col>
-                  
-                  <Col xs={24} sm={12} lg={6}>
-                    <div className="space-y-2">
-                      <Text strong className="text-sm">Sort By:</Text>
-                      <Select
-                        value={sortBy}
-                        onChange={setSortBy}
-                        style={{ width: '100%' }}
-                      >
-                        <Option value="name">Name (A-Z)</Option>
-                        <Option value="price_asc">Price ↑</Option>
-                        <Option value="price_desc">Price ↓</Option>
-                        <Option value="stock">Stock ↓</Option>
-                        <Option value="brand">Brand (A-Z)</Option>
-                      </Select>
-                    </div>
-                  </Col>
-                </Row>
-                
-                <Row gutter={[16, 16]} align="middle" className="mt-4">
-                  <Col xs={24} md={12}>
-                    <div className="space-y-2">
-                      <Text strong className="text-sm">Price Range (GHS):</Text>
-                      <div className="flex items-center space-x-2">
-                        <InputNumber
-                          min={0}
-                          max={priceRange[1]}
-                          value={priceRange[0]}
-                          onChange={(value) => setPriceRange([value || 0, priceRange[1]])}
-                          placeholder="Min"
-                          size="small"
-                          className="flex-1"
-                        />
-                        <span className="text-gray-400">to</span>
-                        <InputNumber
-                          min={priceRange[0]}
-                          max={50000}
-                          value={priceRange[1]}
-                          onChange={(value) => setPriceRange([priceRange[0], value || 10000])}
-                          placeholder="Max"
-                          size="small"
-                          className="flex-1"
-                        />
-                      </div>
-                    </div>
-                  </Col>
-                  
-                  <Col xs={24} md={12}>
-                    <div className="flex items-center justify-end space-x-2">
-                      <Text type="secondary" className="text-sm">Showing:</Text>
-                      <Badge 
-                        count={filteredParts.length}
-                        style={{ backgroundColor: '#1890ff' }}
-                      />
-                      <Text type="secondary" className="text-sm">of {parts.length} parts</Text>
-                    </div>
-                  </Col>
-                </Row>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="shadow-sm">
-            <div className="mb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Text strong className="text-lg">
-                    <InboxOutlined className="mr-2" />
-                    Available Parts from Dealers
-                  </Text>
-                  <Text type="secondary" className="ml-2">
-                    ({filteredParts.length} of {parts.length} parts from {uniqueDealers} dealers)
-                  </Text>
-                </div>
-                
-                {/* Active Filters Summary */}
-                <div className="flex items-center space-x-2">
-                  {(searchTerm || selectedCategory || selectedBrand || selectedDealer || stockFilter !== 'all' || priceRange[0] > 0 || priceRange[1] < 10000) && (
-                    <div className="flex items-center space-x-2">
-                      <Text type="secondary">Active filters:</Text>
-                      {searchTerm && (
-                        <Tag 
-                          color="blue" 
-                          closable 
-                          onClose={() => setSearchTerm('')}
-                          className="transition-all duration-200 hover:shadow-md cursor-pointer"
-                        >
-                          Search: {searchTerm}
-                        </Tag>
-                      )}
-                      {selectedCategory && (
-                        <Tag 
-                          color="green" 
-                          closable 
-                          onClose={() => setSelectedCategory('')}
-                          className="transition-all duration-200 hover:shadow-md cursor-pointer"
-                        >
-                          Category: {selectedCategory}
-                        </Tag>
-                      )}
-                      {selectedBrand && (
-                        <Tag 
-                          color="purple" 
-                          closable 
-                          onClose={() => setSelectedBrand('')}
-                          className="transition-all duration-200 hover:shadow-md cursor-pointer"
-                        >
-                          Brand: {selectedBrand}
-                        </Tag>
-                      )}
-                      {selectedDealer && (
-                        <Tag 
-                          color="orange" 
-                          closable 
-                          onClose={() => setSelectedDealer('')}
-                          className="transition-all duration-200 hover:shadow-md cursor-pointer"
-                        >
-                          Dealer: {selectedDealer}
-                        </Tag>
-                      )}
-                      {stockFilter !== 'all' && (
-                        <Tag 
-                          color="red" 
-                          closable 
-                          onClose={() => setStockFilter('all')}
-                          className="transition-all duration-200 hover:shadow-md cursor-pointer"
-                        >
-                          Stock: {stockFilter.replace('_', ' ')}
-                        </Tag>
-                      )}
-                      {(priceRange[0] > 0 || priceRange[1] < 10000) && (
-                        <Tag 
-                          color="gold" 
-                          closable 
-                          onClose={() => setPriceRange([0, 10000])}
-                          className="transition-all duration-200 hover:shadow-md cursor-pointer"
-                        >
-                          Price: GHS {priceRange[0]}-{priceRange[1]}
-                        </Tag>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-            <Table
-              columns={partsColumns}
-              dataSource={filteredParts}
-              rowKey="id"
-              loading={{
-                spinning: loading,
-                indicator: (
-                  <div className="flex flex-col items-center space-y-2">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <span className="text-sm text-gray-500">Loading parts...</span>
                   </div>
-                )
-              }}
-              pagination={{ 
-                pageSize: 10,
-                showSizeChanger: true,
-                showQuickJumper: false, // Disable on mobile for better UX
-                showTotal: (total, range) => (
-                  <span className="text-sm">
-                    <span className="hidden sm:inline">{range[0]}-{range[1]} of {total} parts</span>
-                    <span className="sm:hidden">{range[0]}-{range[1]}/{total}</span>
-                  </span>
-                ),
-                pageSizeOptions: ['5', '10', '20', '50'],
-                size: 'default',
-                responsive: true,
-                className: 'mb-0'
-              }}
-              scroll={{ x: 1200 }}
-              size="middle"
-              className="overflow-auto transition-all duration-200"
-              locale={{
-                emptyText: (
-                  <Empty
-                    description={
-                      <span className="text-gray-500">
-                        <span className="hidden sm:inline">No parts found matching your criteria</span>
-                        <span className="sm:hidden">No parts found</span>
-                      </span>
-                    }
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  >
-                    <div className="space-y-2">
-                      <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                        <Button type="primary" onClick={loadData} icon={<ReloadOutlined />} size="small">
-                          Refresh
-                        </Button>
-                        <Button 
-                          onClick={() => {
-                            setSearchTerm('')
-                            setSelectedCategory('')
-                            setSelectedBrand('')
-                            setSelectedDealer('')
-                            setStockFilter('all')
-                            setPriceRange([0, 10000])
-                            setSortBy('name')
-                            setFilteredParts(parts)
-                          }}
-                          size="small"
-                        >
-                          Clear Filters
-                        </Button>
-                      </div>
-                    </div>
-                  </Empty>
-                )
-              }}
-            />
-          </Card>
-        </div>
+                </div>
+              </Empty>
+            )
+          }}
+        />
+      </Card>
+    </div>
   )
 
   // Define tab items for the modern Tabs component
