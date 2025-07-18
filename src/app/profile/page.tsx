@@ -73,6 +73,17 @@ interface ProfileFormValues {
   email: string
   phone: string
   address: Address | string
+  location_data?: {
+    coordinates?: { lat: number; lng: number }
+    address_components?: Array<{
+      long_name: string
+      short_name: string
+      types: string[]
+    }>
+    place_id?: string
+    city?: string
+    country?: string
+  }
   mechanic_specializations?: {
     service_types: string[]
     vehicle_brands: string[]
@@ -744,7 +755,7 @@ export default function ProfilePage() {
                           showSearch
                           optionFilterProp="children"
                           filterOption={(input, option) =>
-                            (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+                            String(option?.children || '')?.toLowerCase().includes(input.toLowerCase())
                           }
                         >
                           {CERTIFICATIONS.map((cert) => (
