@@ -630,7 +630,7 @@ export default function ProfilePage() {
                               showSearch
                               optionFilterProp="children"
                               filterOption={(input, option) =>
-                                (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+                                String(option?.children || '')?.toLowerCase().includes(input.toLowerCase())
                               }
                             >
                               {SERVICE_TYPES.map((service) => (
@@ -663,7 +663,7 @@ export default function ProfilePage() {
                               showSearch
                               optionFilterProp="children"
                               filterOption={(input, option) =>
-                                (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+                                String(option?.children || '')?.toLowerCase().includes(input.toLowerCase())
                               }
                             >
                               {VEHICLE_BRANDS.map((brand) => (
