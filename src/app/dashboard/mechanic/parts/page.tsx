@@ -558,19 +558,9 @@ export default function MechanicPartsPage() {
     .map(dealer => ({ id: dealer!.id, name: dealer!.name }))
     .sort((a, b) => a.name.localeCompare(b.name))
 
-  // Define tab items for the modern Tabs component
-  const tabItems = [
-    {
-      key: 'browse',
-      label: (
-        <span>
-          <SearchOutlined />
-          Browse Parts
-          <Badge count={totalParts} showZero style={{ marginLeft: 8 }} />
-        </span>
-      ),
-      children: (
-        <div>
+  // Browse tab content component
+  const BrowseTabContent = () => (
+    <div>
           {/* Enhanced Search and Filter - Collapsible */}
           <Card className="mb-4 shadow-sm">
             {/* Header with Collapse Toggle */}
@@ -1021,7 +1011,20 @@ export default function MechanicPartsPage() {
             />
           </Card>
         </div>
-      )
+  )
+
+  // Define tab items for the modern Tabs component
+  const tabItems = [
+    {
+      key: 'browse',
+      label: (
+        <span>
+          <SearchOutlined />
+          Browse Parts
+          <Badge count={totalParts} showZero style={{ marginLeft: 8 }} />
+        </span>
+      ),
+      children: <BrowseTabContent />
     },
     {
       key: 'requests',
