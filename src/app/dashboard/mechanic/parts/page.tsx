@@ -570,7 +570,7 @@ export default function MechanicPartsPage() {
         </span>
       ),
       children: (
-        <React.Fragment>
+        <>
           {/* Enhanced Search and Filter - Collapsible */}
           <Card className="mb-4 shadow-sm">
             {/* Header with Collapse Toggle */}
@@ -1020,7 +1020,7 @@ export default function MechanicPartsPage() {
               }}
             />
           </Card>
-        </React.Fragment>
+        </>
       )
     },
     {
