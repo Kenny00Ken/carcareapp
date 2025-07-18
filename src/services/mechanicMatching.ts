@@ -25,6 +25,7 @@ export interface MechanicMatchingParams {
   requestLocation: GeolocationCoords
   urgencyLevel: 'low' | 'medium' | 'high'
   serviceType?: string[]
+  vehicleBrand?: string
   maxDistance?: number // in km
   maxResults?: number
   priceRange?: {
@@ -245,9 +246,9 @@ export class MechanicMatchingService {
           travel_mode: 'driving',
           max_travel_distance: settings.mechanic_settings?.service_radius || 25,
           estimated_response_time: estimatedArrival,
-          specializations: user.specializations || [],
+          specializations: user.mechanic_specializations?.service_types || [],
           hourly_rate: settings.mechanic_settings?.minimum_job_value || 50,
-          emergency_service: settings.mechanic_settings?.emergency_services || false,
+          emergency_service: user.mechanic_specializations?.emergency_services || settings.mechanic_settings?.emergency_services || false,
           working_hours: {
             start: '08:00',
             end: '18:00',
@@ -297,10 +298,11 @@ export class MechanicMatchingService {
     // Availability Score
     const availabilityScore = this.checkCurrentAvailability(settings) ? 100 : 0
 
-    // Specialization Score
+    // Specialization Score - now using new mechanic_specializations structure
     const specializationScore = this.calculateSpecializationScore(
-      user.specializations || [],
-      params.serviceType || []
+      user.mechanic_specializations,
+      params.serviceType || [],
+      params.vehicleBrand
     )
 
     // Rating Score
@@ -312,7 +314,7 @@ export class MechanicMatchingService {
 
     // Urgency Score (emergency mechanics get bonus for urgent requests)
     const urgencyScore = this.calculateUrgencyScore(
-      settings.mechanic_settings?.emergency_services || false,
+      user.mechanic_specializations?.emergency_services || settings.mechanic_settings?.emergency_services || false,
       params.urgencyLevel
     )
 
@@ -372,22 +374,49 @@ export class MechanicMatchingService {
   }
 
   /**
-   * Calculate specialization match score
+   * Calculate specialization match score with vehicle brand consideration
    */
   private static calculateSpecializationScore(
-    mechanicSpecs: string[],
-    requestedSpecs: string[]
+    mechanicSpecs: any,
+    requestedSpecs: string[],
+    vehicleBrand?: string
   ): number {
-    if (requestedSpecs.length === 0) return 100 // No specific requirements
+    if (!mechanicSpecs) return 50 // Neutral score for mechanics without specializations
 
-    const matches = requestedSpecs.filter(spec => 
-      mechanicSpecs.some(mechanicSpec => 
-        mechanicSpec.toLowerCase().includes(spec.toLowerCase()) ||
-        spec.toLowerCase().includes(mechanicSpec.toLowerCase())
+    let totalScore = 0
+    let weightedFactors = 0
+
+    // Service type matching (70% weight)
+    if (requestedSpecs.length > 0 && mechanicSpecs.service_types?.length > 0) {
+      const serviceMatches = requestedSpecs.filter(spec => 
+        mechanicSpecs.service_types.some((mechanicSpec: string) => 
+          mechanicSpec.toLowerCase().includes(spec.toLowerCase()) ||
+          spec.toLowerCase().includes(mechanicSpec.toLowerCase())
+        )
       )
-    )
+      const serviceScore = (serviceMatches.length / requestedSpecs.length) * 100
+      totalScore += serviceScore * 0.7
+      weightedFactors += 0.7
+    }
 
-    return (matches.length / requestedSpecs.length) * 100
+    // Vehicle brand matching (30% weight)
+    if (vehicleBrand && mechanicSpecs.vehicle_brands?.length > 0) {
+      const brandMatch = mechanicSpecs.vehicle_brands.some((brand: string) => 
+        brand.toLowerCase() === vehicleBrand.toLowerCase() ||
+        brand.toLowerCase() === 'other'
+      )
+      const brandScore = brandMatch ? 100 : 0
+      totalScore += brandScore * 0.3
+      weightedFactors += 0.3
+    }
+
+    // If no specific requirements, give higher score
+    if (requestedSpecs.length === 0 && !vehicleBrand) {
+      return 100
+    }
+
+    // Return weighted average, or neutral score if no factors matched
+    return weightedFactors > 0 ? totalScore / weightedFactors : 50
   }
 
   /**

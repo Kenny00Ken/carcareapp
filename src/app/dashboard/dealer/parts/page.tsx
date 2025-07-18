@@ -25,7 +25,8 @@ import {
   Tabs,
   Descriptions,
   Statistic,
-  Divider
+  Divider,
+  AutoComplete
 } from 'antd'
 import { 
   PlusOutlined, 
@@ -88,6 +89,7 @@ export default function DealerPartsPage() {
   const [partSuggestions, setPartSuggestions] = useState<string[]>([])
   const [suggestedBrands, setSuggestedBrands] = useState<string[]>([])
   const [isAutoFilling, setIsAutoFilling] = useState(false)
+  const [partNameValue, setPartNameValue] = useState('')
 
   const categories = [
     'Engine', 'Brakes', 'Transmission', 'Suspension', 'Electrical', 
@@ -103,6 +105,9 @@ export default function DealerPartsPage() {
 
   // Smart auto-fill function
   const handlePartNameChange = (value: string) => {
+    setPartNameValue(value)
+    form.setFieldsValue({ name: value })
+    
     if (!value || value.length < 2) {
       setPartSuggestions([])
       setSuggestedBrands([])
@@ -147,6 +152,7 @@ export default function DealerPartsPage() {
 
   // Handle part name selection from dropdown
   const handlePartNameSelect = (value: string) => {
+    setPartNameValue(value)
     const bestMatch = getBestMatch(value)
     if (bestMatch) {
       setIsAutoFilling(true)
@@ -223,6 +229,7 @@ export default function DealerPartsPage() {
   const handleEdit = (part: Part) => {
     setSelectedPart(part)
     setIsEditing(true)
+    setPartNameValue(part.name)
     form.setFieldsValue({
       ...part,
       specifications: part.specifications || {}
@@ -415,6 +422,7 @@ export default function DealerPartsPage() {
                 form.resetFields()
                 setPartSuggestions([])
                 setSuggestedBrands([])
+                setPartNameValue('')
                 setModalVisible(true)
               }}
               className="shadow-lg"
@@ -536,6 +544,7 @@ export default function DealerPartsPage() {
             setSelectedPart(null)
             setPartSuggestions([])
             setSuggestedBrands([])
+            setPartNameValue('')
             setIsAutoFilling(false)
           }}
           width={900}
@@ -556,7 +565,7 @@ export default function DealerPartsPage() {
             }}
           >
             <Alert
-              message="Smart Part Entry"
+              message="💡 Smart Part Entry System"
               description="Start typing a part name and we'll automatically suggest category, compatibility, and other details to make entry faster and more accurate."
               type="info"
               showIcon
@@ -565,7 +574,7 @@ export default function DealerPartsPage() {
 
             {isAutoFilling && (
               <Alert
-                message="Auto-filling form fields..."
+                message="🎯 Auto-filling form fields..."
                 description="We've found matching part information and are filling in the details for you."
                 type="success"
                 showIcon
@@ -574,64 +583,89 @@ export default function DealerPartsPage() {
               />
             )}
 
-            <Row gutter={16}>
+            <Row gutter={[16, 16]}>
               <Col span={12}>
                 <Form.Item
                   name="name"
-                  label="Part Name"
+                  label={
+                    <span className="font-semibold">
+                      Part Name
+                      <span className="text-red-500 ml-1">*</span>
+                    </span>
+                  }
                   rules={[{ required: true, message: 'Please enter part name' }]}
                 >
-                  <Select
-                    showSearch
-                    placeholder="Start typing part name (e.g., Brake Pads, Oil Filter)"
+                  <AutoComplete
                     size="large"
-                    filterOption={false}
-                    onSearch={handlePartNameChange}
+                    placeholder="Start typing part name (e.g., Brake Pads, Oil Filter)"
+                    value={partNameValue}
+                    onChange={handlePartNameChange}
                     onSelect={handlePartNameSelect}
-                    notFoundContent={null}
                     allowClear
-                    suffixIcon={<UploadOutlined />}
-                  >
-                    {partSuggestions.map(suggestion => (
-                      <Option key={suggestion} value={suggestion}>
-                        <div className="flex items-center justify-between">
-                          <span>{suggestion}</span>
-                          <Text type="secondary" className="text-xs">
+                    className="w-full"
+                    options={partSuggestions.map(suggestion => ({
+                      key: suggestion,
+                      value: suggestion,
+                      label: (
+                        <div className="flex items-center justify-between py-2">
+                          <span className="font-medium">{suggestion}</span>
+                          <span className="text-xs text-gray-500 bg-blue-50 px-2 py-1 rounded">
                             {getCategoryForPart(suggestion)}
-                          </Text>
+                          </span>
                         </div>
-                      </Option>
-                    ))}
-                  </Select>
+                      )
+                    }))}
+                    filterOption={false}
+                    notFoundContent={
+                      partNameValue && partNameValue.length > 2 ? (
+                        <div className="text-center py-4 text-gray-500">
+                          <div>No matching parts found</div>
+                          <div className="text-xs">Continue typing to create a custom part</div>
+                        </div>
+                      ) : null
+                    }
+                  />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item
                   name="category"
                   label={
-                    <span>
-                      Category 
+                    <span className="font-semibold">
+                      Category
+                      <span className="text-red-500 ml-1">*</span>
                       {isAutoFilling && <span className="text-green-500 ml-2">✓ Auto-filled</span>}
                     </span>
                   }
                   rules={[{ required: true, message: 'Please select category' }]}
                 >
-                  <Select size="large" placeholder="Select category (auto-filled based on part name)">
+                  <Select 
+                    size="large" 
+                    placeholder="Select category (auto-filled based on part name)"
+                    className="w-full"
+                    showSearch
+                    optionFilterProp="children"
+                  >
                     {categories.map(category => (
-                      <Option key={category} value={category}>{category}</Option>
+                      <Option key={category} value={category}>
+                        <div className="flex items-center">
+                          <span className="font-medium">{category}</span>
+                        </div>
+                      </Option>
                     ))}
                   </Select>
                 </Form.Item>
               </Col>
             </Row>
 
-            <Row gutter={16}>
+            <Row gutter={[16, 16]}>
               <Col span={12}>
                 <Form.Item
                   name="brand"
                   label={
-                    <span>
+                    <span className="font-semibold">
                       Brand
+                      <span className="text-red-500 ml-1">*</span>
                       {suggestedBrands.length > 0 && (
                         <Text type="secondary" className="ml-2 text-xs">
                           (Popular: {suggestedBrands.slice(0, 3).join(', ')})
@@ -646,6 +680,7 @@ export default function DealerPartsPage() {
                     placeholder="Select or type brand name"
                     size="large"
                     allowClear
+                    className="w-full"
                     filterOption={(input, option) =>
                       String(option?.children || '')?.toLowerCase().includes(input.toLowerCase())
                     }
@@ -653,40 +688,116 @@ export default function DealerPartsPage() {
                     {/* Show suggested brands first */}
                     {suggestedBrands.map(brand => (
                       <Option key={`suggested-${brand}`} value={brand}>
-                        <span className="text-green-600">⭐ {brand}</span>
-                        <Text type="secondary" className="ml-2">(Recommended)</Text>
+                        <div className="flex items-center">
+                          <span className="text-green-600 font-medium">⭐ {brand}</span>
+                          <Text type="secondary" className="ml-2 text-xs">(Recommended)</Text>
+                        </div>
                       </Option>
                     ))}
                     {/* Common brands */}
-                    <Option value="Bosch">Bosch</Option>
-                    <Option value="NGK">NGK</Option>
-                    <Option value="Denso">Denso</Option>
-                    <Option value="Brembo">Brembo</Option>
-                    <Option value="Monroe">Monroe</Option>
-                    <Option value="Gates">Gates</Option>
-                    <Option value="Fram">Fram</Option>
-                    <Option value="K&N">K&N</Option>
-                    <Option value="Bilstein">Bilstein</Option>
-                    <Option value="ATE">ATE</Option>
-                    <Option value="Sachs">Sachs</Option>
-                    <Option value="Febi">Febi</Option>
-                    <Option value="Lemförder">Lemförder</Option>
-                    <Option value="TRW">TRW</Option>
-                    <Option value="Valeo">Valeo</Option>
-                    <Option value="OEM">OEM</Option>
-                    <Option value="Aftermarket">Aftermarket</Option>
+                    <Option value="Bosch">
+                      <div className="flex items-center">
+                        <span className="font-medium">Bosch</span>
+                      </div>
+                    </Option>
+                    <Option value="NGK">
+                      <div className="flex items-center">
+                        <span className="font-medium">NGK</span>
+                      </div>
+                    </Option>
+                    <Option value="Denso">
+                      <div className="flex items-center">
+                        <span className="font-medium">Denso</span>
+                      </div>
+                    </Option>
+                    <Option value="Brembo">
+                      <div className="flex items-center">
+                        <span className="font-medium">Brembo</span>
+                      </div>
+                    </Option>
+                    <Option value="Monroe">
+                      <div className="flex items-center">
+                        <span className="font-medium">Monroe</span>
+                      </div>
+                    </Option>
+                    <Option value="Gates">
+                      <div className="flex items-center">
+                        <span className="font-medium">Gates</span>
+                      </div>
+                    </Option>
+                    <Option value="Fram">
+                      <div className="flex items-center">
+                        <span className="font-medium">Fram</span>
+                      </div>
+                    </Option>
+                    <Option value="K&N">
+                      <div className="flex items-center">
+                        <span className="font-medium">K&N</span>
+                      </div>
+                    </Option>
+                    <Option value="Bilstein">
+                      <div className="flex items-center">
+                        <span className="font-medium">Bilstein</span>
+                      </div>
+                    </Option>
+                    <Option value="ATE">
+                      <div className="flex items-center">
+                        <span className="font-medium">ATE</span>
+                      </div>
+                    </Option>
+                    <Option value="Sachs">
+                      <div className="flex items-center">
+                        <span className="font-medium">Sachs</span>
+                      </div>
+                    </Option>
+                    <Option value="Febi">
+                      <div className="flex items-center">
+                        <span className="font-medium">Febi</span>
+                      </div>
+                    </Option>
+                    <Option value="Lemförder">
+                      <div className="flex items-center">
+                        <span className="font-medium">Lemförder</span>
+                      </div>
+                    </Option>
+                    <Option value="TRW">
+                      <div className="flex items-center">
+                        <span className="font-medium">TRW</span>
+                      </div>
+                    </Option>
+                    <Option value="Valeo">
+                      <div className="flex items-center">
+                        <span className="font-medium">Valeo</span>
+                      </div>
+                    </Option>
+                    <Option value="OEM">
+                      <div className="flex items-center">
+                        <span className="font-medium">OEM</span>
+                      </div>
+                    </Option>
+                    <Option value="Aftermarket">
+                      <div className="flex items-center">
+                        <span className="font-medium">Aftermarket</span>
+                      </div>
+                    </Option>
                   </Select>
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item
                   name="part_number"
-                  label="Part Number"
+                  label={
+                    <span className="font-semibold">
+                      Part Number
+                      <span className="text-red-500 ml-1">*</span>
+                    </span>
+                  }
                   rules={[{ required: true, message: 'Please enter part number' }]}
                 >
                   <Input 
-                    placeholder="Manufacturer part number"
+                    placeholder="Manufacturer part number (e.g., BP-2024-001)"
                     size="large"
+                    className="w-full"
                   />
                 </Form.Item>
               </Col>
@@ -695,26 +806,30 @@ export default function DealerPartsPage() {
             <Form.Item
               name="description"
               label={
-                <span>
+                <span className="font-semibold">
                   Description
+                  <span className="text-red-500 ml-1">*</span>
                   {isAutoFilling && <span className="text-green-500 ml-2">✓ Auto-filled</span>}
                 </span>
               }
               rules={[{ required: true, message: 'Please provide description' }]}
             >
               <TextArea 
-                rows={3} 
+                rows={4} 
                 placeholder="Detailed description of the part, its function, and specifications (auto-filled based on part name)"
                 showCount
                 maxLength={500}
+                className="w-full"
+                size="large"
               />
             </Form.Item>
 
             <Form.Item
               name="compatibility"
               label={
-                <span>
+                <span className="font-semibold">
                   Vehicle Compatibility
+                  <span className="text-red-500 ml-1">*</span>
                   {isAutoFilling && <span className="text-green-500 ml-2">✓ Auto-filled</span>}
                 </span>
               }
@@ -726,13 +841,20 @@ export default function DealerPartsPage() {
                 placeholder="Select compatible car makes/models (auto-filled based on part name)"
                 optionLabelProp="label"
                 maxTagCount="responsive"
+                className="w-full"
+                showSearch
+                filterOption={(input, option) =>
+                  String(option?.label || '').toLowerCase().includes(input.toLowerCase())
+                }
               >
                 {carMakes.map(make => (
                   <Option key={make} value={make} label={make}>
                     <div className="flex items-center justify-between">
-                      <span>{make}</span>
+                      <span className="font-medium">{make}</span>
                       {getCompatibilityForPart(form.getFieldValue('name') || '').includes(make) && (
-                        <Text type="secondary" className="text-xs">Recommended</Text>
+                        <Text type="secondary" className="text-xs bg-green-50 px-2 py-1 rounded">
+                          Recommended
+                        </Text>
                       )}
                     </div>
                   </Option>
@@ -740,11 +862,16 @@ export default function DealerPartsPage() {
               </Select>
             </Form.Item>
 
-            <Row gutter={16}>
+            <Row gutter={[16, 16]}>
               <Col span={8}>
                 <Form.Item
                   name="price"
-                  label="Price (GHS)"
+                  label={
+                    <span className="font-semibold">
+                      Price (GHS)
+                      <span className="text-red-500 ml-1">*</span>
+                    </span>
+                  }
                   rules={[{ required: true, message: 'Please enter price' }]}
                 >
                   <InputNumber 
@@ -754,13 +881,19 @@ export default function DealerPartsPage() {
                     size="large"
                     prefix={<DollarOutlined />}
                     placeholder="0.00"
+                    className="w-full"
                   />
                 </Form.Item>
               </Col>
               <Col span={8}>
                 <Form.Item
                   name="stock"
-                  label="Current Stock"
+                  label={
+                    <span className="font-semibold">
+                      Current Stock
+                      <span className="text-red-500 ml-1">*</span>
+                    </span>
+                  }
                   rules={[{ required: true, message: 'Please enter stock quantity' }]}
                 >
                   <InputNumber 
@@ -768,13 +901,19 @@ export default function DealerPartsPage() {
                     style={{ width: '100%' }}
                     size="large"
                     placeholder="0"
+                    className="w-full"
                   />
                 </Form.Item>
               </Col>
               <Col span={8}>
                 <Form.Item
                   name="min_stock_threshold"
-                  label="Low Stock Alert"
+                  label={
+                    <span className="font-semibold">
+                      Low Stock Alert
+                      <span className="text-red-500 ml-1">*</span>
+                    </span>
+                  }
                   rules={[{ required: true, message: 'Please set minimum threshold' }]}
                 >
                   <InputNumber 
@@ -782,34 +921,56 @@ export default function DealerPartsPage() {
                     style={{ width: '100%' }}
                     size="large"
                     placeholder="5"
+                    className="w-full"
                   />
                 </Form.Item>
               </Col>
             </Row>
 
-            <Form.Item
-              name="image_url"
-              label="Part Image"
-            >
-              <ImageUpload
-                folder="parts"
-                buttonText="Upload Part Image"
-                onChange={(url) => form.setFieldsValue({ image_url: url })}
-                value={form.getFieldValue('image_url')}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="is_active"
-              label="Status"
-              valuePropName="checked"
-            >
-              <Switch 
-                checkedChildren="Active" 
-                unCheckedChildren="Inactive"
-                size="default"
-              />
-            </Form.Item>
+            <Divider />
+            
+            <Row gutter={[16, 16]}>
+              <Col span={12}>
+                <Form.Item
+                  name="image_url"
+                  label={
+                    <span className="font-semibold">
+                      Part Image
+                      <Text type="secondary" className="ml-2 text-xs">(Optional)</Text>
+                    </span>
+                  }
+                >
+                  <ImageUpload
+                    folder="parts"
+                    buttonText="Upload Part Image"
+                    onChange={(url) => form.setFieldsValue({ image_url: url })}
+                    value={form.getFieldValue('image_url')}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="is_active"
+                  label={
+                    <span className="font-semibold">
+                      Status
+                    </span>
+                  }
+                  valuePropName="checked"
+                >
+                  <div className="flex items-center space-x-4">
+                    <Switch 
+                      checkedChildren="Active" 
+                      unCheckedChildren="Inactive"
+                      size="default"
+                    />
+                    <Text type="secondary" className="text-sm">
+                      Active parts are visible to mechanics
+                    </Text>
+                  </div>
+                </Form.Item>
+              </Col>
+            </Row>
           </Form>
         </Modal>
 

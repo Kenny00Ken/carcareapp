@@ -38,6 +38,7 @@ import { AddressSelector } from '@/components/location/AddressSelector'
 import { EnhancedLocationService } from '@/services/enhancedLocation'
 import { MechanicMatchingService } from '@/services/mechanicMatching'
 import type { Address } from '@/types/location'
+import { SERVICE_TYPES } from '@/constants/mechanic'
 
 const { Title, Text } = Typography
 const { TextArea } = Input
@@ -46,6 +47,7 @@ const { TextArea } = Input
 interface CreateRequestFormValues {
   car_id: string
   title: string
+  service_types?: string[]
   description: string
   urgency: 'low' | 'medium' | 'high'
   service_location: Address
@@ -177,7 +179,8 @@ export default function CarOwnerRequestsPage() {
           urgencyLevel: values.urgency,
           maxDistance: values.urgency === 'high' ? 50 : 30, // Larger radius for urgent requests
           maxResults: 10,
-          serviceType: [values.title.toLowerCase()] // Use title as service type hint
+          serviceType: [values.title.toLowerCase()], // Use title as service type hint
+          vehicleBrand: selectedCar.make // Include vehicle brand for better matching
         })
 
         console.log(`📍 Found ${nearbyMechanics.length} nearby mechanics`)
@@ -581,6 +584,29 @@ export default function CarOwnerRequestsPage() {
               rules={[{ required: true, message: 'Please enter a title' }]}
             >
               <Input placeholder="Brief description of the issue" />
+            </Form.Item>
+
+            <Form.Item
+              name="service_types"
+              label="Service Types"
+              tooltip="Select specific service types to find mechanics with matching specializations for better service quality"
+            >
+              <Select
+                mode="multiple"
+                placeholder="Select service types (optional but recommended)"
+                maxTagCount={3}
+                showSearch
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+                }
+              >
+                {SERVICE_TYPES.map((service) => (
+                  <Select.Option key={service} value={service}>
+                    {service}
+                  </Select.Option>
+                ))}
+              </Select>
             </Form.Item>
 
             <Form.Item

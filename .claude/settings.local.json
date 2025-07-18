@@ -29,7 +29,14 @@
       "Bash(timeout 10 npm run dev)",
       "Bash(timeout 30 npm run dev)",
       "Bash(timeout 60 npx next build --dry-run)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(npm:*)",
+      "Bash(firebase:*)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(curl:*)",
+      "Bash(timeout 30s npm run type-check)",
+      "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" npm run dev)"
     ],
     "deny": []
   }

@@ -13,10 +13,21 @@ export interface User {
   fcm_token?: string
   created_at: string
   updated_at?: string
-  specializations?: string[] // For mechanics
+  specializations?: string[] // For mechanics - deprecated, use mechanic_specializations
+  mechanic_specializations?: {
+    service_types: string[] // Engine, Brakes, Electrical, etc.
+    vehicle_brands: string[] // Toyota, Honda, BMW, etc.
+    experience_years?: number
+    certifications?: string[]
+    emergency_services?: boolean
+  }
   location_data?: {
     coordinates?: { lat: number; lng: number }
-    address_components?: any[]
+    address_components?: Array<{
+      long_name: string
+      short_name: string
+      types: string[]
+    }>
     place_id?: string
     city?: string
     country?: string

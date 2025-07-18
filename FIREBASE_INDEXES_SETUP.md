@@ -15,12 +15,11 @@ Fields:
 - created_at (Descending)
 ```
 
-#### Index 2: dealer_id + status + created_at
+#### Index 2: is_active + created_at (For getAllParts)
 ```
 Collection: parts
 Fields:
-- dealer_id (Ascending)
-- status (Ascending)
+- is_active (Ascending)
 - created_at (Descending)
 ```
 
@@ -34,7 +33,15 @@ Fields:
 - created_at (Descending)
 ```
 
-#### Index 4: dealer_id + status + created_at
+#### Index 4: mechanic_id + created_at (For getTransactionsByMechanic)
+```
+Collection: transactions
+Fields:
+- mechanic_id (Ascending)
+- created_at (Descending)
+```
+
+#### Index 5: dealer_id + status + created_at
 ```
 Collection: transactions
 Fields:
@@ -45,7 +52,15 @@ Fields:
 
 ### 3. Requests Collection Indexes
 
-#### Index 5: mechanic_id + status + created_at
+#### Index 6: mechanic_id + created_at (For getRequestsByMechanic)
+```
+Collection: requests
+Fields:
+- mechanic_id (Ascending)
+- created_at (Descending)
+```
+
+#### Index 7: mechanic_id + status + created_at
 ```
 Collection: requests
 Fields:
@@ -54,7 +69,7 @@ Fields:
 - created_at (Descending)
 ```
 
-#### Index 6: owner_id + created_at
+#### Index 8: owner_id + created_at
 ```
 Collection: requests
 Fields:
@@ -64,7 +79,7 @@ Fields:
 
 ### 4. Chat Messages Collection Indexes
 
-#### Index 7: request_id + created_at
+#### Index 9: request_id + created_at
 ```
 Collection: chat_messages
 Fields:
@@ -74,7 +89,7 @@ Fields:
 
 ### 5. Activity Logs Collection Indexes
 
-#### Index 8: user_id + created_at
+#### Index 10: user_id + created_at
 ```
 Collection: activity_logs
 Fields:
@@ -82,11 +97,21 @@ Fields:
 - created_at (Descending)
 ```
 
-#### Index 9: request_id + created_at
+#### Index 11: request_id + created_at
 ```
 Collection: activity_logs
 Fields:
 - request_id (Ascending)
+- created_at (Descending)
+```
+
+### 6. Diagnoses Collection Indexes
+
+#### Index 12: mechanic_id + created_at (For getDiagnosesByMechanic)
+```
+Collection: diagnoses
+Fields:
+- mechanic_id (Ascending)
 - created_at (Descending)
 ```
 

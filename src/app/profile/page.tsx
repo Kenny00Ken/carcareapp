@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Card, Form, Input, Button, Avatar, Row, Col, Typography, Space, Divider, Badge, Tooltip, Statistic, message } from 'antd'
+import { Card, Form, Input, Button, Avatar, Row, Col, Typography, Space, Divider, Badge, Tooltip, Statistic, message, Select, Switch } from 'antd'
 import { 
   UserOutlined, 
   PhoneOutlined, 
@@ -16,21 +16,27 @@ import {
   StarFilled,
   CarOutlined,
   ToolOutlined,
-  ShopOutlined
+  ShopOutlined,
+  SettingOutlined,
+  SafetyCertificateOutlined,
+  ThunderboltOutlined,
+  ExperimentFilled
 } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { ImageUpload } from '@/components/common/ImageUpload'
 import { AddressSelector } from '@/components/location/AddressSelector'
 import { motion } from 'framer-motion'
-import type { Address } from '@/types/location'
+import type { Address, GeolocationCoords } from '@/types/location'
+import type { User } from '@/types'
+import { SERVICE_TYPES, VEHICLE_BRANDS, EXPERIENCE_LEVELS, CERTIFICATIONS } from '@/constants/mechanic'
 
 const { Title, Text, Paragraph } = Typography
 
 // Helper function to remove undefined fields recursively
-const removeUndefinedFields = (obj: any): any => {
+const removeUndefinedFields = <T>(obj: T): T | undefined => {
   if (obj === null) {
-    return null
+    return null as T
   }
   
   if (obj === undefined) {
@@ -39,11 +45,11 @@ const removeUndefinedFields = (obj: any): any => {
   
   if (Array.isArray(obj)) {
     const cleanedArray = obj.map(removeUndefinedFields).filter(item => item !== undefined)
-    return cleanedArray.length > 0 ? cleanedArray : undefined
+    return cleanedArray.length > 0 ? (cleanedArray as T) : undefined
   }
   
   if (typeof obj === 'object' && obj !== null) {
-    const cleaned: any = {}
+    const cleaned: Record<string, unknown> = {}
     let hasValidFields = false
     
     for (const [key, value] of Object.entries(obj)) {
@@ -56,10 +62,32 @@ const removeUndefinedFields = (obj: any): any => {
       }
     }
     
-    return hasValidFields ? cleaned : undefined
+    return hasValidFields ? (cleaned as T) : undefined
   }
   
   return obj
+}
+
+interface ProfileFormValues {
+  name: string
+  email: string
+  phone: string
+  address: Address | string
+  mechanic_specializations?: {
+    service_types: string[]
+    vehicle_brands: string[]
+    experience_years?: number
+    certifications?: string[]
+    emergency_services?: boolean
+  }
+}
+
+// Type guard for Address objects
+const isAddressObject = (address: unknown): address is Address => {
+  return typeof address === 'object' && 
+         address !== null && 
+         'formatted_address' in address &&
+         'coordinates' in address
 }
 
 export default function ProfilePage() {
@@ -95,24 +123,31 @@ export default function ProfilePage() {
         email: user.email || firebaseUser?.email,
         phone: user.phone,
         address: addressValue,
+        mechanic_specializations: user.mechanic_specializations || {
+          service_types: [],
+          vehicle_brands: [],
+          experience_years: 1,
+          certifications: [],
+          emergency_services: false
+        }
       })
       setProfileImage(firebaseUser?.photoURL || null)
     }
   }, [user, firebaseUser, form])
 
-  const handleSubmit = async (values: Record<string, unknown>) => {
+  const handleSubmit = async (values: ProfileFormValues) => {
     if (!user) return
 
     setLoading(true)
     try {
       // Handle address object if present
       const processedValues = { ...values }
-      if (values.address && typeof values.address === 'object') {
-        const addressObj = values.address as Address
+      if (values.address && isAddressObject(values.address)) {
+        const addressObj = values.address
         processedValues.address = addressObj.formatted_address
         
         // Build location_data object carefully, only adding defined fields
-        const locationData: any = {}
+        const locationData: Partial<User['location_data']> = {}
         
         if (addressObj.coordinates) {
           locationData.coordinates = addressObj.coordinates
@@ -140,6 +175,33 @@ export default function ProfilePage() {
         }
       }
 
+      // Handle mechanic specializations if present
+      if (user?.role === 'Mechanic' && values.mechanic_specializations) {
+        const specializations = values.mechanic_specializations
+        
+        // Validate required fields for mechanics
+        if (!specializations.service_types || specializations.service_types.length === 0) {
+          message.error('Please select at least one service specialization')
+          setLoading(false)
+          return
+        }
+        
+        if (!specializations.vehicle_brands || specializations.vehicle_brands.length === 0) {
+          message.error('Please select at least one vehicle brand')
+          setLoading(false)
+          return
+        }
+        
+        // Clean up specializations data
+        processedValues.mechanic_specializations = {
+          service_types: specializations.service_types,
+          vehicle_brands: specializations.vehicle_brands,
+          experience_years: specializations.experience_years || 1,
+          certifications: specializations.certifications || [],
+          emergency_services: specializations.emergency_services || false
+        }
+      }
+
       // Remove any undefined values from the processed values recursively
       const cleanedValues = removeUndefinedFields(processedValues)
 
@@ -156,14 +218,15 @@ export default function ProfilePage() {
 
       await updateUserProfile(finalValues)
       message.success('Profile updated successfully!')
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error updating profile:', error)
-      message.error('Failed to update profile')
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update profile'
+      message.error(errorMessage)
     }
     setLoading(false)
   }
 
-  const handleImageUpload = async (url: string | null) => {
+  const handleImageUpload = async (url: string | null): Promise<void> => {
     setProfileImage(url)
     // Optionally update the profile image in the database
     if (url && user) {
@@ -173,15 +236,16 @@ export default function ProfilePage() {
           updated_at: new Date().toISOString(),
         })
         message.success('Profile image updated!')
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error updating profile image:', error)
-        message.error('Failed to update profile image')
+        const errorMessage = error instanceof Error ? error.message : 'Failed to update profile image'
+        message.error(errorMessage)
       }
     }
   }
 
   // Helper function to get role icon
-  const getRoleIcon = (role?: string) => {
+  const getRoleIcon = (role?: string): React.ReactNode => {
     switch (role) {
       case 'CarOwner': return <CarOutlined className="text-blue-500" />
       case 'Mechanic': return <ToolOutlined className="text-green-500" />
@@ -191,7 +255,7 @@ export default function ProfilePage() {
   }
 
   // Helper function to get role color
-  const getRoleColor = (role?: string) => {
+  const getRoleColor = (role?: string): string => {
     switch (role) {
       case 'CarOwner': return 'blue'
       case 'Mechanic': return 'green'
@@ -329,7 +393,7 @@ export default function ProfilePage() {
                   {/* Quick Stats */}
                   <div className="bg-white/80 dark:bg-slate-700/50 rounded-lg p-4 space-y-3">
                     <Title level={5} className="!mb-3 text-gray-700 dark:!text-gray-200">
-                      Account Status
+                      {user.role === 'Mechanic' ? 'Professional Status' : 'Account Status'}
                     </Title>
                     <Row gutter={[16, 16]}>
                       <Col span={12}>
@@ -344,14 +408,30 @@ export default function ProfilePage() {
                       </Col>
                       <Col span={12}>
                         <Statistic
-                          title="Profile"
-                          value="Verified"
-                          prefix={<SafetyOutlined />}
-                          valueStyle={{ fontSize: '14px', color: '#52c41a' }}
+                          title={user.role === 'Mechanic' ? 'Specializations' : 'Profile'}
+                          value={user.role === 'Mechanic' ? 
+                            (user.mechanic_specializations?.service_types?.length || 0) : 
+                            'Verified'
+                          }
+                          prefix={user.role === 'Mechanic' ? <ToolOutlined /> : <SafetyOutlined />}
+                          valueStyle={{ fontSize: '14px', color: user.role === 'Mechanic' ? '#1890ff' : '#52c41a' }}
                           className="dark:[&_.ant-statistic-content-value]:!text-green-400 dark:[&_.ant-statistic-title]:!text-slate-300"
                         />
                       </Col>
                     </Row>
+                    
+                    {user.role === 'Mechanic' && user.mechanic_specializations && (
+                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-600">
+                        <div className="flex flex-wrap gap-1">
+                          {user.mechanic_specializations.service_types?.slice(0, 3).map((service, index) => (
+                            <Badge key={index} color="green" text={service} className="text-xs" />
+                          ))}
+                          {(user.mechanic_specializations.service_types?.length || 0) > 3 && (
+                            <Badge color="blue" text={`+${(user.mechanic_specializations.service_types?.length || 0) - 3} more`} className="text-xs" />
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Card>
@@ -506,6 +586,176 @@ export default function ProfilePage() {
                       className="w-full"
                     />
                   </Form.Item>
+
+                  {/* Mechanic Specializations Section */}
+                  {user.role === 'Mechanic' && (
+                    <>
+                      <Divider>
+                        <Title level={4} className="!mb-0 !text-green-600 dark:!text-green-400">
+                          <ToolOutlined className="mr-2" />
+                          Professional Specializations
+                        </Title>
+                      </Divider>
+
+                      <Row gutter={[24, 16]}>
+                        <Col xs={24} md={12}>
+                          <Form.Item
+                            name={['mechanic_specializations', 'service_types']}
+                            label={
+                              <span className="font-medium text-gray-700 dark:text-slate-300">
+                                <SettingOutlined className="mr-2" />
+                                Service Specializations
+                              </span>
+                            }
+                            rules={[{ required: true, message: 'Please select at least one service type' }]}
+                            tooltip="Select the types of automotive services you specialize in"
+                          >
+                            <Select
+                              mode="multiple"
+                              placeholder="Select service types you specialize in"
+                              size="large"
+                              className="w-full"
+                              maxTagCount={3}
+                              showSearch
+                              optionFilterProp="children"
+                              filterOption={(input, option) =>
+                                (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+                              }
+                            >
+                              {SERVICE_TYPES.map((service) => (
+                                <Select.Option key={service} value={service}>
+                                  {service}
+                                </Select.Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                        </Col>
+
+                        <Col xs={24} md={12}>
+                          <Form.Item
+                            name={['mechanic_specializations', 'vehicle_brands']}
+                            label={
+                              <span className="font-medium text-gray-700 dark:text-slate-300">
+                                <CarOutlined className="mr-2" />
+                                Vehicle Brands
+                              </span>
+                            }
+                            rules={[{ required: true, message: 'Please select at least one vehicle brand' }]}
+                            tooltip="Select the vehicle brands you have expertise with"
+                          >
+                            <Select
+                              mode="multiple"
+                              placeholder="Select vehicle brands you work with"
+                              size="large"
+                              className="w-full"
+                              maxTagCount={3}
+                              showSearch
+                              optionFilterProp="children"
+                              filterOption={(input, option) =>
+                                (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+                              }
+                            >
+                              {VEHICLE_BRANDS.map((brand) => (
+                                <Select.Option key={brand} value={brand}>
+                                  {brand}
+                                </Select.Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                        </Col>
+                      </Row>
+
+                      <Row gutter={[24, 16]}>
+                        <Col xs={24} md={8}>
+                          <Form.Item
+                            name={['mechanic_specializations', 'experience_years']}
+                            label={
+                              <span className="font-medium text-gray-700 dark:text-slate-300">
+                                <ExperimentFilled className="mr-2" />
+                                Experience
+                              </span>
+                            }
+                            rules={[{ required: true, message: 'Please select your experience level' }]}
+                            tooltip="Years of professional automotive repair experience"
+                          >
+                            <Select
+                              placeholder="Select experience level"
+                              size="large"
+                              className="w-full"
+                            >
+                              {EXPERIENCE_LEVELS.map((level) => (
+                                <Select.Option key={level.value} value={level.value}>
+                                  {level.label}
+                                </Select.Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                        </Col>
+
+                        <Col xs={24} md={8}>
+                          <Form.Item
+                            name={['mechanic_specializations', 'emergency_services']}
+                            label={
+                              <span className="font-medium text-gray-700 dark:text-slate-300">
+                                <ThunderboltOutlined className="mr-2" />
+                                Emergency Services
+                              </span>
+                            }
+                            tooltip="Available for emergency and roadside assistance"
+                          >
+                            <Switch
+                              checkedChildren="Available"
+                              unCheckedChildren="Not Available"
+                              size="default"
+                              className="mt-1"
+                            />
+                          </Form.Item>
+                        </Col>
+
+                        <Col xs={24} md={8}>
+                          <div className="text-center p-4 bg-green-50 dark:bg-slate-700 rounded-lg">
+                            <ThunderboltOutlined className="text-2xl text-green-500 mb-2" />
+                            <Text strong className="block text-gray-700 dark:text-slate-200 text-sm">
+                              Match Priority
+                            </Text>
+                            <Text type="secondary" className="text-xs">
+                              Higher specialization = Better matches
+                            </Text>
+                          </div>
+                        </Col>
+                      </Row>
+
+                      <Form.Item
+                        name={['mechanic_specializations', 'certifications']}
+                        label={
+                          <span className="font-medium text-gray-700 dark:text-slate-300">
+                            <SafetyCertificateOutlined className="mr-2" />
+                            Professional Certifications
+                          </span>
+                        }
+                        tooltip="Select any professional certifications you hold"
+                      >
+                        <Select
+                          mode="multiple"
+                          placeholder="Select your certifications (optional)"
+                          size="large"
+                          className="w-full"
+                          maxTagCount={2}
+                          showSearch
+                          optionFilterProp="children"
+                          filterOption={(input, option) =>
+                            (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+                          }
+                        >
+                          {CERTIFICATIONS.map((cert) => (
+                            <Select.Option key={cert} value={cert}>
+                              {cert}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    </>
+                  )}
 
                   <Divider />
 
