@@ -34,7 +34,7 @@ import { SERVICE_TYPES, VEHICLE_BRANDS, EXPERIENCE_LEVELS, CERTIFICATIONS } from
 const { Title, Text, Paragraph } = Typography
 
 // Helper function to remove undefined fields recursively
-const removeUndefinedFields = <T>(obj: T): T | undefined => {
+const removeUndefinedFields = <T,>(obj: T): T | undefined => {
   if (obj === null) {
     return null as T
   }
