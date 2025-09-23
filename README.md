@@ -104,9 +104,22 @@ POSTGRESQL_INSTANCE_URL=<your-postgresql-url>
    - Enable Google authentication
    - Add your domain to authorized domains
 
-3. **Setup Database Schema**:
+3. **Deploy Security Rules**:
+   - Deploy Firestore rules: `firestore.rules`
+   - Deploy Storage rules: `storage.rules`
+   - Run: `firebase deploy --only firestore:rules,storage:rules`
+
+4. **Setup Database Indexes**:
+   - Deploy indexes: `firebase deploy --only firestore:indexes`
+   - Indexes are defined in `firestore.indexes.json`
+
+5. **Setup Database Schema**:
    - Use the provided schema in `src/database/schema.sql`
    - Run the schema in your PostgreSQL instance connected to Firebase Data Connect
+
+6. **Configure FCM (Optional)**:
+   - Generate VAPID key in Firebase Console → Cloud Messaging
+   - Add `NEXT_PUBLIC_FIREBASE_VAPID_KEY=your_vapid_key` to `.env.local`
 
 ### 5. Run the Development Server
 
