@@ -356,13 +356,18 @@ export const LandingPage: React.FC = () => {
       {/* Hero Section */}
       <main className="relative">
         {/* Dark Theme Hero */}
-        <div className="hidden dark:block">
-          <LampContainer className="pt-20" style={{
-            backgroundImage: `url(${BackgroundImage.src})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}>
+        <div className="hidden dark:block relative">
+          {/* Background Image Layer */}
+          <div
+            className="absolute inset-0 z-0"
+            style={{
+              backgroundImage: `url(${BackgroundImage.src})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          />
+          <LampContainer className="pt-20">
             {/* Dark overlay to maintain readability */}
             <div className="absolute inset-0 bg-gradient-to-br from-slate-950/60 via-slate-900/50 to-blue-950/60 z-0"></div>
             {/* Dark Theme Hero Content with automotive graphics */}
