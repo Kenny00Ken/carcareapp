@@ -321,12 +321,187 @@
     min-height: 44px !important;
     padding: 8px 16px !important;
   }
-  
+
   .ant-input {
     height: 44px !important;
   }
-  
+
   .ant-select-selector {
     height: 44px !important;
   }
+}
+
+/* Enhanced Phone Input with Floating Label */
+.floating-label-wrapper {
+  margin-bottom: 0 !important;
+}
+
+.floating-label-wrapper .ant-form-item-label {
+  display: none;
+}
+
+.floating-label {
+  z-index: 1;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.enhanced-phone-input {
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.enhanced-phone-input:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.enhanced-phone-input:focus,
+.enhanced-phone-input.ant-input-affix-wrapper-focused {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), 0 2px 8px rgba(59, 130, 246, 0.15) !important;
+}
+
+.dark .enhanced-phone-input {
+  border-color: #374151;
+  background-color: #1f2937;
+}
+
+.dark .enhanced-phone-input:hover {
+  border-color: #4b5563;
+}
+
+.dark .enhanced-phone-input:focus,
+.dark .enhanced-phone-input.ant-input-affix-wrapper-focused {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15), 0 2px 8px rgba(96, 165, 250, 0.2) !important;
+}
+
+/* Floating label animation */
+.enhanced-phone-input:focus ~ .floating-label,
+.enhanced-phone-input:not(:placeholder-shown) ~ .floating-label {
+  top: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.dark .enhanced-phone-input:focus ~ .floating-label,
+.dark .enhanced-phone-input:not(:placeholder-shown) ~ .floating-label {
+  color: #60a5fa;
+}
+
+/* Enhanced Auth Modal Tabs - Compact Design */
+.enhanced-auth-tabs .ant-tabs-nav {
+  margin-bottom: 0 !important;
+}
+
+.enhanced-auth-tabs .ant-tabs-tab {
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.5rem 0.5rem 0 0 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  font-size: 0.875rem !important;
+  margin: 0 0.25rem !important;
+}
+
+.enhanced-auth-tabs .ant-tabs-tab:hover {
+  background-color: #f9fafb !important;
+}
+
+.dark .enhanced-auth-tabs .ant-tabs-tab:hover {
+  background-color: #374151 !important;
+}
+
+.enhanced-auth-tabs .ant-tabs-tab-active {
+  background-color: white !important;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+.dark .enhanced-auth-tabs .ant-tabs-tab-active {
+  background-color: #1f2937 !important;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.25) !important;
+}
+
+.enhanced-auth-tabs .ant-tabs-ink-bar {
+  height: 2px !important;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6) !important;
+  border-radius: 2px 2px 0 0 !important;
+}
+
+.enhanced-auth-tabs .ant-tabs-content-holder {
+  background-color: white !important;
+  border-radius: 0 0 0.5rem 0.5rem !important;
+  padding: 1rem !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04) !important;
+}
+
+.dark .enhanced-auth-tabs .ant-tabs-content-holder {
+  background-color: #1f2937 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Enhanced OTP Input */
+.enhanced-otp-input {
+  border: 2px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.enhanced-otp-input:hover {
+  border-color: #d1d5db !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+.enhanced-otp-input:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), 0 2px 8px rgba(59, 130, 246, 0.15) !important;
+}
+
+.dark .enhanced-otp-input {
+  border-color: #374151 !important;
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+}
+
+.dark .enhanced-otp-input:hover {
+  border-color: #4b5563 !important;
+}
+
+.dark .enhanced-otp-input:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15), 0 2px 8px rgba(96, 165, 250, 0.2) !important;
+}
+
+/* Auth Modal Enhancements - Compact Design */
+.auth-modal .ant-modal-header {
+  border-bottom: none !important;
+  padding: 1.5rem 1.5rem 0.75rem !important;
+}
+
+.auth-modal .ant-modal-body {
+  padding: 0 1.5rem 1.5rem !important;
+}
+
+.auth-modal .ant-modal-close {
+  top: 1rem !important;
+  right: 1rem !important;
+}
+
+.auth-modal .ant-modal-close-x {
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  font-size: 16px !important;
+  border-radius: 6px !important;
+  transition: all 0.2s !important;
+}
+
+.auth-modal .ant-modal-close-x:hover {
+  background-color: #f3f4f6 !important;
+}
+
+.dark .auth-modal .ant-modal-close-x:hover {
+  background-color: #374151 !important;
 }

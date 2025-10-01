@@ -151,35 +151,35 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
         form={form}
         onFinish={handlePhoneAuth}
         layout="vertical"
-        size="large"
       >
         <Form.Item
           name="phone"
-          label="Phone Number"
+          label={<span className="text-sm font-medium">Phone Number</span>}
+          className="!mb-4"
           rules={[
             { required: true, message: 'Please enter your phone number' },
-            { 
-              pattern: /^(\+233|0)[0-9]{9}$/, 
-              message: 'Please enter a valid Ghanaian phone number' 
+            {
+              pattern: /^(\+233|0)[0-9]{9}$/,
+              message: 'Please enter a valid Ghanaian phone number'
             }
           ]}
         >
           <Input
-            prefix={<PhoneOutlined />}
+            prefix={<PhoneOutlined className="text-brand-500" />}
             placeholder="0244123456 or +233244123456"
-            size="large"
+            className="enhanced-phone-input !h-11 !text-sm"
           />
         </Form.Item>
-        
-        <Form.Item>
+
+        <Form.Item className="!mb-0">
           <LoadingButton
             type="primary"
             htmlType="submit"
             block
-            size="large"
             loading={loading}
             disabled={!termsAccepted}
             loadingText="Sending code..."
+            className="!h-11 !text-sm !font-semibold !rounded-lg hover:!shadow-lg transition-all duration-300"
           >
             Send Verification Code
           </LoadingButton>
@@ -189,13 +189,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
   )
 
   const renderOTPInput = () => (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="text-center mb-4">
-        <CheckCircleOutlined className="text-green-500 text-3xl mb-2" />
-        <Title level={4} className="!mb-2">Verify Your Phone</Title>
-        <Text type="secondary">
+        <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full mb-3">
+          <CheckCircleOutlined className="text-green-500 text-2xl" />
+        </div>
+        <Title level={4} className="!mb-2 !text-lg sm:!text-xl">Verify Your Phone</Title>
+        <Text type="secondary" className="!text-xs sm:!text-sm">
           We sent a 6-digit code to <br />
-          <Text strong>{phoneNumber}</Text>
+          <Text strong className="text-brand-600 dark:text-brand-400">{phoneNumber}</Text>
         </Text>
       </div>
 
@@ -203,32 +205,31 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
         form={otpForm}
         onFinish={handleOTPVerification}
         layout="vertical"
-        size="large"
       >
         <Form.Item
           name="otp"
-          label="Verification Code"
+          label={<span className="text-sm font-medium">Verification Code</span>}
           rules={[
             { required: true, message: 'Please enter the verification code' },
             { len: 6, message: 'Verification code must be 6 digits' }
           ]}
+          className="!mb-4"
         >
           <Input
-            placeholder="Enter 6-digit code"
-            size="large"
+            placeholder="000000"
             maxLength={6}
-            style={{ textAlign: 'center', fontSize: '18px', letterSpacing: '2px' }}
+            className="enhanced-otp-input !h-12 !text-center !text-xl !tracking-widest !font-semibold"
           />
         </Form.Item>
-        
-        <Form.Item>
+
+        <Form.Item className="!mb-0">
           <LoadingButton
             type="primary"
             htmlType="submit"
             block
-            size="large"
             loading={loading}
             loadingText="Verifying..."
+            className="!h-11 !text-sm !font-semibold !rounded-lg hover:!shadow-lg transition-all duration-300"
           >
             Verify Code
           </LoadingButton>
@@ -261,53 +262,65 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
 
   return (
     <Modal
-      title="Welcome to AutoCare"
+      title={
+        <div className="text-center">
+          <Title level={3} className="!mb-1 !text-xl sm:!text-2xl font-bold bg-gradient-to-r from-brand-600 to-brand-800 dark:from-brand-400 dark:to-brand-600 bg-clip-text text-transparent">
+            Welcome to AutoCare
+          </Title>
+        </div>
+      }
       open={visible}
       onCancel={onCancel}
       footer={null}
-      width={450}
+      width={440}
       centered
-      className="!mx-4"
+      className="auth-modal !mx-4"
     >
-      <div className="space-y-4 sm:space-y-6">
-        <div className="text-center mb-4 sm:mb-6">
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+      <div className="space-y-4 sm:space-y-5">
+        <div className="text-center">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
             Join our community of car owners, mechanics, and dealers
           </p>
         </div>
 
         {step === 'input' ? (
-          <Tabs activeKey={activeTab} onChange={setActiveTab} centered>
-            <TabPane 
+          <Tabs
+            activeKey={activeTab}
+            onChange={setActiveTab}
+            centered
+            className="enhanced-auth-tabs"
+          >
+            <TabPane
               tab={
-                <span>
+                <span className="flex items-center gap-1.5 font-medium text-sm">
                   <PhoneOutlined />
-                  Phone Number
+                  <span>Phone Number</span>
                 </span>
-              } 
+              }
               key="phone"
             >
-              {renderPhoneInput()}
+              <div className="pt-3">
+                {renderPhoneInput()}
+              </div>
             </TabPane>
-            
-            <TabPane 
+
+            <TabPane
               tab={
-                <span>
+                <span className="flex items-center gap-1.5 font-medium text-sm">
                   <GoogleOutlined />
-                  Social Login
+                  <span>Social Login</span>
                 </span>
-              } 
+              }
               key="social"
             >
-              <div className="space-y-3">
+              <div className="pt-3">
                 <LoadingButton
                   icon={<GoogleOutlined />}
-                  size="large"
                   block
                   onClick={handleGoogleAuth}
                   loading={loading}
                   disabled={!termsAccepted}
-                  className="!flex !items-center !justify-center !h-11 sm:!h-12 !text-sm sm:!text-base"
+                  className="!flex !items-center !justify-center !h-11 !text-sm !font-semibold !rounded-lg hover:!shadow-lg transition-all duration-300"
                   loadingText="Signing in..."
                 >
                   Continue with Google

@@ -1,5 +1,6 @@
 'use client'
 
+import { BackgroundImage } from '../assets'
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button, Typography, Avatar, Dropdown } from 'antd'
@@ -27,7 +28,6 @@ import { AuthModal } from './auth/AuthModal'
 import { useAuthRedirect } from '@/hooks/useAuthRedirect'
 import { LampContainer } from '@/components/ui/lamp-demo'
 import { motion } from 'framer-motion'
-import appimage from '@/app/images/appimage.png'
 import RoleSelector from '@/components/ui/role-selector'
 
 const { Title, Paragraph, Text } = Typography
@@ -550,7 +550,7 @@ export const LandingPage: React.FC = () => {
 
         {/* Enhanced Light Theme Hero */}
         <div className="dark:hidden min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50" style={{
-          backgroundImage: `url(${appimage})`,
+          backgroundImage: `url(${BackgroundImage.src})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
@@ -673,11 +673,8 @@ export const LandingPage: React.FC = () => {
               }}
               className="relative"
             >
-              <Paragraph className="!text-base sm:!text-lg md:!text-xl text-text-secondary max-w-3xl mx-auto !mb-8 sm:!mb-12 !leading-relaxed px-4 sm:px-0 relative z-10">
-                <span className="font-medium">Ghana's premier automotive platform</span>{' '}
-                <span className="text-brand-600 font-semibold">connecting car owners</span>{' '}
-                with <span className="text-secondary-600 font-semibold">trusted mechanics</span>{' '}
-                and <span className="text-accent-600 font-semibold">reliable parts dealers</span>
+              <Paragraph className="!text-lg md:!text-xl text-slate-600 max-w-3xl mx-auto !mb-8 sm:!mb-12 !leading-relaxed px-4 sm:px-0 relative z-10 text-center">
+                Ghana's premier automotive platform connecting car owners with trusted mechanics and reliable parts dealers
               </Paragraph>
               {/* Decorative elements */}
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-brand-300 to-transparent opacity-30"></div>
@@ -1301,4 +1298,4 @@ export const LandingPage: React.FC = () => {
       
     </div>
   )
-} 
+}

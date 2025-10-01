@@ -60,3 +60,5 @@ ui-debug.log
 # Package manager lock files (keep only one)
 # yarn.lock
 # pnpm-lock.yaml 
+# Moat task system
+.moat/
