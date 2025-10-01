@@ -77,157 +77,97 @@ const professionalStyles = `
   }
 `
 
-// Inject styles
-if (typeof document !== 'undefined') {
-  const styleElement = document.getElementById('professional-animations')
-  if (!styleElement) {
-    const style = document.createElement('style')
-    style.id = 'professional-animations'
-    style.textContent = professionalStyles
-    document.head.appendChild(style)
-  }
-}
+// Styles will be injected via useEffect in the component
 
-// Continuous typing animation component specifically for "Connect"
-const ContinuousTypingText: React.FC<{
-  text: string,
+// Professional typing animation component with smooth continuous loop
+const TypingText: React.FC<{
+  texts: string[],
   speed?: number,
   pauseDuration?: number,
   deleteSpeed?: number,
-  className?: string
+  className?: string,
+  colors?: string[]
 }> = ({
-  text = "Connect",
-  speed = 150,
-  pauseDuration = 1500,
-  deleteSpeed = 80,
-  className = ""
+  texts,
+  speed = 120,
+  pauseDuration = 2500,
+  deleteSpeed = 60,
+  className = "",
+  colors = []
 }) => {
+  const [currentTextIndex, setCurrentTextIndex] = useState(0)
   const [currentText, setCurrentText] = useState('')
-  const [isTyping, setIsTyping] = useState(true)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [showCursor, setShowCursor] = useState(true)
-  const [isComplete, setIsComplete] = useState(false)
 
   useEffect(() => {
     let timeout: NodeJS.Timeout
 
     if (isDeleting) {
-      // Smooth character deletion with dynamic speed
+      // Smooth character deletion
       if (currentText.length > 0) {
-        const dynamicDeleteSpeed = currentText.length > 4 ? deleteSpeed : deleteSpeed * 1.3
         timeout = setTimeout(() => {
           setCurrentText(currentText.slice(0, -1))
-        }, dynamicDeleteSpeed)
+        }, deleteSpeed)
       } else {
-        // Start typing again after deletion
+        // Move to next text after deletion completes
         setIsDeleting(false)
-        setIsTyping(true)
-        setIsComplete(false)
+        setCurrentTextIndex((prev) => (prev + 1) % texts.length)
       }
-    } else if (isTyping) {
-      // Professional typing with variable speeds for different characters
-      if (currentText.length < text.length) {
-        const nextChar = text[currentText.length]
-        let dynamicSpeed = speed
-
-        // Slower for consonants, faster for vowels to create natural rhythm
-        if ('aeiouAEIOU'.includes(nextChar)) {
-          dynamicSpeed = speed * 0.8
-        } else if (nextChar === nextChar.toUpperCase() && nextChar !== nextChar.toLowerCase()) {
-          dynamicSpeed = speed * 1.4 // Slower for uppercase
-        }
-
+    } else {
+      // Typing mode
+      if (currentText.length < texts[currentTextIndex].length) {
         timeout = setTimeout(() => {
-          setCurrentText(text.slice(0, currentText.length + 1))
-        }, dynamicSpeed)
+          setCurrentText(texts[currentTextIndex].slice(0, currentText.length + 1))
+        }, speed)
       } else {
-        // Completed typing
-        setIsTyping(false)
-        setIsComplete(true)
-
-        // Wait before starting to delete
+        // Completed current text, pause then start deleting
         timeout = setTimeout(() => {
           setIsDeleting(true)
-          setIsComplete(false)
         }, pauseDuration)
       }
     }
 
     return () => clearTimeout(timeout)
-  }, [currentText, isTyping, isDeleting, text, speed, pauseDuration, deleteSpeed])
+  }, [currentText, currentTextIndex, isDeleting, texts, speed, pauseDuration, deleteSpeed])
 
-  // Dynamic cursor animation based on state
-  useEffect(() => {
-    const blinkSpeed = isComplete ? 400 : isTyping ? 800 : 500
-    const cursorInterval = setInterval(() => {
-      setShowCursor(prev => !prev)
-    }, blinkSpeed)
-    return () => clearInterval(cursorInterval)
-  }, [isTyping, isComplete])
+  // Enhanced text rendering with professional styling
+  const renderText = (text: string) => {
+    // Use colors array if provided, otherwise use bullet-based coloring
+    const textColor = colors.length > 0 ? colors[currentTextIndex] : ''
+
+    const parts = text.split('•')
+    return parts.map((part, index) => (
+      <span key={index} className="inline-block">
+        {index > 0 && (
+          <span className="text-purple-400 mx-3 text-4xl md:text-6xl font-bold animate-pulse-slow transform transition-all duration-300 drop-shadow-lg">
+            •
+          </span>
+        )}
+        <span
+          className={`
+            font-extrabold tracking-tight transition-all duration-500 transform drop-shadow-md
+            ${textColor || (index === 0 ? 'text-blue-600 hover:text-blue-700' :
+              index === 1 ? 'text-green-600 hover:text-green-700' :
+              'text-purple-600 hover:text-purple-700')}
+          `}
+          style={{
+            textShadow: index === 0 ? '0 0 20px rgba(37, 99, 235, 0.3)' :
+                       index === 1 ? '0 0 20px rgba(34, 197, 94, 0.3)' :
+                       '0 0 20px rgba(147, 51, 234, 0.3)'
+          }}
+        >
+          {part.trim()}
+        </span>
+      </span>
+    ))
+  }
 
   return (
     <div className={`${className} relative`}>
       <div className="inline-block min-h-[1.2em] relative">
-        {/* Main text with enhanced styling */}
-        <span
-          className="inline-block font-extrabold tracking-tight transform transition-all duration-500 drop-shadow-lg"
-          style={{
-            background: 'linear-gradient(135deg, #3B82F6 0%, #1E40AF 50%, #1E3A8A 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            textShadow: '0 0 30px rgba(59, 130, 246, 0.4)'
-          }}
-        >
-          {currentText}
+        <span className="inline-block transform transition-all duration-300">
+          {renderText(currentText)}
         </span>
-
-        {/* Enhanced animated cursor */}
-        <span
-          className={`
-            inline-block w-2 ml-2 bg-gradient-to-b from-blue-400 via-blue-500 to-blue-600
-            rounded-full transition-all duration-300 shadow-lg transform
-            ${showCursor ?
-              'opacity-100 h-16 md:h-20 shadow-blue-400/60 scale-110 rotate-1' :
-              'opacity-20 h-14 md:h-18 scale-95 rotate-0'
-            }
-            ${isTyping ? 'animate-pulse' : ''}
-            ${isComplete ? 'animate-bounce' : ''}
-            ${isDeleting ? 'bg-gradient-to-b from-red-400 via-red-500 to-red-600' : ''}
-          `}
-          style={{
-            boxShadow: showCursor ?
-              '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4), 0 0 60px rgba(59, 130, 246, 0.2)' :
-              'none',
-            filter: showCursor ? 'brightness(1.2)' : 'brightness(0.8)'
-          }}
-        />
-
-        {/* Glowing background effect */}
-        <div className={`
-          absolute inset-0 blur-lg opacity-15 transition-all duration-1000 pointer-events-none transform scale-110
-          ${isComplete ? 'opacity-25 scale-115' : 'opacity-10 scale-105'}
-          ${isTyping ? 'animate-pulse' : ''}
-        `}>
-          <span
-            className="font-extrabold tracking-tight"
-            style={{
-              background: 'linear-gradient(135deg, #3B82F6 0%, #1E40AF 50%, #1E3A8A 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}
-          >
-            {currentText}
-          </span>
-        </div>
-
-        {/* Enhanced particle effects for desktop */}
-        <div className="absolute -inset-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none hidden sm:block">
-          <div className="absolute top-0 left-0 w-1 h-1 bg-blue-400 rounded-full animate-ping" style={{ animationDelay: '0s' }}></div>
-          <div className="absolute top-2 right-2 w-0.5 h-0.5 bg-blue-300 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute bottom-1 left-3 w-0.5 h-0.5 bg-blue-500 rounded-full animate-ping" style={{ animationDelay: '2s' }}></div>
-        </div>
       </div>
     </div>
   )
@@ -240,12 +180,23 @@ export const LandingPage: React.FC = () => {
   const router = useRouter()
   const [authModalVisible, setAuthModalVisible] = useState(false)
   const [selectedRole, setSelectedRole] = useState('car-owner')
-  
+
   // Use the auth redirect hook to handle navigation
   const { isAuthenticated, hasRole } = useAuthRedirect({
     redirectOnAuth: true, // Automatically redirect authenticated users to their dashboard
     redirectOnSignOut: true // Redirect to landing page on sign-out
   })
+
+  // Inject professional animations styles
+  useEffect(() => {
+    const styleElement = document.getElementById('professional-animations')
+    if (!styleElement) {
+      const style = document.createElement('style')
+      style.id = 'professional-animations'
+      style.textContent = professionalStyles
+      document.head.appendChild(style)
+    }
+  }, [])
 
   // Helper function to get dashboard path based on user role
   const getDashboardPath = (userRole: string) => {
@@ -330,8 +281,8 @@ export const LandingPage: React.FC = () => {
     <div className="min-h-screen bg-background dark:bg-slate-950 theme-transition overflow-hidden">
 
 
-      {/* Enhanced Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 glass-morphism border-b border-gray-200 dark:border-white/10 theme-transition shadow-lg">
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/90 dark:bg-slate-950/80 border-b border-gray-200 dark:border-white/10 theme-transition">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2 sm:space-x-3">
@@ -466,19 +417,6 @@ export const LandingPage: React.FC = () => {
               }}
               className="text-center max-w-4xl mx-auto relative z-10"
             >
-              <Title level={1} className="!text-5xl md:!text-7xl !mb-8 !leading-tight !font-bold text-shadow-lg">
-                <span className="text-transparent bg-clip-text bg-gradient-to-br from-slate-200 to-slate-400">
-                  AutoCare{' '}
-                  <ContinuousTypingText
-                    text="Connect"
-                    speed={120}
-                    pauseDuration={2000}
-                    deleteSpeed={70}
-                    className="inline-block"
-                  />
-                </span>
-              </Title>
-              
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -488,8 +426,16 @@ export const LandingPage: React.FC = () => {
                   ease: "easeInOut",
                 }}
               >
-                <Paragraph className="!text-lg md:!text-xl text-slate-300 max-w-3xl mx-auto !mb-12 !leading-relaxed">
-                  Ghana's premier automotive platform connecting car owners with trusted mechanics and reliable parts dealers
+                <Paragraph className="!text-lg md:!text-xl text-slate-200 font-semibold max-w-3xl mx-auto !mb-12 !leading-relaxed">
+                  Ghana's premier automotive platform connecting{' '}
+                  <TypingText
+                    texts={['car owners', 'trusted mechanics', 'reliable parts dealers']}
+                    speed={100}
+                    pauseDuration={2000}
+                    deleteSpeed={50}
+                    className="font-bold"
+                    colors={['text-brand-400', 'text-secondary-400', 'text-accent-400']}
+                  />
                 </Paragraph>
               </motion.div>
               
@@ -548,22 +494,14 @@ export const LandingPage: React.FC = () => {
           </LampContainer>
         </div>
 
-        {/* Enhanced Light Theme Hero */}
-        <div className="dark:hidden min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50" style={{
+        {/* Light Theme Hero */}
+        <div className="dark:hidden min-h-[120vh] flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50" style={{
           backgroundImage: `url(${BackgroundImage.src})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
         }}>
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/95 via-white/85 to-indigo-50/95">
-            {/* Subtle automotive pattern overlay */}
-            <div className="absolute inset-0 opacity-5">
-              <div className="absolute top-10 left-10 w-32 h-1 bg-gradient-to-r from-brand-400 to-transparent transform rotate-45"></div>
-              <div className="absolute top-20 right-20 w-24 h-1 bg-gradient-to-l from-secondary-400 to-transparent transform -rotate-45"></div>
-              <div className="absolute bottom-20 left-1/4 w-40 h-1 bg-gradient-to-r from-accent-400 to-transparent transform rotate-12"></div>
-              <div className="absolute bottom-32 right-1/3 w-28 h-1 bg-gradient-to-l from-brand-500 to-transparent transform -rotate-12"></div>
-            </div>
-          </div>
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-white/30 to-indigo-50/40"></div>
           {/* Professional automotive hero graphics */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             {/* Car silhouette - hidden on mobile */}
@@ -600,31 +538,17 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
             
-            {/* Enhanced floating elements - responsive sizing */}
-            <div className="absolute top-20 left-2 sm:left-10 w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-brand-200 via-brand-300 to-brand-400 rounded-full opacity-40 animate-float blur-sm shadow-lg animate-pulse-glow"></div>
-            <div className="absolute top-40 right-4 sm:right-20 w-12 h-12 sm:w-20 sm:h-20 bg-gradient-to-br from-secondary-200 via-secondary-300 to-secondary-400 rounded-full opacity-50 animate-float blur-sm shadow-md" style={{ animationDelay: '2s' }}></div>
-            <div className="absolute bottom-40 left-4 sm:left-20 w-10 h-10 sm:w-16 sm:h-16 bg-gradient-to-br from-accent-200 via-accent-300 to-accent-400 rounded-full opacity-45 animate-float blur-sm shadow-lg" style={{ animationDelay: '4s' }}></div>
-            <div className="absolute top-1/2 left-8 w-6 h-6 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-200 to-purple-400 rounded-full opacity-30 animate-float" style={{ animationDelay: '1s' }}></div>
-            <div className="absolute bottom-20 right-1/3 w-8 h-8 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-200 to-indigo-400 rounded-full opacity-35 animate-float blur-sm" style={{ animationDelay: '3s' }}></div>
-            
-            {/* Enhanced tool icons floating - responsive */}
+            {/* Floating elements - responsive sizing */}
+            <div className="absolute top-20 left-2 sm:left-10 w-12 h-12 sm:w-20 sm:h-20 bg-gradient-to-br from-brand-100 to-brand-200 rounded-full opacity-60 animate-float blur-sm"></div>
+            <div className="absolute top-40 right-4 sm:right-20 w-10 h-10 sm:w-16 sm:h-16 bg-gradient-to-br from-secondary-100 to-secondary-200 rounded-full opacity-60 animate-float blur-sm" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute bottom-40 left-4 sm:left-20 w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-accent-100 to-accent-200 rounded-full opacity-60 animate-float blur-sm" style={{ animationDelay: '4s' }}></div>
+
+            {/* Tool icons floating - responsive */}
             <div className="absolute top-32 left-1/4 opacity-20 animate-float hidden sm:block" style={{ animationDelay: '1s' }}>
-              <div className="relative p-3 bg-gradient-to-br from-secondary-100 to-secondary-200 rounded-xl shadow-lg">
-                <ToolOutlined className="text-2xl sm:text-4xl text-secondary-600" />
-                <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent rounded-xl"></div>
-              </div>
+              <ToolOutlined className="text-2xl sm:text-4xl text-secondary-500" />
             </div>
             <div className="absolute bottom-32 right-1/4 opacity-20 animate-float hidden sm:block" style={{ animationDelay: '3s' }}>
-              <div className="relative p-3 bg-gradient-to-br from-accent-100 to-accent-200 rounded-xl shadow-lg">
-                <ShopOutlined className="text-xl sm:text-3xl text-accent-600" />
-                <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent rounded-xl"></div>
-              </div>
-            </div>
-            <div className="absolute top-1/3 right-12 opacity-15 animate-float hidden lg:block" style={{ animationDelay: '5s' }}>
-              <div className="relative p-2 bg-gradient-to-br from-brand-100 to-brand-200 rounded-lg shadow-md">
-                <CarOutlined className="text-xl text-brand-600" />
-                <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent rounded-lg"></div>
-              </div>
+              <ShopOutlined className="text-xl sm:text-3xl text-accent-500" />
             </div>
           </div>
 
@@ -638,110 +562,26 @@ export const LandingPage: React.FC = () => {
             }}
             className="text-center max-w-4xl mx-auto px-4 sm:px-6 relative z-10"
           >
-            {/* Professional badge */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8, y: -20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.8, ease: "easeOut" }}
-              className="inline-flex items-center px-4 py-2.5 sm:px-6 sm:py-3 rounded-full bg-gradient-to-r from-brand-100 via-brand-50 to-brand-200 text-brand-800 text-xs sm:text-sm font-semibold mb-6 sm:mb-8 shadow-lg border border-brand-300/30 backdrop-blur-sm hover:shadow-xl hover:scale-105 transition-all duration-300 group cursor-default relative overflow-hidden"
-            >
-              <CarOutlined className="mr-2 sm:mr-3 text-sm sm:text-base text-brand-600 group-hover:text-brand-700 transition-colors" />
-              <span className="hidden sm:inline bg-gradient-to-r from-brand-700 to-brand-800 bg-clip-text text-transparent font-bold">Ghana's #1 Automotive Platform</span>
-              <span className="sm:hidden bg-gradient-to-r from-brand-700 to-brand-800 bg-clip-text text-transparent font-bold">#1 Auto Platform</span>
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-brand-200/20 to-brand-300/20 animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </motion.div>
-            <Title level={1} className="!text-3xl sm:!text-5xl md:!text-7xl !mb-6 sm:!mb-8 !leading-tight !font-bold">
-              <span className="text-transparent bg-clip-text bg-gradient-to-br from-brand-600 via-brand-700 to-brand-800">
-                AutoCare{' '}
-                <ContinuousTypingText
-                  text="Connect"
-                  speed={120}
-                  pauseDuration={2000}
-                  deleteSpeed={70}
-                  className="inline-block group"
-                />
-              </span>
-            </Title>
-            
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
                 delay: 0.6,
-                duration: 0.8,
-                ease: "easeOut",
-              }}
-              className="relative"
-            >
-              <Paragraph className="!text-lg md:!text-xl text-slate-600 max-w-3xl mx-auto !mb-8 sm:!mb-12 !leading-relaxed px-4 sm:px-0 relative z-10 text-center">
-                Ghana's premier automotive platform connecting car owners with trusted mechanics and reliable parts dealers
-              </Paragraph>
-              {/* Decorative elements */}
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-brand-300 to-transparent opacity-30"></div>
-              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-brand-400 to-transparent opacity-40"></div>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: 0.9,
                 duration: 0.6,
                 ease: "easeInOut",
               }}
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4 sm:px-0"
             >
-              {firebaseUser ? (
-                user ? (
-                  <Button
-                    type="primary"
-                    size="large"
-                    icon={getRoleIcon(user.role)}
-                    onClick={navigateToDashboard}
-                    className="!h-11 !px-6 sm:!h-12 sm:!px-8 !text-sm sm:!text-base font-medium shadow-medium hover:shadow-hard transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl w-full sm:w-auto"
-                  >
-                    <span className="hidden sm:inline">Go to Dashboard</span>
-                    <span className="sm:hidden">Dashboard</span>
-                    <ArrowRightOutlined />
-                  </Button>
-                ) : (
-                  <Button
-                    type="primary"
-                    size="large"
-                    onClick={() => router.push('/auth/role-selection')}
-                    className="!h-11 !px-6 sm:!h-12 sm:!px-8 !text-sm sm:!text-base font-medium shadow-medium hover:shadow-hard transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl w-full sm:w-auto"
-                  >
-                    <span className="hidden sm:inline">Complete Your Profile</span>
-                    <span className="sm:hidden">Complete Profile</span>
-                    <ArrowRightOutlined />
-                  </Button>
-                )
-              ) : (
-                <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
-                  <Button
-                    type="primary"
-                    size="large"
-                    onClick={() => setAuthModalVisible(true)}
-                    className="!h-12 !px-8 sm:!h-14 sm:!px-10 !text-sm sm:!text-base font-semibold shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 border-none rounded-xl w-full sm:w-auto group relative overflow-hidden"
-                  >
-                    <span className="relative z-10 flex items-center gap-2">
-                      Get Started
-                      <ArrowRightOutlined className="transition-transform duration-300 group-hover:translate-x-1" />
-                    </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  </Button>
-                  <Button
-                    size="large"
-                    onClick={() => router.push('/know-more')}
-                    className="!h-12 !px-8 sm:!h-14 sm:!px-10 !text-sm sm:!text-base font-medium text-text-secondary hover:text-brand-700 border-2 border-brand-300 hover:border-brand-500 bg-white/80 hover:bg-brand-50 rounded-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 w-full sm:w-auto shadow-md hover:shadow-lg backdrop-blur-sm group"
-                  >
-                    <span className="flex items-center gap-2">
-                      Learn More
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </span>
-                  </Button>
-                </div>
-              )}
+              <Paragraph className="!text-lg md:!text-xl text-gray-800 dark:text-gray-200 font-semibold max-w-3xl mx-auto !mb-12 !leading-relaxed drop-shadow-sm">
+                Ghana's premier automotive platform connecting{' '}
+                <TypingText
+                  texts={['car owners', 'trusted mechanics', 'reliable parts dealers']}
+                  speed={100}
+                  pauseDuration={2000}
+                  deleteSpeed={50}
+                  className="font-bold"
+                  colors={['text-brand-600', 'text-secondary-600', 'text-accent-600']}
+                />
+              </Paragraph>
             </motion.div>
           </motion.div>
         </div>
@@ -755,45 +595,40 @@ export const LandingPage: React.FC = () => {
             transition={{ delay: 0.2, duration: 0.8 }}
             className="mb-12 sm:mb-20"
           >
-            <Title level={2} className="text-center text-text-primary dark:!text-white !mb-3 sm:!mb-4 !text-2xl sm:!text-3xl md:!text-4xl theme-transition">
+            <Title level={2} className="text-center text-text-primary dark:!text-white !mb-8 sm:!mb-12 !text-2xl sm:!text-3xl md:!text-4xl theme-transition">
               Choose Your Professional Role
             </Title>
-            <Paragraph className="text-center text-text-secondary dark:!text-slate-400 !mb-6 sm:!mb-8 !text-base sm:!text-lg max-w-2xl mx-auto theme-transition px-4 sm:px-0">
-              Join Ghana's most trusted automotive platform designed for professionals at every level of the industry
-            </Paragraph>
-            
-            {/* Role Selector */}
-            <div className="flex justify-center mb-8 sm:mb-12 px-4 sm:px-0">
-              <RoleSelector 
-                onRoleSelect={setSelectedRole} 
-                selectedRole={selectedRole}
-              />
-            </div>
-            
-            {/* Professional Role Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
+
+            {/* Professional Role Cards Grid - Slanted & Connected Masterpiece */}
+            <div className="relative max-w-7xl mx-auto px-4 lg:px-0" style={{ minHeight: '500px' }}>
+              <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-6">
               {/* Car Owner Card */}
               <motion.div
                 initial={{ opacity: 0, y: 40, rotateX: 20 }}
                 whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
                 transition={{ delay: 0.1, duration: 0.8, ease: "easeOut" }}
-                whileHover={{ 
-                  y: -12, 
-                  rotateY: 2, 
-                  transition: { duration: 0.3, ease: "easeOut" } 
+                whileHover={{
+                  y: -8,
+                  scale: 1.02,
+                  zIndex: 30,
+                  transition: { duration: 0.3, ease: "easeOut" }
                 }}
-                className={`group relative perspective-1000 ${selectedRole === 'car-owner' ? 'ring-2 ring-brand-400 ring-offset-2' : ''}`}>
-                {/* Gradient background glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-brand-400/20 via-brand-500/20 to-brand-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
-                
-                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border border-brand-200/50 dark:border-brand-300/20 rounded-2xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:border-brand-300 dark:hover:border-brand-400/60 theme-transition cursor-pointer overflow-hidden"
-                     onClick={() => setAuthModalVisible(true)}
-                     style={{ filter: selectedRole === 'car-owner' ? 'url("#radio-glass")' : 'none' }}>
-                  {/* Animated background pattern */}
-                  <div className="absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-900/20 dark:to-brand-800/20 transform rotate-12 scale-150"></div>
-                  </div>
-                  
+                className="group relative perspective-1000 lg:rotate-[-8deg] z-10 w-full max-w-sm"
+                style={{ transformStyle: 'preserve-3d' }}>
+                {/* Rotating hexagonal border on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{
+                  clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
+                }}>
+                  <div className="absolute inset-0 bg-gradient-to-r from-brand-400 via-brand-500 to-brand-400 animate-spin-slow" style={{
+                    animation: 'spin 3s linear infinite',
+                    filter: 'blur(8px)'
+                  }}></div>
+                </div>
+
+                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border-2 border-brand-200/50 dark:border-brand-300/20 p-5 sm:p-6 shadow-xl hover:shadow-2xl transition-all duration-500 theme-transition cursor-pointer overflow-hidden group-hover:border-brand-400 dark:group-hover:border-brand-500 rounded-3xl" style={{
+                  clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
+                }}
+                     onClick={() => setAuthModalVisible(true)}>
                   {/* Floating icon container */}
                   <motion.div 
                     className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-900/50 dark:to-brand-800/50 rounded-2xl mb-4 sm:mb-6 group-hover:from-brand-200 group-hover:to-brand-300 dark:group-hover:from-brand-800/60 dark:group-hover:to-brand-700/60 transition-all duration-500 relative shadow-lg"
@@ -847,16 +682,6 @@ export const LandingPage: React.FC = () => {
                       </motion.div>
                     ))}
                   </motion.div>
-                  
-                  <motion.div 
-                    className="text-xs text-text-tertiary dark:text-slate-500 bg-gradient-to-r from-brand-50 to-brand-100 dark:from-brand-900/30 dark:to-brand-800/30 px-4 py-3 rounded-xl theme-transition border border-brand-200/50 dark:border-brand-700/30"
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6, duration: 0.6 }}
-                  >
-                    <StarFilled className="text-brand-500 mr-2" />
-                    Perfect for vehicle owners seeking reliable service
-                  </motion.div>
                 </div>
               </motion.div>
               
@@ -865,23 +690,28 @@ export const LandingPage: React.FC = () => {
                 initial={{ opacity: 0, y: 40, rotateX: 20 }}
                 whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
                 transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
-                whileHover={{ 
-                  y: -12, 
-                  rotateY: -2, 
-                  transition: { duration: 0.3, ease: "easeOut" } 
+                whileHover={{
+                  y: -10,
+                  scale: 1.03,
+                  zIndex: 30,
+                  transition: { duration: 0.3, ease: "easeOut" }
                 }}
-                className={`group relative perspective-1000 ${selectedRole === 'mechanic' ? 'ring-2 ring-secondary-400 ring-offset-2' : ''}`}>
-                {/* Gradient background glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-secondary-400/20 via-secondary-500/20 to-secondary-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
-                
-                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border border-secondary-200/50 dark:border-secondary-300/20 rounded-2xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:border-secondary-300 dark:hover:border-secondary-400/60 theme-transition cursor-pointer overflow-hidden"
-                     onClick={() => setAuthModalVisible(true)}
-                     style={{ filter: selectedRole === 'mechanic' ? 'url("#radio-glass")' : 'none' }}>
-                  {/* Animated background pattern */}
-                  <div className="absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-br from-secondary-100 to-secondary-200 dark:from-secondary-900/20 dark:to-secondary-800/20 transform -rotate-12 scale-150"></div>
-                  </div>
-                  
+                className="group relative perspective-1000 lg:rotate-[0deg] z-20 w-full max-w-sm"
+                style={{ transformStyle: 'preserve-3d' }}>
+                {/* Rotating hexagonal border on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{
+                  clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
+                }}>
+                  <div className="absolute inset-0 bg-gradient-to-r from-secondary-400 via-secondary-500 to-secondary-400 animate-spin-slow" style={{
+                    animation: 'spin 3s linear infinite',
+                    filter: 'blur(8px)'
+                  }}></div>
+                </div>
+
+                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border-2 border-secondary-200/50 dark:border-secondary-300/20 p-5 sm:p-6 shadow-xl hover:shadow-2xl transition-all duration-500 theme-transition cursor-pointer overflow-hidden group-hover:border-secondary-400 dark:group-hover:border-secondary-500 rounded-3xl" style={{
+                  clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
+                }}
+                     onClick={() => setAuthModalVisible(true)}>
                   {/* Floating icon container */}
                   <motion.div 
                     className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-secondary-100 to-secondary-200 dark:from-secondary-900/50 dark:to-secondary-800/50 rounded-2xl mb-4 sm:mb-6 group-hover:from-secondary-200 group-hover:to-secondary-300 dark:group-hover:from-secondary-800/60 dark:group-hover:to-secondary-700/60 transition-all duration-500 relative shadow-lg"
@@ -935,16 +765,6 @@ export const LandingPage: React.FC = () => {
                       </motion.div>
                     ))}
                   </motion.div>
-                  
-                  <motion.div 
-                    className="text-xs text-text-tertiary dark:text-slate-500 bg-gradient-to-r from-secondary-50 to-secondary-100 dark:from-secondary-900/30 dark:to-secondary-800/30 px-4 py-3 rounded-xl theme-transition border border-secondary-200/50 dark:border-secondary-700/30"
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6, duration: 0.6 }}
-                  >
-                    <StarFilled className="text-secondary-500 mr-2" />
-                    Ideal for automotive professionals
-                  </motion.div>
                 </div>
               </motion.div>
               
@@ -953,23 +773,28 @@ export const LandingPage: React.FC = () => {
                 initial={{ opacity: 0, y: 40, rotateX: 20 }}
                 whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
                 transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
-                whileHover={{ 
-                  y: -12, 
-                  rotateY: 2, 
-                  transition: { duration: 0.3, ease: "easeOut" } 
+                whileHover={{
+                  y: -8,
+                  scale: 1.02,
+                  zIndex: 30,
+                  transition: { duration: 0.3, ease: "easeOut" }
                 }}
-                className={`group relative md:col-span-2 lg:col-span-1 perspective-1000 ${selectedRole === 'dealer' ? 'ring-2 ring-accent-400 ring-offset-2' : ''}`}>
-                {/* Gradient background glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-accent-400/20 via-accent-500/20 to-accent-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
-                
-                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border border-accent-200/50 dark:border-accent-300/20 rounded-2xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:border-accent-300 dark:hover:border-accent-400/60 theme-transition cursor-pointer overflow-hidden"
-                     onClick={() => setAuthModalVisible(true)}
-                     style={{ filter: selectedRole === 'dealer' ? 'url("#radio-glass")' : 'none' }}>
-                  {/* Animated background pattern */}
-                  <div className="absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-br from-accent-100 to-accent-200 dark:from-accent-900/20 dark:to-accent-800/20 transform rotate-6 scale-150"></div>
-                  </div>
-                  
+                className="group relative perspective-1000 lg:rotate-[8deg] z-10 w-full max-w-sm"
+                style={{ transformStyle: 'preserve-3d' }}>
+                {/* Rotating hexagonal border on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{
+                  clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
+                }}>
+                  <div className="absolute inset-0 bg-gradient-to-r from-accent-400 via-accent-500 to-accent-400 animate-spin-slow" style={{
+                    animation: 'spin 3s linear infinite',
+                    filter: 'blur(8px)'
+                  }}></div>
+                </div>
+
+                <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg border-2 border-accent-200/50 dark:border-accent-300/20 p-5 sm:p-6 shadow-xl hover:shadow-2xl transition-all duration-500 theme-transition cursor-pointer overflow-hidden group-hover:border-accent-400 dark:group-hover:border-accent-500 rounded-3xl" style={{
+                  clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
+                }}
+                     onClick={() => setAuthModalVisible(true)}>
                   {/* Floating icon container */}
                   <motion.div 
                     className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-accent-100 to-accent-200 dark:from-accent-900/50 dark:to-accent-800/50 rounded-2xl mb-4 sm:mb-6 group-hover:from-accent-200 group-hover:to-accent-300 dark:group-hover:from-accent-800/60 dark:group-hover:to-accent-700/60 transition-all duration-500 relative shadow-lg"
@@ -1023,18 +848,9 @@ export const LandingPage: React.FC = () => {
                       </motion.div>
                     ))}
                   </motion.div>
-                  
-                  <motion.div 
-                    className="text-xs text-text-tertiary dark:text-slate-500 bg-gradient-to-r from-accent-50 to-accent-100 dark:from-accent-900/30 dark:to-accent-800/30 px-4 py-3 rounded-xl theme-transition border border-accent-200/50 dark:border-accent-700/30"
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6, duration: 0.6 }}
-                  >
-                    <StarFilled className="text-accent-500 mr-2" />
-                    Perfect for parts suppliers and dealers
-                  </motion.div>
                 </div>
               </motion.div>
+              </div>
             </div>
           </motion.div>
           
@@ -1078,7 +894,7 @@ export const LandingPage: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="text-center mb-12 sm:mb-20"
           >
-            <div className="bg-gradient-to-br from-brand-50 to-brand-100 dark:bg-white/5 backdrop-blur-sm border border-brand-200 dark:border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 theme-transition">
+            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-gray-200 dark:border-white/10 rounded-2xl p-6 sm:p-8 theme-transition">
               <Title level={2} className="text-text-primary dark:!text-white !mb-6 sm:!mb-8 !text-xl sm:!text-2xl md:!text-3xl theme-transition">
                 Trusted by automotive professionals across Ghana
               </Title>
@@ -1100,7 +916,6 @@ export const LandingPage: React.FC = () => {
                 >
                   <Title level={1} className="!text-secondary-600 dark:!text-secondary-400 !mb-1 sm:!mb-2 !text-3xl sm:!text-4xl md:!text-5xl font-bold theme-transition">5K+</Title>
                   <Paragraph className="text-text-secondary dark:!text-slate-300 !mb-0 !text-sm sm:!text-base theme-transition">Repairs Completed</Paragraph>
-                  <Text className="text-text-tertiary dark:!text-slate-400 text-xs sm:text-sm theme-transition">All currencies in GHS</Text>
                 </motion.div>
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -1117,13 +932,8 @@ export const LandingPage: React.FC = () => {
         </div>
       </main>
 
-      {/* Enhanced Footer */}
-      <footer className="bg-gradient-to-br from-gray-50 to-gray-100 dark:bg-gradient-to-br dark:from-slate-950/95 dark:to-slate-900/95 backdrop-blur-sm border-t-2 border-gray-200/60 dark:border-white/10 py-8 sm:py-12 theme-transition relative overflow-hidden">
-        {/* Decorative automotive elements */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-500 via-secondary-500 to-accent-500"></div>
-          <div className="absolute bottom-0 right-0 w-1/3 h-1 bg-gradient-to-l from-brand-400 to-transparent"></div>
-        </div>
+      {/* Footer */}
+      <footer className="bg-gray-50 dark:bg-slate-950/90 backdrop-blur-sm border-t border-gray-200 dark:border-white/10 py-8 sm:py-12 theme-transition">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
             {/* Company Info */}
@@ -1272,16 +1082,10 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Enhanced Footer Bottom */}
-          <div className="pt-6 sm:pt-8 border-t border-gray-200 dark:border-white/10 text-center relative">
-            <div className="text-xs sm:text-sm text-text-tertiary dark:text-slate-500 theme-transition font-medium">
+          {/* Footer Bottom */}
+          <div className="pt-6 sm:pt-8 border-t border-gray-200 dark:border-white/10 text-center">
+            <div className="text-xs sm:text-sm text-text-tertiary dark:text-slate-500 theme-transition">
               © {new Date().getFullYear()} AutoCare Connect • All rights reserved
-              <div className="mt-2 text-xs opacity-75">
-                <span className="inline-flex items-center gap-1">
-                  <CarOutlined className="text-brand-500" />
-                  <span>Driving automotive excellence in Ghana</span>
-                </span>
-              </div>
             </div>
           </div>
         </div>

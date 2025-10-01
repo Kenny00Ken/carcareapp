@@ -36,7 +36,9 @@
       "Bash(true)",
       "Bash(curl:*)",
       "Bash(timeout 30s npm run type-check)",
-      "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" npm run dev)"
+      "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" npm run dev)",
+      "Bash(python -c \"\nimport json\nwith open(''moat-tasks-detail.json'', ''r'') as f:\n    data = json.load(f)\nfor task in data:\n    if task[''id''] == ''7a17077c-5e05-488c-9214-931488def746'':\n        task[''status''] = ''done''\n        break\nwith open(''moat-tasks-detail.json'', ''w'') as f:\n    json.dump(data, f, indent=2)\n\")",
+      "Bash(python:*)"
     ],
     "deny": []
   }
