@@ -94,7 +94,7 @@ const KnowMorePage: React.FC = () => {
             <div className="flex items-center gap-2">
               <CarOutlined className="text-2xl text-brand-500" />
               <Title level={3} className="!mb-0 text-text-primary dark:!text-white !text-lg font-bold">
-                AutoCare Connect
+                AutoCare
               </Title>
             </div>
 
@@ -412,7 +412,7 @@ const KnowMorePage: React.FC = () => {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
             <CarOutlined className="text-xl text-brand-500" />
-            <Title level={4} className="!mb-0 text-text-primary dark:!text-white">AutoCare Connect</Title>
+            <Title level={4} className="!mb-0 text-text-primary dark:!text-white">AutoCare</Title>
           </div>
 
           <Paragraph className="text-text-secondary dark:!text-slate-400 !text-sm !mb-3">
@@ -422,7 +422,6 @@ const KnowMorePage: React.FC = () => {
           <div className="flex items-center justify-center gap-4 mb-3">
             <a
               href="/terms"
-              target="_blank"
               className="text-sm text-text-secondary dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400"
             >
               Terms
@@ -430,7 +429,6 @@ const KnowMorePage: React.FC = () => {
             <span className="text-text-tertiary">•</span>
             <a
               href="/privacy"
-              target="_blank"
               className="text-sm text-text-secondary dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400"
             >
               Privacy
@@ -438,7 +436,7 @@ const KnowMorePage: React.FC = () => {
           </div>
 
           <div className="text-sm text-text-tertiary dark:text-slate-500">
-            © {new Date().getFullYear()} AutoCare Connect
+            © {new Date().getFullYear()} AutoCare
           </div>
         </div>
       </footer>

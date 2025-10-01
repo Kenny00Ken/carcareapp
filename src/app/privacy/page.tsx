@@ -130,19 +130,19 @@ export default function PrivacyPage() {
 
           <div className="space-y-6">
             {/* 1. Introduction */}
-            <Card>
-              <Title level={2}>1. Introduction</Title>
-              <Paragraph>
-                This Privacy Policy describes how AutoCare Connect ("we", "us", "our") collects, uses, and shares personal information when you use our automotive services platform ("AutoCare", "the Service").
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">1. Introduction</Title>
+              <Paragraph className="dark:!text-slate-300">
+                This Privacy Policy describes how AutoCare ("we", "us", "our") collects, uses, and shares personal information when you use our automotive services platform ("AutoCare", "the Service").
               </Paragraph>
-              <Paragraph>
+              <Paragraph className="dark:!text-slate-300">
                 We are committed to protecting your privacy and maintaining the highest standards of data security in compliance with applicable privacy laws, including Ghana's Data Protection Act, 2012 (Act 843) and international best practices.
               </Paragraph>
             </Card>
 
             {/* 2. Information We Collect */}
-            <Card>
-              <Title level={2}>2. Information We Collect</Title>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">2. Information We Collect</Title>
               
               <Title level={4} className="flex items-center gap-2">
                 <EyeOutlined />
@@ -161,7 +161,7 @@ export default function PrivacyPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
@@ -181,7 +181,7 @@ export default function PrivacyPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
@@ -201,17 +201,17 @@ export default function PrivacyPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
             </Card>
 
             {/* 3. How We Use Your Information */}
-            <Card>
-              <Title level={2}>3. How We Use Your Information</Title>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">3. How We Use Your Information</Title>
               
-              <Title level={4}>3.1 Primary Uses</Title>
+              <Title level={4} className="dark:!text-white">3.1 Primary Uses</Title>
               <List
                 bordered={false}
                 dataSource={[
@@ -224,12 +224,12 @@ export default function PrivacyPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
 
-              <Title level={4}>3.2 Secondary Uses</Title>
+              <Title level={4} className="dark:!text-white">3.2 Secondary Uses</Title>
               <List
                 bordered={false}
                 dataSource={[
@@ -242,16 +242,16 @@ export default function PrivacyPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
             </Card>
 
             {/* 4. Data Retention */}
-            <Card>
-              <Title level={2}>4. Data Retention</Title>
-              <Paragraph>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">4. Data Retention</Title>
+              <Paragraph className="dark:!text-slate-300">
                 We retain your personal information only for as long as necessary to fulfill the purposes outlined in this Privacy Policy, unless a longer retention period is required by law.
               </Paragraph>
               
@@ -265,8 +265,8 @@ export default function PrivacyPage() {
             </Card>
 
             {/* 5. Information Sharing */}
-            <Card>
-              <Title level={2}>5. How We Share Your Information</Title>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">5. How We Share Your Information</Title>
               
               <Alert
                 message="Limited Sharing Policy"
@@ -277,12 +277,12 @@ export default function PrivacyPage() {
                 className="mb-4"
               />
 
-              <Title level={4}>5.1 With Other Users</Title>
-              <Paragraph>
+              <Title level={4} className="dark:!text-white">5.1 With Other Users</Title>
+              <Paragraph className="dark:!text-slate-300">
                 To facilitate services, we share relevant information between car owners, mechanics, and dealers as necessary for service delivery.
               </Paragraph>
 
-              <Title level={4}>5.2 With Service Providers</Title>
+              <Title level={4} className="dark:!text-white">5.2 With Service Providers</Title>
               <List
                 bordered={false}
                 dataSource={[
@@ -294,22 +294,22 @@ export default function PrivacyPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
 
-              <Title level={4}>5.3 Legal Requirements</Title>
-              <Paragraph>
+              <Title level={4} className="dark:!text-white">5.3 Legal Requirements</Title>
+              <Paragraph className="dark:!text-slate-300">
                 We may disclose information when required by law, legal process, or to protect the rights, property, or safety of AutoCare, our users, or others.
               </Paragraph>
             </Card>
 
             {/* 6. Data Security */}
-            <Card>
-              <Title level={2}>6. Data Security</Title>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">6. Data Security</Title>
               
-              <Title level={4}>6.1 Security Measures</Title>
+              <Title level={4} className="dark:!text-white">6.1 Security Measures</Title>
               <List
                 bordered={false}
                 dataSource={[
@@ -322,22 +322,22 @@ export default function PrivacyPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
 
-              <Title level={4}>6.2 Payment Security</Title>
-              <Paragraph>
+              <Title level={4} className="dark:!text-white">6.2 Payment Security</Title>
+              <Paragraph className="dark:!text-slate-300">
                 Payment information is processed by PCI DSS compliant payment processors. We do not store complete payment card information on our servers.
               </Paragraph>
             </Card>
 
             {/* 7. Your Privacy Rights */}
-            <Card>
-              <Title level={2}>7. Your Privacy Rights</Title>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">7. Your Privacy Rights</Title>
               
-              <Title level={4}>7.1 Access and Control</Title>
+              <Title level={4} className="dark:!text-white">7.1 Access and Control</Title>
               <List
                 bordered={false}
                 dataSource={[
@@ -350,27 +350,27 @@ export default function PrivacyPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
 
-              <Title level={4}>7.2 Communication Preferences</Title>
-              <Paragraph>
+              <Title level={4} className="dark:!text-white">7.2 Communication Preferences</Title>
+              <Paragraph className="dark:!text-slate-300">
                 You can control marketing communications through your account settings or by contacting us directly. Note that you cannot opt out of essential service-related communications.
               </Paragraph>
 
-              <Title level={4}>7.3 Location Services</Title>
-              <Paragraph>
+              <Title level={4} className="dark:!text-white">7.3 Location Services</Title>
+              <Paragraph className="dark:!text-slate-300">
                 You can enable or disable location services through your device settings or account preferences. Disabling location services may limit some platform features.
               </Paragraph>
             </Card>
 
             {/* 8. Cookies and Tracking */}
-            <Card>
-              <Title level={2}>8. Cookies and Tracking Technologies</Title>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">8. Cookies and Tracking Technologies</Title>
               
-              <Title level={4}>8.1 Types of Cookies</Title>
+              <Title level={4} className="dark:!text-white">8.1 Types of Cookies</Title>
               <List
                 bordered={false}
                 dataSource={[
@@ -381,21 +381,21 @@ export default function PrivacyPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
 
-              <Title level={4}>8.2 Cookie Management</Title>
-              <Paragraph>
+              <Title level={4} className="dark:!text-white">8.2 Cookie Management</Title>
+              <Paragraph className="dark:!text-slate-300">
                 You can control cookies through your browser settings. Note that disabling certain cookies may affect platform functionality.
               </Paragraph>
             </Card>
 
             {/* 9. International Data Transfers */}
-            <Card>
-              <Title level={2}>9. International Data Transfers</Title>
-              <Paragraph>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">9. International Data Transfers</Title>
+              <Paragraph className="dark:!text-slate-300">
                 Your information may be transferred to and processed in countries other than Ghana. We ensure appropriate safeguards are in place to protect your information during such transfers, including:
               </Paragraph>
               <List
@@ -408,15 +408,15 @@ export default function PrivacyPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
             </Card>
 
             {/* 10. Children's Privacy */}
-            <Card>
-              <Title level={2}>10. Children's Privacy</Title>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">10. Children's Privacy</Title>
               <Alert
                 message="Age Restriction"
                 description="AutoCare is not intended for use by individuals under 18 years of age. We do not knowingly collect personal information from children."
@@ -425,15 +425,15 @@ export default function PrivacyPage() {
                 showIcon
                 className="mb-4"
               />
-              <Paragraph>
+              <Paragraph className="dark:!text-slate-300">
                 If we become aware that we have collected personal information from a child under 18, we will delete such information promptly. If you believe we have collected information from a child, please contact us immediately.
               </Paragraph>
             </Card>
 
             {/* 11. Changes to Privacy Policy */}
-            <Card>
-              <Title level={2}>11. Changes to This Privacy Policy</Title>
-              <Paragraph>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">11. Changes to This Privacy Policy</Title>
+              <Paragraph className="dark:!text-slate-300">
                 We may update this Privacy Policy periodically to reflect changes in our practices, technology, legal requirements, or other factors. We will notify you of significant changes through:
               </Paragraph>
               <List
@@ -446,45 +446,45 @@ export default function PrivacyPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
             </Card>
 
             {/* 12. Contact Information */}
-            <Card>
-              <Title level={2}>12. Contact Us</Title>
-              <Paragraph>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">12. Contact Us</Title>
+              <Paragraph className="dark:!text-slate-300">
                 If you have questions, concerns, or requests regarding this Privacy Policy or our privacy practices, please contact us:
               </Paragraph>
               
-              <Title level={4}>Data Protection Officer</Title>
+              <Title level={4} className="dark:!text-white">Data Protection Officer</Title>
               <List
                 bordered={false}
                 dataSource={[
                   "Email: privacy@autocareconnect.com",
                   "Phone: +233 (0) 555-0124",
-                  "Address: Data Protection Office, AutoCare Connect, Accra, Ghana",
+                  "Address: Data Protection Office, AutoCare, Accra, Ghana",
                   "Response Time: We aim to respond within 72 hours"
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
 
-              <Title level={4}>Regulatory Authority</Title>
-              <Paragraph>
+              <Title level={4} className="dark:!text-white">Regulatory Authority</Title>
+              <Paragraph className="dark:!text-slate-300">
                 You also have the right to lodge a complaint with the Data Protection Commission of Ghana if you believe your privacy rights have been violated.
               </Paragraph>
             </Card>
 
             {/* Footer */}
-            <Card className="text-center bg-gray-50 dark:bg-gray-800">
-              <Title level={4}>Privacy Commitment</Title>
-              <Paragraph>
+            <Card className="text-center bg-gray-50 dark:bg-slate-800 dark:border-slate-700">
+              <Title level={4} className="dark:!text-white">Privacy Commitment</Title>
+              <Paragraph className="dark:!text-slate-300">
                 AutoCare is committed to protecting your privacy and maintaining the highest standards of data security. This Privacy Policy is part of our commitment to transparency and user trust.
               </Paragraph>
               <Space>

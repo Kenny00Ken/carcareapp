@@ -25,25 +25,32 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>('light')
-
-  useEffect(() => {
-    // Load theme from localStorage on mount
-    const savedTheme = localStorage.getItem('theme') as Theme | null
-    if (savedTheme) {
-      setTheme(savedTheme)
-    } else {
+  const [theme, setTheme] = useState<Theme>(() => {
+    // Initialize theme from localStorage immediately (SSR-safe)
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme') as Theme | null
+      if (savedTheme) {
+        return savedTheme
+      }
       // Check system preference
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      setTheme(prefersDark ? 'dark' : 'light')
+      return prefersDark ? 'dark' : 'light'
     }
+    return 'light'
+  })
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
   }, [])
 
   useEffect(() => {
+    if (!mounted) return
+
     // Update document class and localStorage when theme changes
     document.documentElement.classList.toggle('dark', theme === 'dark')
     localStorage.setItem('theme', theme)
-  }, [theme])
+  }, [theme, mounted])
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light')

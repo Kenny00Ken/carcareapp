@@ -341,11 +341,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onCancel }) => {
               >
                 <Text className="text-xs">
                   I agree to the{' '}
-                  <Link href="/terms" target="_blank" className="text-blue-600 hover:text-blue-700">
+                  <Link href="/terms" className="text-blue-600 hover:text-blue-700">
                     Terms and Conditions
                   </Link>{' '}
                   and{' '}
-                  <Link href="/privacy" target="_blank" className="text-blue-600 hover:text-blue-700">
+                  <Link href="/privacy" className="text-blue-600 hover:text-blue-700">
                     Privacy Policy
                   </Link>
                 </Text>

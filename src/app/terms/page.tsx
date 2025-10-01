@@ -75,20 +75,20 @@ export default function TermsPage() {
 
           <div className="space-y-6">
             {/* 1. Acceptance of Terms */}
-            <Card>
-              <Title level={2}>1. Acceptance of Terms</Title>
-              <Paragraph>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">1. Acceptance of Terms</Title>
+              <Paragraph className="dark:!text-slate-300">
                 By accessing and using AutoCare ("the Platform", "our Service"), you accept and agree to be bound by the terms and provision of this agreement. AutoCare is a digital platform that connects car owners, mechanics, and automotive parts dealers in Ghana.
               </Paragraph>
-              <Paragraph>
-                These Terms and Conditions ("Terms") constitute a legally binding agreement between you ("User", "you", "your") and AutoCare Connect ("Company", "we", "us", "our").
+              <Paragraph className="dark:!text-slate-300">
+                These Terms and Conditions ("Terms") constitute a legally binding agreement between you ("User", "you", "your") and AutoCare ("Company", "we", "us", "our").
               </Paragraph>
             </Card>
 
             {/* 2. Service Description */}
-            <Card>
-              <Title level={2}>2. Service Description</Title>
-              <Paragraph>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">2. Service Description</Title>
+              <Paragraph className="dark:!text-slate-300">
                 AutoCare provides:
               </Paragraph>
               <List
@@ -103,21 +103,21 @@ export default function TermsPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
             </Card>
 
             {/* 3. User Accounts and Registration */}
-            <Card>
-              <Title level={2}>3. User Accounts and Registration</Title>
-              <Title level={4}>3.1 Account Creation</Title>
-              <Paragraph>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">3. User Accounts and Registration</Title>
+              <Title level={4} className="dark:!text-white">3.1 Account Creation</Title>
+              <Paragraph className="dark:!text-slate-300">
                 To use AutoCare services, you must create an account by providing accurate, complete, and current information. You are responsible for maintaining the confidentiality of your account credentials.
               </Paragraph>
               
-              <Title level={4}>3.2 User Categories</Title>
+              <Title level={4} className="dark:!text-white">3.2 User Categories</Title>
               <List
                 bordered={false}
                 dataSource={[
@@ -127,21 +127,21 @@ export default function TermsPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
 
-              <Title level={4}>3.3 Account Verification</Title>
-              <Paragraph>
+              <Title level={4} className="dark:!text-white">3.3 Account Verification</Title>
+              <Paragraph className="dark:!text-slate-300">
                 Mechanics and dealers must provide valid business licenses, certifications, and undergo our verification process before offering services through the platform.
               </Paragraph>
             </Card>
 
             {/* 4. User Responsibilities */}
-            <Card>
-              <Title level={2}>4. User Responsibilities</Title>
-              <Title level={4}>4.1 General Obligations</Title>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">4. User Responsibilities</Title>
+              <Title level={4} className="dark:!text-white">4.1 General Obligations</Title>
               <List
                 bordered={false}
                 dataSource={[
@@ -153,12 +153,12 @@ export default function TermsPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
 
-              <Title level={4}>4.2 Prohibited Activities</Title>
+              <Title level={4} className="dark:!text-white">4.2 Prohibited Activities</Title>
               <Alert
                 message="The following activities are strictly prohibited:"
                 type="warning"
@@ -178,16 +178,16 @@ export default function TermsPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
             </Card>
 
             {/* 5. Service Provider Obligations */}
-            <Card>
-              <Title level={2}>5. Service Provider Obligations</Title>
-              <Title level={4}>5.1 Mechanics</Title>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">5. Service Provider Obligations</Title>
+              <Title level={4} className="dark:!text-white">5.1 Mechanics</Title>
               <List
                 bordered={false}
                 dataSource={[
@@ -199,12 +199,12 @@ export default function TermsPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
 
-              <Title level={4}>5.2 Parts Dealers</Title>
+              <Title level={4} className="dark:!text-white">5.2 Parts Dealers</Title>
               <List
                 bordered={false}
                 dataSource={[
@@ -216,56 +216,56 @@ export default function TermsPage() {
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
             </Card>
 
             {/* 6. Payment Terms */}
-            <Card>
-              <Title level={2}>6. Payment Terms</Title>
-              <Title level={4}>6.1 Platform Fees</Title>
-              <Paragraph>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">6. Payment Terms</Title>
+              <Title level={4} className="dark:!text-white">6.1 Platform Fees</Title>
+              <Paragraph className="dark:!text-slate-300">
                 AutoCare charges service fees for facilitating transactions between users. Current fee structures are available in your account dashboard and may be updated with reasonable notice.
               </Paragraph>
 
-              <Title level={4}>6.2 Payment Processing</Title>
-              <Paragraph>
+              <Title level={4} className="dark:!text-white">6.2 Payment Processing</Title>
+              <Paragraph className="dark:!text-slate-300">
                 Payments are processed through secure third-party payment processors. AutoCare does not store payment card information. Users are responsible for all charges incurred through their accounts.
               </Paragraph>
 
-              <Title level={4}>6.3 Refunds and Disputes</Title>
-              <Paragraph>
+              <Title level={4} className="dark:!text-white">6.3 Refunds and Disputes</Title>
+              <Paragraph className="dark:!text-slate-300">
                 Refund eligibility depends on the specific circumstances of each transaction. AutoCare provides dispute resolution services but is not liable for direct refunds unless required by law.
               </Paragraph>
             </Card>
 
             {/* 7. Intellectual Property */}
-            <Card>
-              <Title level={2}>7. Intellectual Property</Title>
-              <Paragraph>
-                The AutoCare platform, including but not limited to its design, functionality, content, and trademarks, is owned by AutoCare Connect and is protected by copyright, trademark, and other intellectual property laws.
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">7. Intellectual Property</Title>
+              <Paragraph className="dark:!text-slate-300">
+                The AutoCare platform, including but not limited to its design, functionality, content, and trademarks, is owned by AutoCare and is protected by copyright, trademark, and other intellectual property laws.
               </Paragraph>
-              <Paragraph>
+              <Paragraph className="dark:!text-slate-300">
                 Users retain ownership of content they create but grant AutoCare a license to use, display, and distribute such content as necessary to provide our services.
               </Paragraph>
             </Card>
 
             {/* 8. Privacy and Data Protection */}
-            <Card>
-              <Title level={2}>8. Privacy and Data Protection</Title>
-              <Paragraph>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">8. Privacy and Data Protection</Title>
+              <Paragraph className="dark:!text-slate-300">
                 Your privacy is important to us. Our collection, use, and protection of your personal information is governed by our Privacy Policy, which is incorporated into these Terms by reference.
               </Paragraph>
-              <Paragraph>
+              <Paragraph className="dark:!text-slate-300">
                 By using AutoCare, you consent to our data collection and processing practices as described in our Privacy Policy.
               </Paragraph>
             </Card>
 
             {/* 9. Disclaimers and Limitation of Liability */}
-            <Card>
-              <Title level={2}>9. Disclaimers and Limitation of Liability</Title>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">9. Disclaimers and Limitation of Liability</Title>
               <Alert
                 message="Important Legal Notice"
                 description="Please read this section carefully as it limits our liability and affects your legal rights."
@@ -275,48 +275,48 @@ export default function TermsPage() {
                 className="mb-4"
               />
 
-              <Title level={4}>9.1 Service Disclaimer</Title>
-              <Paragraph>
+              <Title level={4} className="dark:!text-white">9.1 Service Disclaimer</Title>
+              <Paragraph className="dark:!text-slate-300">
                 AutoCare provides a platform for connecting users but does not directly provide automotive services or sell parts. We do not guarantee the quality, safety, or legality of services or products offered by third-party providers.
               </Paragraph>
 
-              <Title level={4}>9.2 Limitation of Liability</Title>
-              <Paragraph>
+              <Title level={4} className="dark:!text-white">9.2 Limitation of Liability</Title>
+              <Paragraph className="dark:!text-slate-300">
                 To the maximum extent permitted by law, AutoCare shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues.
               </Paragraph>
             </Card>
 
             {/* 10. Termination */}
-            <Card>
-              <Title level={2}>10. Termination</Title>
-              <Paragraph>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">10. Termination</Title>
+              <Paragraph className="dark:!text-slate-300">
                 Either party may terminate this agreement at any time. AutoCare reserves the right to suspend or terminate accounts that violate these Terms or engage in prohibited activities.
               </Paragraph>
-              <Paragraph>
+              <Paragraph className="dark:!text-slate-300">
                 Upon termination, your access to the platform will be revoked, but these Terms will continue to apply to any outstanding obligations.
               </Paragraph>
             </Card>
 
             {/* 11. Governing Law */}
-            <Card>
-              <Title level={2}>11. Governing Law and Jurisdiction</Title>
-              <Paragraph>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">11. Governing Law and Jurisdiction</Title>
+              <Paragraph className="dark:!text-slate-300">
                 These Terms are governed by the laws of Ghana. Any disputes arising from these Terms or your use of AutoCare will be subject to the exclusive jurisdiction of the courts of Ghana.
               </Paragraph>
             </Card>
 
             {/* 12. Changes to Terms */}
-            <Card>
-              <Title level={2}>12. Changes to Terms</Title>
-              <Paragraph>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">12. Changes to Terms</Title>
+              <Paragraph className="dark:!text-slate-300">
                 AutoCare reserves the right to modify these Terms at any time. Users will be notified of significant changes through the platform or email. Continued use of the service after changes constitutes acceptance of the new Terms.
               </Paragraph>
             </Card>
 
             {/* 13. Contact Information */}
-            <Card>
-              <Title level={2}>13. Contact Information</Title>
-              <Paragraph>
+            <Card className="dark:bg-slate-800 dark:border-slate-700">
+              <Title level={2} className="dark:!text-white">13. Contact Information</Title>
+              <Paragraph className="dark:!text-slate-300">
                 If you have questions about these Terms and Conditions, please contact us:
               </Paragraph>
               <List
@@ -324,21 +324,21 @@ export default function TermsPage() {
                 dataSource={[
                   "Email: legal@autocareconnect.com",
                   "Phone: +233 (0) 555-0123",
-                  "Address: AutoCare Connect, Accra, Ghana",
+                  "Address: AutoCare, Accra, Ghana",
                   "Business Hours: Monday - Friday, 8:00 AM - 6:00 PM GMT"
                 ]}
                 renderItem={item => (
                   <List.Item>
-                    <Text>• {item}</Text>
+                    <Text className="dark:!text-slate-300">• {item}</Text>
                   </List.Item>
                 )}
               />
             </Card>
 
             {/* Footer */}
-            <Card className="text-center bg-gray-50 dark:bg-gray-800">
-              <Title level={4}>Agreement Acknowledgment</Title>
-              <Paragraph>
+            <Card className="text-center bg-gray-50 dark:bg-slate-800 dark:border-slate-700">
+              <Title level={4} className="dark:!text-white">Agreement Acknowledgment</Title>
+              <Paragraph className="dark:!text-slate-300">
                 By using AutoCare, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions.
               </Paragraph>
               <Space>

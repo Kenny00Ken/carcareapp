@@ -355,9 +355,16 @@ export const LandingPage: React.FC = () => {
 
       {/* Hero Section */}
       <main className="relative">
-        {/* Light Theme Hero */}
+        {/* Dark Theme Hero */}
         <div className="hidden dark:block">
-          <LampContainer className="pt-20">
+          <LampContainer className="pt-20" style={{
+            backgroundImage: `url(${BackgroundImage.src})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}>
+            {/* Dark overlay to maintain readability */}
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-950/60 via-slate-900/50 to-blue-950/60 z-0"></div>
             {/* Dark Theme Hero Content with automotive graphics */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-10">
               {/* Dark theme car visualization */}
@@ -426,7 +433,7 @@ export const LandingPage: React.FC = () => {
                   ease: "easeInOut",
                 }}
               >
-                <Paragraph className="!text-lg md:!text-xl text-slate-200 font-semibold max-w-3xl mx-auto !mb-12 !leading-relaxed">
+                <Paragraph className="!text-xl md:!text-2xl lg:!text-3xl text-slate-200 font-semibold max-w-3xl mx-auto !mb-12 !leading-relaxed">
                   Ghana's premier automotive platform connecting{' '}
                   <TypingText
                     texts={['car owners', 'trusted mechanics', 'reliable parts dealers']}
@@ -437,58 +444,6 @@ export const LandingPage: React.FC = () => {
                     colors={['text-brand-400', 'text-secondary-400', 'text-accent-400']}
                   />
                 </Paragraph>
-              </motion.div>
-              
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{
-                  delay: 0.9,
-                  duration: 0.6,
-                  ease: "easeInOut",
-                }}
-                className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-              >
-                {firebaseUser ? (
-                  user ? (
-                    <Button
-                      type="primary"
-                      size="large"
-                      icon={getRoleIcon(user.role)}
-                      onClick={navigateToDashboard}
-                      className="!h-12 !px-8 !text-base font-medium shadow-glow hover:shadow-glow-lg transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl"
-                    >
-                      Go to Dashboard <ArrowRightOutlined />
-                    </Button>
-                  ) : (
-                    <Button
-                      type="primary"
-                      size="large"
-                      onClick={() => router.push('/auth/role-selection')}
-                      className="!h-12 !px-8 !text-base font-medium shadow-glow hover:shadow-glow-lg transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl"
-                    >
-                      Complete Your Profile <ArrowRightOutlined />
-                    </Button>
-                  )
-                ) : (
-                  <>
-                    <Button
-                      type="primary"
-                      size="large"
-                      onClick={() => setAuthModalVisible(true)}
-                      className="!h-12 !px-8 !text-base font-medium shadow-glow hover:shadow-glow-lg transition-all duration-300 transform hover:scale-105 bg-brand-500 hover:bg-brand-600 border-none rounded-xl"
-                    >
-                      Get Started <ArrowRightOutlined />
-                    </Button>
-                    <Button
-                      size="large"
-                      onClick={() => router.push('/know-more')}
-                      className="!h-12 !px-8 !text-base font-medium text-slate-300 hover:text-white border-slate-600 hover:border-slate-400 bg-transparent hover:bg-slate-800/30 rounded-xl transition-all duration-300"
-                    >
-                      Learn More
-                    </Button>
-                  </>
-                )}
               </motion.div>
             </motion.div>
           </LampContainer>
@@ -571,7 +526,7 @@ export const LandingPage: React.FC = () => {
                 ease: "easeInOut",
               }}
             >
-              <Paragraph className="!text-lg md:!text-xl text-gray-800 dark:text-gray-200 font-semibold max-w-3xl mx-auto !mb-12 !leading-relaxed drop-shadow-sm">
+              <Paragraph className="!text-xl md:!text-2xl lg:!text-3xl text-gray-800 dark:text-gray-200 font-semibold max-w-3xl mx-auto !mb-12 !leading-relaxed drop-shadow-sm">
                 Ghana's premier automotive platform connecting{' '}
                 <TypingText
                   texts={['car owners', 'trusted mechanics', 'reliable parts dealers']}
@@ -1049,20 +1004,16 @@ export const LandingPage: React.FC = () => {
               <Title level={4} className="text-text-primary dark:!text-white !mb-3 sm:!mb-4 !text-base sm:!text-lg theme-transition">Legal</Title>
               <ul className="space-y-2 sm:space-y-3">
                 <li>
-                  <a 
-                    href="/terms" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
+                  <a
+                    href="/terms"
                     className="text-text-secondary dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 text-sm sm:text-base transition-colors"
                   >
                     Terms & Conditions
                   </a>
                 </li>
                 <li>
-                  <a 
-                    href="/privacy" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
+                  <a
+                    href="/privacy"
                     className="text-text-secondary dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 text-sm sm:text-base transition-colors"
                   >
                     Privacy Policy
@@ -1085,7 +1036,7 @@ export const LandingPage: React.FC = () => {
           {/* Footer Bottom */}
           <div className="pt-6 sm:pt-8 border-t border-gray-200 dark:border-white/10 text-center">
             <div className="text-xs sm:text-sm text-text-tertiary dark:text-slate-500 theme-transition">
-              © {new Date().getFullYear()} AutoCare Connect • All rights reserved
+              © {new Date().getFullYear()} AutoCare • All rights reserved
             </div>
           </div>
         </div>
@@ -1096,10 +1047,10 @@ export const LandingPage: React.FC = () => {
         visible={authModalVisible}
         onCancel={() => setAuthModalVisible(false)}
       />
-      
+
       {/* Recaptcha Container */}
       <div id="recaptcha-container"></div>
-      
+
     </div>
   )
 }
