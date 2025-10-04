@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { 
   Card, 
   Table, 
@@ -21,10 +21,8 @@ import {
   Typography,
   Avatar,
   Empty,
-  Statistic,
   Tooltip,
   Divider,
-  Alert,
   Descriptions
 } from 'antd'
 import { 
@@ -37,6 +35,8 @@ import {
   MedicineBoxOutlined,
   UserOutlined,
   PhoneOutlined,
+  PlusOutlined,
+  DeleteOutlined,
   EnvironmentOutlined,
   FileTextOutlined,
   ShopOutlined,
@@ -58,6 +58,11 @@ import { App } from 'antd'
 const { Search } = Input
 const { Option } = Select
 const { Title, Text } = Typography
+
+interface DiagnosisSelectionItem {
+  part: Part
+  quantity: number
+}
 
 export default function MechanicPartsPage() {
   const { user } = useAuth()
@@ -81,6 +86,10 @@ export default function MechanicPartsPage() {
   const [sortBy, setSortBy] = useState<'name' | 'price_asc' | 'price_desc' | 'stock' | 'brand'>('name')
   const [suggestedParts, setSuggestedParts] = useState<Part[]>([])
   const [filteredParts, setFilteredParts] = useState<Part[]>([])
+  const [searchResults, setSearchResults] = useState<Part[]>([])
+  const [searchFeedback, setSearchFeedback] = useState<string>('')
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [diagnosisPartSelections, setDiagnosisPartSelections] = useState<Array<{ part: Part; quantity: number }>>([])
   const [searchExpanded, setSearchExpanded] = useState(true)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [form] = Form.useForm()
@@ -97,17 +106,89 @@ export default function MechanicPartsPage() {
     }
   }, [user])
   
-  // Auto-apply filters when criteria change
   useEffect(() => {
-    if (parts.length > 0) {
-      handleSearch()
-    }
-  }, [parts, selectedCategory, selectedBrand, selectedDealer, stockFilter, priceRange, sortBy])
-  
-  // Initialize filtered parts
-  useEffect(() => {
-    setFilteredParts(parts)
+    setSearchResults(parts ? [...parts] : [])
   }, [parts])
+
+  const applyFilters = useCallback((list: Part[]) => {
+    let results = [...list]
+
+    if (selectedBrand) {
+      const normalizedBrand = selectedBrand.toLowerCase()
+      results = results.filter(part => part.brand?.toLowerCase() === normalizedBrand)
+    }
+
+    if (selectedDealer) {
+      results = results.filter(part => part.dealer_id === selectedDealer)
+    }
+
+    if (stockFilter !== 'all') {
+      results = results.filter(part => {
+        switch (stockFilter) {
+          case 'in_stock':
+            return part.stock > 5
+          case 'low_stock':
+            return part.stock > 0 && part.stock <= 5
+          case 'out_of_stock':
+            return part.stock === 0
+          default:
+            return true
+        }
+      })
+    }
+
+    results = results.filter(part => part.price >= priceRange[0] && part.price <= priceRange[1])
+
+    const sorted = [...results]
+    sorted.sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.name.localeCompare(b.name)
+        case 'price_asc':
+          return a.price - b.price
+        case 'price_desc':
+          return b.price - a.price
+        case 'stock':
+          return b.stock - a.stock
+        case 'brand':
+          return (a.brand || '').localeCompare(b.brand || '')
+        default:
+          return 0
+      }
+    })
+
+    return sorted
+  }, [priceRange, selectedBrand, selectedDealer, sortBy, stockFilter])
+
+  useEffect(() => {
+    setFilteredParts(applyFilters(searchResults))
+  }, [applyFilters, searchResults])
+
+  useEffect(() => {
+    const filtersApplied = Boolean(
+      searchTerm.trim() ||
+      selectedCategory ||
+      selectedBrand ||
+      selectedDealer ||
+      stockFilter !== 'all' ||
+      priceRange[0] !== 0 ||
+      priceRange[1] !== 10000
+    )
+
+    if (!loading && filtersApplied && filteredParts.length === 0) {
+      setSearchFeedback('No parts found matching your criteria. Try adjusting your filters.')
+    } else if (!loading) {
+      setSearchFeedback('')
+    }
+  }, [filteredParts, loading, priceRange, searchTerm, selectedBrand, selectedCategory, selectedDealer, stockFilter])
+
+  useEffect(() => {
+    return () => {
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current)
+      }
+    }
+  }, [])
 
   const loadData = async () => {
     if (!user?.id) {
@@ -185,97 +266,81 @@ export default function MechanicPartsPage() {
   }
 
   // Enhanced search and filter function
-  const handleSearch = async () => {
-    if (!searchTerm && !selectedCategory && !selectedBrand && !selectedDealer && stockFilter === 'all') {
-      setFilteredParts(parts)
+  const handleSearch = useCallback(async (override?: { term?: string; category?: string }) => {
+
+    const termToUse = override?.term ?? searchTerm
+
+    const categoryToUse = override?.category ?? selectedCategory
+
+    const trimmedTerm = termToUse.trim()
+
+    const normalizedCategory = (categoryToUse || '').trim()
+
+
+
+    if (!trimmedTerm && !normalizedCategory) {
+
+      setSearchResults(parts ? [...parts] : [])
+
       return
+
     }
 
+
+
     setLoading(true)
+
     try {
-      let searchResults: Part[] = []
-      
-      // If we have search terms, use database search
-      if (searchTerm || selectedCategory) {
-        searchResults = await DatabaseService.searchParts(searchTerm, selectedCategory) || []
-      } else {
-        // Otherwise use current parts
-        searchResults = parts
-      }
-      
-      // Apply local filters
-      let filteredResults = searchResults
-      
-      // Filter by brand
-      if (selectedBrand) {
-        filteredResults = filteredResults.filter(part => 
-          part.brand?.toLowerCase().includes(selectedBrand.toLowerCase())
-        )
-      }
-      
-      // Filter by dealer
-      if (selectedDealer) {
-        filteredResults = filteredResults.filter(part => 
-          part.dealer?.name?.toLowerCase().includes(selectedDealer.toLowerCase()) ||
-          part.dealer_id === selectedDealer
-        )
-      }
-      
-      // Filter by stock status
-      if (stockFilter !== 'all') {
-        filteredResults = filteredResults.filter(part => {
-          switch (stockFilter) {
-            case 'in_stock': return part.stock > 5
-            case 'low_stock': return part.stock > 0 && part.stock <= 5
-            case 'out_of_stock': return part.stock === 0
-            default: return true
-          }
-        })
-      }
-      
-      // Filter by price range
-      filteredResults = filteredResults.filter(part => 
-        part.price >= priceRange[0] && part.price <= priceRange[1]
-      )
-      
-      // Sort results
-      filteredResults.sort((a, b) => {
-        switch (sortBy) {
-          case 'name': return a.name.localeCompare(b.name)
-          case 'price_asc': return a.price - b.price
-          case 'price_desc': return b.price - a.price
-          case 'stock': return b.stock - a.stock
-          case 'brand': return (a.brand || '').localeCompare(b.brand || '')
-          default: return 0
-        }
+
+      const results = await DatabaseService.searchParts(trimmedTerm, normalizedCategory || undefined)
+
+      const enriched = results.map(result => {
+
+        const match = parts.find(original => original.id === result.id)
+
+        return match || result
+
       })
-      
-      setFilteredParts(filteredResults)
-      
-      if (filteredResults.length === 0) {
-        message.info('No parts found matching your search criteria. Try adjusting your filters.')
-      } else {
-        message.success(`Found ${filteredResults.length} parts matching your criteria`)
-      }
+
+      setSearchResults(enriched)
+
     } catch (error) {
+
       console.error('Error searching parts:', error)
-      setFilteredParts([])
-      
+
+      setSearchResults([])
+
+
+
       if (error instanceof Error) {
+
         if (error.message.includes('permission') || error.message.includes('unauthorized')) {
+
           message.error('You do not have permission to search parts. Please contact support.')
+
         } else if (error.message.includes('network') || error.message.includes('fetch')) {
+
           message.error('Network error while searching parts. Please check your connection and try again.')
+
         } else {
+
           message.error('Unable to search parts at this time. Please try again later.')
+
         }
+
       } else {
+
         message.error('Search failed. Please try again.')
+
       }
+
     } finally {
+
       setLoading(false)
+
     }
-  }
+
+  }, [message, parts, searchTerm, selectedCategory])
 
   // Get part suggestions based on diagnosis
   const getPartSuggestionsForDiagnosis = (diagnosis: Diagnosis): Part[] => {
@@ -310,8 +375,51 @@ export default function MechanicPartsPage() {
 
   const handleViewDiagnosis = (diagnosis: Diagnosis) => {
     setSelectedDiagnosis(diagnosis)
+
     const suggestions = getPartSuggestionsForDiagnosis(diagnosis)
     setSuggestedParts(suggestions)
+
+    const normalizedSelections: DiagnosisSelectionItem[] = []
+
+    const registerPart = (part: Part | undefined, quantity = 1) => {
+      if (!part) {
+        return
+      }
+
+      const safeQuantity = Math.max(1, Math.min(part.stock || quantity, quantity))
+      const existingIndex = normalizedSelections.findIndex(item => item.part.id === part.id)
+      if (existingIndex >= 0) {
+        const existing = normalizedSelections[existingIndex]
+        normalizedSelections[existingIndex] = { ...existing, quantity: Math.max(existing.quantity, safeQuantity) }
+      } else {
+        normalizedSelections.push({ part, quantity: safeQuantity })
+      }
+    }
+
+    const partsNeeded = diagnosis.parts_needed
+    if (Array.isArray(partsNeeded)) {
+      partsNeeded.forEach(item => {
+        if (typeof item === 'string') {
+          const match = parts.find(part => part.name.toLowerCase() === item.toLowerCase())
+          registerPart(match)
+        } else {
+          if (item.part_id) {
+            registerPart(parts.find(part => part.id === item.part_id), item.quantity || 1)
+          } else if (item.name) {
+            const match = parts.find(part => part.name.toLowerCase() === item.name.toLowerCase())
+            registerPart(match, item.quantity || 1)
+          }
+        }
+      })
+    } else {
+      const stringData = String(partsNeeded || '')
+      stringData.split(/[,\n]+/).map(name => name.trim()).filter(Boolean).forEach(name => {
+        const match = parts.find(part => part.name.toLowerCase() === name.toLowerCase())
+        registerPart(match)
+      })
+    }
+
+    setDiagnosisPartSelections(normalizedSelections)
     setDiagnosisModalVisible(true)
   }
 
@@ -363,6 +471,63 @@ export default function MechanicPartsPage() {
       console.error('Error requesting part:', error)
       message.error('Failed to request part')
     }
+  }
+
+  const contactDealer = (dealer?: Part['dealer']) => {
+    if (!dealer?.phone) {
+      message.info('Dealer phone number not available yet.')
+      return
+    }
+
+    if (typeof window !== 'undefined') {
+      window.open(`tel:${dealer.phone}`)
+    }
+  }
+
+  const addPartToDiagnosisSelections = (part: Part) => {
+    if (part.stock === 0) {
+      message.warning('This part is currently out of stock.')
+      return
+    }
+
+    setDiagnosisPartSelections(prev => {
+      const existingIndex = prev.findIndex(item => item.part.id === part.id)
+      if (existingIndex >= 0) {
+        const existing = prev[existingIndex]
+        if (existing.quantity >= part.stock) {
+          message.warning(`Maximum stock reached for ${part.name}.`)
+          return prev
+        }
+        const updated = [...prev]
+        updated[existingIndex] = { ...existing, quantity: existing.quantity + 1 }
+        message.success(`${part.name} quantity updated for this diagnosis.`)
+        return updated
+      }
+
+      message.success(`${part.name} added to this diagnosis.`)
+      return [...prev, { part, quantity: 1 }]
+    })
+  }
+
+  const updateDiagnosisSelectionQuantity = (partId: string, quantity?: number | null) => {
+    setDiagnosisPartSelections(prev => prev.map(item => {
+      if (item.part.id !== partId) {
+        return item
+      }
+      const numericQuantity = typeof quantity === 'number' ? quantity : 1
+      const clamped = Math.max(1, Math.min(item.part.stock || 1, numericQuantity))
+      return { ...item, quantity: clamped }
+    }))
+  }
+
+  const removeDiagnosisSelection = (partId: string) => {
+    setDiagnosisPartSelections(prev => {
+      const updated = prev.filter(item => item.part.id !== partId)
+      if (updated.length !== prev.length) {
+        message.success('Removed part from diagnosis selection.')
+      }
+      return updated
+    })
   }
 
   const getTransactionStatusColor = (status: TransactionStatus) => {
@@ -450,7 +615,9 @@ export default function MechanicPartsPage() {
           {record.dealer?.phone && (
             <div className="flex items-center text-sm text-gray-500">
               <PhoneOutlined className="mr-1" />
-              {record.dealer.phone}
+              <a href={`tel:${record.dealer.phone}`} className="text-blue-600 hover:underline">
+                {record.dealer.phone}
+              </a>
             </div>
           )}
           {record.dealer?.address && (
@@ -477,7 +644,15 @@ export default function MechanicPartsPage() {
               size="small"
             />
           </Tooltip>
-          <Tooltip title={record.stock === 0 ? "Out of stock" : "Request this part"}>
+          <Tooltip title={record.dealer?.phone ? 'Call dealer' : 'Dealer phone unavailable'}>
+            <Button
+              icon={<PhoneOutlined />}
+              onClick={() => contactDealer(record.dealer)}
+              disabled={!record.dealer?.phone}
+              size="small"
+            />
+          </Tooltip>
+          <Tooltip title={record.stock === 0 ? 'Out of stock' : 'Request this part'}>
             <Button
               type="primary"
               icon={<ShoppingCartOutlined />}
@@ -546,17 +721,34 @@ export default function MechanicPartsPage() {
 
   // Calculate statistics for filtered parts
   const totalParts = filteredParts.length
-  const availableParts = filteredParts.filter(p => p.stock > 0).length
-  const lowStockParts = filteredParts.filter(p => p.stock > 0 && p.stock <= 5).length
-  const outOfStockParts = filteredParts.filter(p => p.stock === 0).length
   const uniqueDealers = [...new Set(filteredParts.map(p => p.dealer_id))].length
-  const averagePrice = filteredParts.length > 0 ? filteredParts.reduce((sum, p) => sum + p.price, 0) / filteredParts.length : 0
   
   // Get unique brands and dealers for filter options
   const uniqueBrands = [...new Set(parts.map(p => p.brand).filter(Boolean))].sort()
-  const uniqueDealerOptions = [...new Set(parts.map(p => p.dealer).filter(Boolean))]
-    .map(dealer => ({ id: dealer!.id, name: dealer!.name }))
-    .sort((a, b) => a.name.localeCompare(b.name))
+  const uniqueDealerOptions = useMemo(() => {
+    const map = new Map<string, { id: string; name: string; phone?: string }>()
+
+    parts.forEach(part => {
+      if (!part.dealer_id) return
+      const existing = map.get(part.dealer_id)
+      const name = part.dealer?.name || existing?.name || `Dealer ${part.dealer_id.slice(0, 6)}`
+      const phone = part.dealer?.phone || existing?.phone
+      map.set(part.dealer_id, { id: part.dealer_id, name, phone })
+    })
+
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name))
+  }, [parts])
+
+  const dealerLookup = useMemo(() => {
+    return uniqueDealerOptions.reduce((acc, dealer) => {
+      acc[dealer.id] = dealer
+      return acc
+    }, {} as Record<string, { id: string; name: string; phone?: string }>)
+  }, [uniqueDealerOptions])
+
+  const diagnosisSelectionTotal = useMemo(() => {
+    return diagnosisPartSelections.reduce((total, item) => total + (item.part.price * item.quantity), 0)
+  }, [diagnosisPartSelections])
 
   // Browse tab content component
   const BrowseTabContent = () => (
@@ -599,6 +791,14 @@ export default function MechanicPartsPage() {
         </div>
 
         {/* Quick Search Bar - Always Visible */}
+        <div className="mb-2">
+          {searchFeedback && (
+            <Text type="secondary" className="block mb-2 text-sm text-red-500">
+              {searchFeedback}
+            </Text>
+          )}
+        </div>
+
         <div className="mb-4">
           <Row gutter={[12, 12]} align="middle">
             <Col xs={24} sm={16} md={12} lg={14}>
@@ -606,13 +806,23 @@ export default function MechanicPartsPage() {
                 placeholder="Quick search by name, brand, or part number..."
                 value={searchTerm}
                 onChange={(e) => {
-                  setSearchTerm(e.target.value)
-                  // Auto-search after 500ms delay
-                  if (e.target.value.length > 2 || e.target.value.length === 0) {
-                    setTimeout(() => handleSearch(), 500)
+                  const value = e.target.value
+                  setSearchTerm(value)
+
+                  if (searchDebounceRef.current) {
+                    clearTimeout(searchDebounceRef.current)
                   }
+
+                  if (!value.trim()) {
+                    setSearchResults(parts ? [...parts] : [])
+                    return
+                  }
+
+                  searchDebounceRef.current = setTimeout(() => {
+                    handleSearch({ term: value })
+                  }, 400)
                 }}
-                onSearch={handleSearch}
+                onSearch={(value) => handleSearch({ term: value })}
                 enterButton={<SearchOutlined />}
                 size="large"
                 allowClear
@@ -623,8 +833,12 @@ export default function MechanicPartsPage() {
               <Select
                 placeholder="Category"
                 style={{ width: '100%' }}
-                value={selectedCategory}
-                onChange={setSelectedCategory}
+                value={selectedCategory || undefined}
+                onChange={(value) => {
+                  const nextValue = value || ''
+                  setSelectedCategory(nextValue)
+                  handleSearch({ category: nextValue })
+                }}
                 allowClear
                 size="large"
                 showSearch
@@ -660,7 +874,7 @@ export default function MechanicPartsPage() {
                 >
                   <span className="hidden sm:inline">Filters</span>
                 </Button>
-                <Button 
+                <Button
                   onClick={() => {
                     setSearchTerm('')
                     setSelectedCategory('')
@@ -669,14 +883,16 @@ export default function MechanicPartsPage() {
                     setStockFilter('all')
                     setPriceRange([0, 10000])
                     setSortBy('name')
-                    setFilteredParts(parts)
+                    setSearchResults(parts ? [...parts] : [])
+                    setFiltersExpanded(false)
+                    setSearchFeedback('')
                   }}
                   size="large"
                   title="Clear all filters"
                   className="transition-all duration-200 hover:shadow-md hover:bg-red-50 hover:border-red-300"
                 >
-                  <span className="hidden sm:inline">Clear</span>
-                  <span className="sm:hidden">✕</span>
+                  <span className="hidden sm:inline">Reset</span>
+                  <span className="sm:hidden">Reset</span>
                 </Button>
               </Space.Compact>
             </Col>
@@ -744,14 +960,14 @@ export default function MechanicPartsPage() {
                 <Select
                   placeholder="Any dealer"
                   style={{ width: '100%' }}
-                  value={selectedDealer}
-                  onChange={setSelectedDealer}
+                  value={selectedDealer || undefined}
+                  onChange={(value) => setSelectedDealer(value || '')}
                   allowClear
                   showSearch
                   optionFilterProp="children"
                 >
                   {uniqueDealerOptions.map(dealer => (
-                    <Option key={dealer.id} value={dealer.name}>
+                    <Option key={dealer.id} value={dealer.id}>
                       <div className="flex items-center justify-between">
                         <span>{dealer.name}</span>
                         <Badge 
@@ -912,7 +1128,7 @@ export default function MechanicPartsPage() {
                       onClose={() => setSelectedDealer('')}
                       className="transition-all duration-200 hover:shadow-md cursor-pointer"
                     >
-                      Dealer: {selectedDealer}
+                      Dealer: {dealerLookup[selectedDealer]?.name || selectedDealer}
                     </Tag>
                   )}
                   {stockFilter !== 'all' && (
@@ -996,7 +1212,9 @@ export default function MechanicPartsPage() {
                         setStockFilter('all')
                         setPriceRange([0, 10000])
                         setSortBy('name')
-                        setFilteredParts(parts)
+                        setSearchResults(parts ? [...parts] : [])
+
+                        setSearchFeedback('')
                       }}
                       size="small"
                     >
@@ -1171,75 +1389,7 @@ export default function MechanicPartsPage() {
             </Space>
           </div>
 
-          {/* Statistics Cards - Mobile Responsive */}
-          <Row gutter={[12, 12]} className="mb-4">
-            <Col xs={12} sm={6} lg={6}>
-              <Card className="text-center" size="small">
-                <Statistic 
-                  title={<span className="text-xs sm:text-sm">Total Parts</span>}
-                  value={totalParts} 
-                  prefix={<InboxOutlined className="text-blue-500" />}
-                  valueStyle={{ color: '#1890ff', fontSize: '16px' }}
-                  suffix={<span className="text-xs hidden sm:inline">parts</span>}
-                />
-              </Card>
-            </Col>
-            <Col xs={12} sm={6} lg={6}>
-              <Card className="text-center" size="small">
-                <Statistic 
-                  title={<span className="text-xs sm:text-sm">In Stock</span>}
-                  value={availableParts} 
-                  prefix={<CheckCircleOutlined className="text-green-500" />}
-                  valueStyle={{ color: '#52c41a', fontSize: '16px' }}
-                  suffix={<span className="text-xs hidden sm:inline">parts</span>}
-                />
-              </Card>
-            </Col>
-            <Col xs={12} sm={6} lg={6}>
-              <Card className="text-center" size="small">
-                <Statistic 
-                  title={<span className="text-xs sm:text-sm">Dealers</span>}
-                  value={uniqueDealers} 
-                  prefix={<UserOutlined className="text-purple-500" />}
-                  valueStyle={{ color: '#722ed1', fontSize: '16px' }}
-                  suffix={<span className="text-xs hidden sm:inline">active</span>}
-                />
-              </Card>
-            </Col>
-            <Col xs={12} sm={6} lg={6}>
-              <Card className="text-center" size="small">
-                <Statistic 
-                  title={<span className="text-xs sm:text-sm">Avg Price</span>}
-                  value={averagePrice}
-                  precision={2}
-                  prefix={<span className="text-xs sm:text-sm">GHS </span>}
-                  valueStyle={{ color: '#faad14', fontSize: '16px' }}
-                />
-              </Card>
-            </Col>
-          </Row>
-
-          {/* Alerts */}
-          {outOfStockParts > 0 && (
-            <Alert
-              message={`${outOfStockParts} part(s) are currently out of stock`}
-              description="These parts are not available for ordering. Contact dealers directly for availability."
-              type="warning"
-              showIcon
-              closable
-            />
-          )}
-
-          {lowStockParts > 0 && (
-            <Alert
-              message={`${lowStockParts} part(s) have low stock (≤5 units)`}
-              description="Order these parts soon as they may run out quickly."
-              type="info"
-              showIcon
-              closable
-            />
-          )}
-
+          
           <Tabs defaultActiveKey="browse" size="large" items={tabItems} />
 
         {/* Request Part Modal */}
@@ -1271,6 +1421,16 @@ export default function MechanicPartsPage() {
                     <div className="text-sm text-gray-500">{selectedPart.brand}</div>
                     <div className="text-sm text-gray-500">Stock: {selectedPart.stock}</div>
                     <div className="font-semibold text-green-600">GHS {selectedPart.price.toFixed(2)} each</div>
+                    {selectedPart.dealer?.phone && (
+                      <Button
+                        icon={<PhoneOutlined />}
+                        className="mt-2"
+                        size="small"
+                        onClick={() => contactDealer(selectedPart.dealer)}
+                      >
+                        Call Dealer
+                      </Button>
+                    )}
                   </Col>
                 </Row>
               </div>
@@ -1410,6 +1570,7 @@ export default function MechanicPartsPage() {
             setDiagnosisModalVisible(false)
             setSelectedDiagnosis(null)
             setSuggestedParts([])
+            setDiagnosisPartSelections([])
           }}
           footer={null}
           width={1000}
@@ -1551,17 +1712,35 @@ export default function MechanicPartsPage() {
                         title: 'Action',
                         key: 'action',
                         render: (record: Part) => (
-                          <Button
-                            type="primary"
-                            icon={<ShoppingCartOutlined />}
-                            onClick={() => {
-                              setSelectedPart(record)
-                              setRequestModalVisible(true)
-                            }}
-                            disabled={record.stock === 0}
-                          >
-                            Request
-                          </Button>
+                          <Space size="small">
+                            <Tooltip title={record.stock === 0 ? 'Out of stock' : 'Add to diagnosis list'}>
+                              <Button
+                                icon={<PlusOutlined />}
+                                disabled={record.stock === 0}
+                                onClick={() => addPartToDiagnosisSelections(record)}
+                              />
+                            </Tooltip>
+                            <Tooltip title={record.dealer?.phone ? 'Call dealer' : 'Dealer phone unavailable'}>
+                              <Button
+                                icon={<PhoneOutlined />}
+                                onClick={() => contactDealer(record.dealer)}
+                                disabled={!record.dealer?.phone}
+                              />
+                            </Tooltip>
+                            <Tooltip title={record.stock === 0 ? 'Part unavailable' : 'Request this part'}>
+                              <Button
+                                type="primary"
+                                icon={<ShoppingCartOutlined />}
+                                onClick={() => {
+                                  setSelectedPart(record)
+                                  setRequestModalVisible(true)
+                                }}
+                                disabled={record.stock === 0}
+                              >
+                                Request
+                              </Button>
+                            </Tooltip>
+                          </Space>
                         )
                       }
                     ]}
@@ -1573,6 +1752,116 @@ export default function MechanicPartsPage() {
                 ) : (
                   <Empty description="No matching parts found for this diagnosis" />
                 )}
+              {diagnosisPartSelections.length > 0 && (
+                <Card
+                  title="Selected Parts for Dealer Coordination"
+                  size="small"
+                  extra={
+                    <Text strong className="text-blue-600">
+                      Total: GHS {diagnosisSelectionTotal.toFixed(2)}
+                    </Text>
+                  }
+                >
+                  <Table
+                    columns={[
+                      {
+                        title: 'Part',
+                        key: 'part',
+                        render: (_: unknown, item: DiagnosisSelectionItem) => (
+                          <div className="flex items-center">
+                            <Image
+                              src={item.part.image_url || '/placeholder-part.jpg'}
+                              alt={item.part.name}
+                              width={40}
+                              height={40}
+                              style={{ objectFit: 'cover' }}
+                              fallback="/placeholder-part.jpg"
+                              className="mr-3"
+                            />
+                            <div>
+                              <div className="font-medium">{item.part.name}</div>
+                              <div className="text-xs text-gray-500">{item.part.brand}</div>
+                            </div>
+                          </div>
+                        )
+                      },
+                      {
+                        title: 'Dealer',
+                        key: 'dealer',
+                        render: (_: unknown, item: DiagnosisSelectionItem) => (
+                          <div>
+                            <div className="font-medium">{item.part.dealer?.name || 'Unknown dealer'}</div>
+                            <div className="text-xs text-gray-500">{item.part.dealer?.phone || 'No phone on file'}</div>
+                          </div>
+                        )
+                      },
+                      {
+                        title: 'Quantity',
+                        key: 'quantity',
+                        width: 120,
+                        render: (_: unknown, item: DiagnosisSelectionItem) => (
+                          <InputNumber
+                            min={1}
+                            max={item.part.stock}
+                            value={item.quantity}
+                            onChange={(value) => updateDiagnosisSelectionQuantity(item.part.id, value)}
+                            size="small"
+                          />
+                        )
+                      },
+                      {
+                        title: 'Unit Price',
+                        key: 'unit_price',
+                        render: (_: unknown, item: DiagnosisSelectionItem) => (
+                          <span className="font-medium">GHS {item.part.price.toFixed(2)}</span>
+                        )
+                      },
+                      {
+                        title: 'Line Total',
+                        key: 'line_total',
+                        render: (_: unknown, item: DiagnosisSelectionItem) => (
+                          <span className="font-semibold text-green-600">
+                            GHS {(item.part.price * item.quantity).toFixed(2)}
+                          </span>
+                        )
+                      },
+                      {
+                        title: 'Contact',
+                        key: 'contact',
+                        render: (_: unknown, item: DiagnosisSelectionItem) => (
+                          <Tooltip title={item.part.dealer?.phone ? 'Call dealer' : 'Phone not available'}>
+                            <Button
+                              icon={<PhoneOutlined />}
+                              onClick={() => contactDealer(item.part.dealer)}
+                              disabled={!item.part.dealer?.phone}
+                              size="small"
+                            />
+                          </Tooltip>
+                        )
+                      },
+                      {
+                        title: 'Remove',
+                        key: 'remove',
+                        render: (_: unknown, item: DiagnosisSelectionItem) => (
+                          <Tooltip title="Remove from selection">
+                            <Button
+                              icon={<DeleteOutlined />}
+                              onClick={() => removeDiagnosisSelection(item.part.id)}
+                              danger
+                              size="small"
+                            />
+                          </Tooltip>
+                        )
+                      }
+                    ]}
+                    dataSource={diagnosisPartSelections}
+                    rowKey={(item) => item.part.id}
+                    pagination={false}
+                    size="small"
+                    scroll={{ x: 700 }}
+                  />
+                </Card>
+              )}
               </Card>
             </div>
           )}

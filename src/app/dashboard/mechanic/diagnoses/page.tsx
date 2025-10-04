@@ -1,18 +1,18 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { 
-  Card, 
-  Table, 
-  Button, 
-  Tag, 
-  Space, 
-  Modal, 
-  Form, 
-  Input, 
-  Select, 
+import {
+  Card,
+  Table,
+  Button,
+  Tag,
+  Space,
+  Modal,
+  Form,
+  Input,
+  Select,
   InputNumber,
-  message, 
+  message,
   Row,
   Col,
   Divider,
@@ -26,10 +26,10 @@ import {
   Tooltip,
   Avatar
 } from 'antd'
-import { 
-  FileTextOutlined, 
-  PlusOutlined, 
-  EyeOutlined, 
+import {
+  FileTextOutlined,
+  PlusOutlined,
+  EyeOutlined,
   EditOutlined,
   DeleteOutlined,
   ToolOutlined,
@@ -37,12 +37,13 @@ import {
   DollarOutlined,
   ClockCircleOutlined,
   ExclamationCircleOutlined,
-  CheckCircleOutlined
+  CheckCircleOutlined,
+  PhoneOutlined
 } from '@ant-design/icons'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { DatabaseService } from '@/services/database'
-import { Diagnosis, Request, SeverityLevel, DiagnosisStatus, PartNeeded } from '@/types'
+import { Diagnosis, Request, SeverityLevel, DiagnosisStatus, PartNeeded, Part } from '@/types'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -54,6 +55,7 @@ export default function MechanicDiagnosesPage() {
   const [submitting, setSubmitting] = useState(false)
   const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([])
   const [myRequests, setMyRequests] = useState<Request[]>([])
+  const [availableParts, setAvailableParts] = useState<Part[]>([])
   const [selectedDiagnosis, setSelectedDiagnosis] = useState<Diagnosis | null>(null)
   const [modalVisible, setModalVisible] = useState(false)
   const [viewModalVisible, setViewModalVisible] = useState(false)
@@ -70,19 +72,22 @@ export default function MechanicDiagnosesPage() {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [diagnosesData, requestsData] = await Promise.all([
+      const [diagnosesData, requestsData, partsData] = await Promise.all([
         DatabaseService.getDiagnosesByMechanic(user!.id),
-        DatabaseService.getRequestsByMechanic(user!.id)
+        DatabaseService.getRequestsByMechanic(user!.id),
+        DatabaseService.getAllParts()
       ])
-      
+
       setDiagnoses(diagnosesData || [])
-      // Filter requests that can have diagnoses created (claimed by this mechanic)
-      setMyRequests(requestsData?.filter(r => 
+      // Filter requests to those claimed by this mechanic
+      setMyRequests(requestsData?.filter(r =>
         ['claimed', 'diagnosed'].includes(r.status) && r.mechanic_id === user!.id
       ) || [])
+      setAvailableParts(partsData || [])
     } catch (error) {
       console.error('Error loading data:', error)
       message.error('Failed to load diagnoses data')
+      setAvailableParts([])
     } finally {
       setLoading(false)
     }
@@ -119,7 +124,7 @@ export default function MechanicDiagnosesPage() {
       } else {
         await DatabaseService.createDiagnosis(diagnosisData)
         message.success('Diagnosis submitted successfully!')
-        
+
         // Send notification to car owner
         const request = myRequests.find(r => r.id === values.request_id)
         if (request) {
@@ -130,8 +135,8 @@ export default function MechanicDiagnosesPage() {
             type: 'info',
             timestamp: new Date().toISOString(),
             read: false,
-            data: { 
-              request_id: request.id, 
+            data: {
+              request_id: request.id,
               mechanic_name: user!.name,
               estimated_cost: diagnosisData.estimated_cost,
               severity: values.severity
@@ -158,100 +163,168 @@ export default function MechanicDiagnosesPage() {
   }
 
   const handleEdit = (diagnosis: Diagnosis) => {
-    console.log('handleEdit called with diagnosis:', diagnosis)
-    
     try {
       setSelectedDiagnosis(diagnosis)
       setIsEditing(true)
-      
-      // Handle both string and array formats for parts_needed
+
       const partsData = diagnosis.parts_needed
       let convertedParts: PartNeeded[] = []
-      
-      // Debug logging to understand the data structure
-      console.log('Diagnosis parts_needed:', partsData, 'Type:', typeof partsData, 'Is Array:', Array.isArray(partsData))
-      
-      // Use explicit type checking to avoid TypeScript "never" type inference
-      if (partsData == null || partsData === undefined) {
-        // Handle null/undefined case
-        console.log('No parts data, setting empty array')
+
+      if (partsData == null) {
         convertedParts = []
       } else if (Array.isArray(partsData)) {
-        // Handle array case (string[] or PartNeeded[])
-        console.log('Parts data is array, processing...')
-        convertedParts = partsData.map(part => {
-          if (typeof part === 'string') {
+        convertedParts = partsData.map(item => {
+          if (typeof item === 'string') {
+            const matchedPart = availableParts.find(part => part.name.toLowerCase() === item.toLowerCase())
             return {
-              name: part,
+              name: matchedPart?.name || item,
               quantity: 1,
-              estimated_price: 0,
-              status: 'needed' as const
+              estimated_price: matchedPart?.price || 0,
+              status: 'needed' as const,
+              part_id: matchedPart?.id,
+              dealer_id: matchedPart?.dealer_id
             }
           }
-          return part
+
+          const matchedPart = availableParts.find(part =>
+            part.id === item.part_id || (item.name && part.name.toLowerCase() === item.name.toLowerCase())
+          )
+
+          return {
+            ...item,
+            name: item.name || matchedPart?.name || '',
+            quantity: item.quantity || 1,
+            estimated_price: item.estimated_price ?? matchedPart?.price ?? 0,
+            status: item.status || 'needed',
+            part_id: item.part_id || matchedPart?.id,
+            dealer_id: item.dealer_id || matchedPart?.dealer_id
+          }
         })
       } else {
-        // Handle string case - split by newlines or commas
         const stringData = String(partsData || '')
         if (stringData.trim()) {
-          console.log('Parts data is string, splitting...')
-          const partNames = stringData.split(/[,\n]+/).map(p => p.trim()).filter(p => p.length > 0)
-          convertedParts = partNames.map(name => ({
-            name,
-            quantity: 1,
-            estimated_price: 0,
-            status: 'needed' as const
-          }))
+          const partNames = stringData.split(/[,\n]+/).map(name => name.trim()).filter(Boolean)
+          convertedParts = partNames.map(name => {
+            const matchedPart = availableParts.find(part => part.name.toLowerCase() === name.toLowerCase())
+            return {
+              name: matchedPart?.name || name,
+              quantity: 1,
+              estimated_price: matchedPart?.price || 0,
+              status: 'needed' as const,
+              part_id: matchedPart?.id,
+              dealer_id: matchedPart?.dealer_id
+            }
+          })
         } else {
-          console.log('Empty string data, setting empty array')
           convertedParts = []
         }
       }
-      
-      console.log('Converted parts:', convertedParts)
+
+      if (convertedParts.length === 0) {
+        convertedParts = [{ name: '', quantity: 1, estimated_price: 0, status: 'needed' as const }]
+      }
+
       setPartsNeeded(convertedParts)
     } catch (error) {
       console.error('Error in handleEdit:', error)
-      // Set safe defaults
-      setPartsNeeded([])
+      setPartsNeeded([{ name: '', quantity: 1, estimated_price: 0, status: 'needed' as const }])
     }
-    
+
     form.setFieldsValue({
       request_id: diagnosis.request_id,
       title: diagnosis.title,
       details: diagnosis.details,
       severity: diagnosis.severity,
-      labor_cost: diagnosis.labor_cost,
+      labor_cost: diagnosis.labor_cost ?? 50,
       follow_up_required: diagnosis.follow_up_required,
       follow_up_notes: diagnosis.follow_up_notes,
-      resolution_time: diagnosis.resolution_time
+      resolution_time: diagnosis.resolution_time ?? '1'
     })
     setModalVisible(true)
   }
 
   const addPartNeeded = () => {
-    setPartsNeeded([...partsNeeded, {
-      name: '',
-      quantity: 1,
-      estimated_price: 0,
-      status: 'needed'
-    }])
+    setPartsNeeded(prev => [
+      ...prev,
+      { name: '', quantity: 1, estimated_price: 0, status: 'needed' as const }
+    ])
   }
 
-  const updatePartNeeded = (index: number, field: string, value: any) => {
-    const updated = [...partsNeeded]
-    updated[index] = { ...updated[index], [field]: value }
-    setPartsNeeded(updated)
+  const updatePartNeeded = (index: number, field: keyof PartNeeded, value: any) => {
+    setPartsNeeded(prev => {
+      const updated = [...prev]
+      const current = updated[index]
+      if (!current) {
+        return prev
+      }
+
+      if (field === 'quantity') {
+        const numericValue = typeof value === 'number' ? value : 1
+        const matchedPart = current.part_id ? availableParts.find(part => part.id === current.part_id) : undefined
+        const cappedQuantity = Math.max(1, Math.min(matchedPart?.stock || numericValue, numericValue))
+        updated[index] = { ...current, quantity: cappedQuantity }
+        return updated
+      }
+
+      updated[index] = { ...current, [field]: value }
+      return updated
+    })
+  }
+
+  const handleDealerPartSelection = (index: number, partId?: string) => {
+    setPartsNeeded(prev => {
+      const updated = [...prev]
+      const current = updated[index]
+      if (!current) {
+        return prev
+      }
+
+      if (!partId) {
+        updated[index] = { ...current, part_id: undefined, dealer_id: undefined }
+        return updated
+      }
+
+      const matchedPart = availableParts.find(part => part.id === partId)
+      if (!matchedPart) {
+        return prev
+      }
+
+      const safeQuantity = Math.max(1, Math.min(matchedPart.stock, current.quantity || 1))
+      updated[index] = {
+        ...current,
+        name: matchedPart.name,
+        part_id: matchedPart.id,
+        dealer_id: matchedPart.dealer_id,
+        estimated_price: matchedPart.price,
+        quantity: safeQuantity,
+        status: current.status || 'needed'
+      }
+      return updated
+    })
+  }
+
+  const contactDealer = (dealer?: Part['dealer']) => {
+    if (!dealer?.phone) {
+      message.info('Dealer phone number not available yet.')
+      return
+    }
+
+    if (typeof window !== 'undefined') {
+      window.open(`tel:${dealer.phone}`)
+    }
   }
 
   const removePartNeeded = (index: number) => {
-    setPartsNeeded(partsNeeded.filter((_, i) => i !== index))
+    setPartsNeeded(prev => {
+      const updated = prev.filter((_, i) => i !== index)
+      return updated.length > 0 ? updated : [{ name: '', quantity: 1, estimated_price: 0, status: 'needed' as const }]
+    })
   }
 
-  const getSeverityColor = (severity: SeverityLevel) => {
+const getSeverityColor = (severity: SeverityLevel) => {
     const colors = {
       low: 'green',
-      medium: 'orange', 
+      medium: 'orange',
       high: 'red',
       critical: 'red'
     }
@@ -271,7 +344,7 @@ export default function MechanicDiagnosesPage() {
   const getStatusColor = (status: DiagnosisStatus) => {
     const colors = {
       draft: 'default',
-      submitted: 'processing', 
+      submitted: 'processing',
       approved: 'success',
       completed: 'success'
     }
@@ -354,8 +427,8 @@ export default function MechanicDiagnosesPage() {
       width: 80,
       align: 'center' as const,
       render: (record: Diagnosis) => (
-        <Badge 
-          count={record.parts_needed?.length || 0} 
+        <Badge
+          count={record.parts_needed?.length || 0}
           showZero
           style={{ backgroundColor: '#52c41a' }}
         />
@@ -431,8 +504,13 @@ export default function MechanicDiagnosesPage() {
               }
               setIsEditing(false)
               setSelectedDiagnosis(null)
-              setPartsNeeded([])
+              setPartsNeeded([{ name: '', quantity: 1, estimated_price: 0, status: 'needed' }])
               form.resetFields()
+              form.setFieldsValue({
+                labor_cost: 50,
+                resolution_time: '1',
+                follow_up_required: false
+              })
               setModalVisible(true)
             }}
             className="shadow-lg"
@@ -487,7 +565,7 @@ export default function MechanicDiagnosesPage() {
             dataSource={diagnoses}
             rowKey="id"
             loading={loading}
-            pagination={{ 
+            pagination={{
               pageSize: 10,
               showSizeChanger: true,
               showQuickJumper: true,
@@ -543,7 +621,7 @@ export default function MechanicDiagnosesPage() {
                   label="Service Request"
                   rules={[{ required: true, message: 'Please select a service request' }]}
                 >
-                  <Select 
+                  <Select
                     placeholder="Select a claimed service request"
                     size="large"
                     disabled={isEditing}
@@ -594,7 +672,7 @@ export default function MechanicDiagnosesPage() {
               label="Diagnosis Title"
               rules={[{ required: true, message: 'Please enter a diagnosis title' }]}
             >
-              <Input 
+              <Input
                 placeholder="Brief title describing the main issue"
                 size="large"
               />
@@ -605,8 +683,8 @@ export default function MechanicDiagnosesPage() {
               label="Detailed Diagnosis"
               rules={[{ required: true, message: 'Please provide detailed diagnosis' }]}
             >
-              <TextArea 
-                rows={6} 
+              <TextArea
+                rows={6}
                 placeholder="Provide comprehensive diagnosis details including:&#10;• Problem identification&#10;• Root cause analysis&#10;• Recommended solution&#10;• Any additional observations"
                 showCount
                 maxLength={2000}
@@ -620,9 +698,9 @@ export default function MechanicDiagnosesPage() {
                   label="Labor Cost (GHS)"
                   rules={[{ required: true, message: 'Please enter labor cost' }]}
                 >
-                  <InputNumber 
-                    min={0} 
-                    step={10} 
+                  <InputNumber
+                    min={0}
+                    step={10}
                     style={{ width: '100%' }}
                     size="large"
                     prefix={<DollarOutlined />}
@@ -636,7 +714,7 @@ export default function MechanicDiagnosesPage() {
                   label="Estimated Time"
                   rules={[{ required: true, message: 'Please enter estimated time' }]}
                 >
-                  <Input 
+                  <Input
                     placeholder="e.g., 2-3 hours, 1 day"
                     size="large"
                     prefix={<ClockCircleOutlined />}
@@ -647,7 +725,7 @@ export default function MechanicDiagnosesPage() {
                 <Form.Item label="Total Cost (GHS)">
                   <div className="text-2xl font-bold text-blue-600 flex items-center h-10">
                     {formatCurrency(
-                      (form.getFieldValue('labor_cost') || 0) + 
+                      (form.getFieldValue('labor_cost') || 0) +
                       partsNeeded.reduce((total, part) => total + (part.estimated_price * part.quantity), 0)
                     )}
                   </div>
@@ -658,56 +736,95 @@ export default function MechanicDiagnosesPage() {
             <Divider orientation="left">
               <span className="text-lg font-semibold">Parts Needed</span>
             </Divider>
-            
-            {partsNeeded.map((part, index) => (
-              <Card key={index} size="small" className="mb-4 border-dashed">
-                <Row gutter={16} align="middle">
-                  <Col span={10}>
-                    <Input
-                      placeholder="Part name (e.g., Brake Pads, Oil Filter)"
-                      value={part.name}
-                      onChange={(e) => updatePartNeeded(index, 'name', e.target.value)}
+
+            {partsNeeded.map((part, index) => {
+              const selectedInventoryPart = availableParts.find(invPart => invPart.id === part.part_id)
+
+              return (
+                <Card key={index} size="small" className="mb-4 border-dashed">
+                  <Space direction="vertical" className="w-full">
+                    <Select
+                      showSearch
+                      allowClear
+                      placeholder="Select available dealer part"
                       size="large"
+                      value={part.part_id || undefined}
+                      optionFilterProp="label"
+                      filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                      onChange={(value) => handleDealerPartSelection(index, value as string | undefined)}
+                      options={availableParts.map(dealerPart => ({
+                        value: dealerPart.id,
+                        label: `${dealerPart.name} - ${dealerPart.dealer?.name || 'Unknown dealer'} (GHS ${dealerPart.price.toFixed(2)})`
+                      }))}
                     />
-                  </Col>
-                  <Col span={5}>
-                    <InputNumber
-                      min={1}
-                      placeholder="Qty"
-                      value={part.quantity}
-                      onChange={(value) => updatePartNeeded(index, 'quantity', value)}
-                      style={{ width: '100%' }}
-                      size="large"
-                    />
-                  </Col>
-                  <Col span={6}>
-                    <InputNumber
-                      min={0}
-                      step={10}
-                      placeholder="Price (GHS)"
-                      value={part.estimated_price}
-                      onChange={(value) => updatePartNeeded(index, 'estimated_price', value)}
-                      style={{ width: '100%' }}
-                      size="large"
-                      prefix="GHS"
-                    />
-                  </Col>
-                  <Col span={2}>
-                    <Text className="font-medium">
-                      {formatCurrency(part.estimated_price * part.quantity)}
-                    </Text>
-                  </Col>
-                  <Col span={1}>
-                    <Button
-                      icon={<DeleteOutlined />}
-                      onClick={() => removePartNeeded(index)}
-                      danger
-                      type="text"
-                    />
-                  </Col>
-                </Row>
-              </Card>
-            ))}
+
+                    {selectedInventoryPart && (
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span>
+                          Dealer: {selectedInventoryPart.dealer?.name || 'Unknown'} - Stock: {selectedInventoryPart.stock}
+                        </span>
+                        <Button
+                          type="link"
+                          size="small"
+                          icon={<PhoneOutlined />}
+                          disabled={!selectedInventoryPart.dealer?.phone}
+                          onClick={() => contactDealer(selectedInventoryPart.dealer)}
+                        >
+                          Call Dealer
+                        </Button>
+                      </div>
+                    )}
+
+                    <Row gutter={16} align="middle">
+                      <Col span={10}>
+                        <Input
+                          placeholder="Part name (e.g., Brake Pads, Oil Filter)"
+                          value={part.name}
+                          onChange={(e) => updatePartNeeded(index, 'name', e.target.value)}
+                          size="large"
+                        />
+                      </Col>
+                      <Col span={5}>
+                        <InputNumber
+                          min={1}
+                          max={selectedInventoryPart?.stock}
+                          placeholder="Qty"
+                          value={part.quantity}
+                          onChange={(value) => updatePartNeeded(index, 'quantity', value)}
+                          style={{ width: '100%' }}
+                          size="large"
+                        />
+                      </Col>
+                      <Col span={6}>
+                        <InputNumber
+                          min={0}
+                          step={10}
+                          placeholder="Price (GHS)"
+                          value={part.estimated_price}
+                          onChange={(value) => updatePartNeeded(index, 'estimated_price', value)}
+                          style={{ width: '100%' }}
+                          size="large"
+                          prefix="GHS"
+                        />
+                      </Col>
+                      <Col span={2}>
+                        <Text className="font-medium">
+                          {formatCurrency((part.estimated_price || 0) * (part.quantity || 0))}
+                        </Text>
+                      </Col>
+                      <Col span={1}>
+                        <Button
+                          icon={<DeleteOutlined />}
+                          onClick={() => removePartNeeded(index)}
+                          danger
+                          type="text"
+                        />
+                      </Col>
+                    </Row>
+                  </Space>
+                </Card>
+              )
+            })}
 
             <Button
               type="dashed"
@@ -730,13 +847,13 @@ export default function MechanicDiagnosesPage() {
                   </Form.Item>
                 </Col>
               </Row>
-              
+
               <Form.Item
                 name="follow_up_notes"
                 label="Follow-up Instructions"
               >
-                <TextArea 
-                  rows={3} 
+                <TextArea
+                  rows={3}
                   placeholder="Specify any follow-up requirements, maintenance schedule, or additional instructions..."
                 />
               </Form.Item>
@@ -859,4 +976,8 @@ export default function MechanicDiagnosesPage() {
       </div>
     </DashboardLayout>
   )
-} 
+}
+
+
+
+
