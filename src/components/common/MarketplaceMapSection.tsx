@@ -1,7 +1,7 @@
 ﻿'use client'
 
 import dynamic from 'next/dynamic'
-import { EnvironmentOutlined } from '@ant-design/icons'
+import { EnvironmentOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import { Typography } from 'antd'
 
 import type { MarketplaceLocation } from '@/hooks/useMarketplaceLocations'
@@ -28,6 +28,9 @@ interface MarketplaceMapSectionProps {
 
 export const MarketplaceMapSection = ({ locations, loading, error }: MarketplaceMapSectionProps) => {
   const hasLocations = locations.length > 0
+  const hasError = Boolean(error)
+  const shouldShowErrorState = hasError && !hasLocations && !loading
+  const shouldShowFallbackNotice = hasError && hasLocations
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-white via-white to-gray-50 py-16 dark:from-slate-950 dark:via-slate-950/95 dark:to-slate-950">
@@ -51,8 +54,17 @@ export const MarketplaceMapSection = ({ locations, loading, error }: Marketplace
       <div className="relative mt-10">
         <div className="absolute inset-x-0 top-6 mx-auto h-[480px] max-w-7xl rounded-3xl bg-gradient-to-r from-green-500/10 via-transparent to-green-500/10 blur-3xl dark:from-green-500/10 dark:to-green-400/10" />
         <div className="relative left-1/2 h-[420px] w-screen -translate-x-1/2 overflow-hidden border-y border-gray-200/60 bg-white/90 shadow-inner backdrop-blur sm:h-[460px] md:h-[520px] dark:border-white/10 dark:bg-slate-950/80">
+          {shouldShowFallbackNotice && (
+            <div className="absolute left-1/2 top-6 z-20 flex w-[90%] max-w-lg -translate-x-1/2 items-center gap-3 rounded-2xl border border-amber-300/40 bg-amber-50/90 px-4 py-3 text-amber-700 shadow-lg backdrop-blur dark:border-amber-200/30 dark:bg-amber-900/40 dark:text-amber-100">
+              <ExclamationCircleOutlined className="text-lg" />
+              <Text className="text-sm font-medium">
+                Showing featured locations while we refresh live availability.
+              </Text>
+            </div>
+          )}
+
           <div className="absolute inset-0">
-            {error ? (
+            {shouldShowErrorState ? (
               <div className="flex h-full w-full flex-col items-center justify-center space-y-3 bg-gradient-to-br from-white via-gray-100 to-gray-200 text-center dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
                 <Title level={4} className="!mb-0 text-base font-semibold text-red-600 dark:!text-red-400">
                   We could not load the map right now
@@ -66,21 +78,19 @@ export const MarketplaceMapSection = ({ locations, loading, error }: Marketplace
                 <span className="h-12 w-12 animate-spin rounded-full border-4 border-green-500/20 border-t-green-500" aria-hidden="true" />
                 <Text className="text-sm font-medium text-gray-600 dark:text-slate-300">Loading trusted locations…</Text>
               </div>
-            ) : (
+            ) : hasLocations ? (
               <DynamicLeafletMap locations={locations} />
+            ) : (
+              <div className="flex h-full w-full flex-col items-center justify-center space-y-3 bg-white/85 text-center backdrop-blur dark:bg-slate-950/85">
+                <Title level={4} className="!mb-0 text-base font-semibold text-gray-900 dark:!text-white">
+                  Locations coming soon
+                </Title>
+                <Paragraph className="!mb-0 max-w-sm text-sm text-gray-600 dark:!text-slate-300">
+                  We are onboarding more mechanics and parts dealers. Check back shortly for live availability in your area.
+                </Paragraph>
+              </div>
             )}
           </div>
-
-          {!loading && !error && !hasLocations && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center space-y-3 bg-white/85 text-center backdrop-blur dark:bg-slate-950/85">
-              <Title level={4} className="!mb-0 text-base font-semibold text-gray-900 dark:!text-white">
-                Locations coming soon
-              </Title>
-              <Paragraph className="!mb-0 max-w-sm text-sm text-gray-600 dark:!text-slate-300">
-                We are onboarding more mechanics and parts dealers. Check back shortly for live availability in your area.
-              </Paragraph>
-            </div>
-          )}
         </div>
       </div>
     </section>
