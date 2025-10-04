@@ -430,7 +430,7 @@ export const LandingPage: React.FC = () => {
                 duration: 0.8,
                 ease: "easeInOut",
               }}
-              className="text-center max-w-4xl mx-auto relative z-10"
+              className="text-center max-w-4xl mx-auto relative z-10 pt-16 sm:pt-20 lg:pt-24"
             >
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -539,7 +539,7 @@ export const LandingPage: React.FC = () => {
               duration: 0.8,
               ease: "easeInOut",
             }}
-            className="text-center max-w-4xl mx-auto px-4 sm:px-6 relative z-10"
+            className="text-center max-w-4xl mx-auto px-4 sm:px-6 relative z-10 pt-16 sm:pt-20 lg:pt-24"
           >
             <motion.div
               initial={{ opacity: 0, y: 30 }}
