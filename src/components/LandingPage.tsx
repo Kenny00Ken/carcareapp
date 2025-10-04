@@ -441,16 +441,32 @@ export const LandingPage: React.FC = () => {
                   ease: "easeInOut",
                 }}
               >
-                <Paragraph className="!text-xl md:!text-2xl lg:!text-3xl text-slate-200 font-semibold max-w-3xl mx-auto !mb-12 !leading-relaxed">
-                  Ghana's premier automotive platform connecting{' '}
-                  <TypingText
-                    texts={['car owners', 'trusted mechanics', 'reliable parts dealers']}
-                    speed={100}
-                    pauseDuration={2000}
-                    deleteSpeed={50}
-                    className="font-bold"
-                    colors={['text-brand-400', 'text-secondary-400', 'text-accent-400']}
-                  />
+                <Paragraph
+                  className="relative mx-auto max-w-3xl overflow-hidden rounded-[32px] border border-white/10 bg-white/5 p-8 text-left text-slate-200 !mb-12 !leading-relaxed shadow-[0_40px_80px_-50px_rgba(59,130,246,0.9)] backdrop-blur-xl"
+                >
+                  <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-500/20 via-secondary-400/15 to-accent-500/20 opacity-80" aria-hidden="true" />
+                  <span className="relative block text-[0.75rem] uppercase tracking-[0.45em] text-slate-200/70">
+                    Ghana's premier automotive platform
+                  </span>
+                  <span className="relative mt-4 block text-3xl font-semibold text-white md:text-4xl lg:text-[2.65rem]">
+                    Connecting{' '}
+                    <span className="relative inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2">
+                      <span className="pointer-events-none absolute inset-0 scale-110 rounded-full bg-white/20 blur-xl" aria-hidden="true" />
+                      <span className="relative font-bold text-brand-100">
+                        <TypingText
+                          texts={['car owners', 'trusted mechanics', 'reliable parts dealers']}
+                          speed={100}
+                          pauseDuration={2000}
+                          deleteSpeed={50}
+                          className="font-bold"
+                          colors={['text-brand-400', 'text-secondary-400', 'text-accent-400']}
+                        />
+                      </span>
+                    </span>
+                  </span>
+                  <span className="relative mt-5 block text-base text-slate-200/75">
+                    Build lasting relationships with verified mechanics and suppliers, carefully curated for Ghanaian roads.
+                  </span>
                 </Paragraph>
               </motion.div>
             </motion.div>
@@ -534,16 +550,32 @@ export const LandingPage: React.FC = () => {
                 ease: "easeInOut",
               }}
             >
-              <Paragraph className="!text-xl md:!text-2xl lg:!text-3xl text-gray-800 dark:text-gray-200 font-semibold max-w-3xl mx-auto !mb-12 !leading-relaxed drop-shadow-sm">
-                Ghana's premier automotive platform connecting{' '}
-                <TypingText
-                  texts={['car owners', 'trusted mechanics', 'reliable parts dealers']}
-                  speed={100}
-                  pauseDuration={2000}
-                  deleteSpeed={50}
-                  className="font-bold"
-                  colors={['text-brand-600', 'text-secondary-600', 'text-accent-600']}
-                />
+              <Paragraph
+                className="relative mx-auto max-w-3xl overflow-hidden rounded-[32px] border border-white/60 bg-white/80 p-8 text-left text-gray-800 !mb-12 !leading-relaxed shadow-[0_40px_100px_-60px_rgba(59,130,246,0.6)] backdrop-blur-xl"
+              >
+                <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-200/60 via-secondary-200/40 to-accent-200/60 opacity-80" aria-hidden="true" />
+                <span className="relative block text-[0.75rem] uppercase tracking-[0.45em] text-gray-500">
+                  Ghana's premier automotive platform
+                </span>
+                <span className="relative mt-4 block text-3xl font-semibold text-gray-900 md:text-4xl lg:text-[2.65rem]">
+                  Connecting{' '}
+                  <span className="relative inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 shadow-inner ring-1 ring-brand-200/70">
+                    <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-r from-brand-100 via-white to-accent-100 opacity-80 blur-xl" aria-hidden="true" />
+                    <span className="relative font-bold text-brand-600">
+                      <TypingText
+                        texts={['car owners', 'trusted mechanics', 'reliable parts dealers']}
+                        speed={100}
+                        pauseDuration={2000}
+                        deleteSpeed={50}
+                        className="font-bold"
+                        colors={['text-brand-600', 'text-secondary-600', 'text-accent-600']}
+                      />
+                    </span>
+                  </span>
+                </span>
+                <span className="relative mt-5 block text-base text-gray-600">
+                  Seamlessly discover expert mechanics and dependable parts dealers wherever your journey leads.
+                </span>
               </Paragraph>
             </motion.div>
           </motion.div>
