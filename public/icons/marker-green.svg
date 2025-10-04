@@ -1,0 +1,16 @@
+﻿<svg width="48" height="64" viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="markerGradient" x1="24" y1="0" x2="24" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22c55e" />
+      <stop offset="1" stop-color="#15803d" />
+    </linearGradient>
+    <filter id="markerShadow" x="0" y="0" width="48" height="64" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#14532d" flood-opacity="0.25" />
+    </filter>
+  </defs>
+  <g filter="url(#markerShadow)">
+    <path d="M24 2C12.4 2 3 11.24 3 22.72C3 37.44 20.1 55.84 22.62 58.48C23.4 59.32 24.6 59.32 25.38 58.48C27.9 55.84 45 37.44 45 22.72C45 11.24 35.6 2 24 2Z" fill="url(#markerGradient)" />
+    <circle cx="24" cy="23" r="11" fill="white" opacity="0.9" />
+    <circle cx="24" cy="23" r="7" fill="#22c55e" />
+  </g>
+</svg>

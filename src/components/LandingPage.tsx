@@ -29,6 +29,8 @@ import { useAuthRedirect } from '@/hooks/useAuthRedirect'
 import { LampContainer } from '@/components/ui/lamp-demo'
 import { motion } from 'framer-motion'
 import RoleSelector from '@/components/ui/role-selector'
+import { MarketplaceMapSection } from '@/components/common/MarketplaceMapSection'
+import { useMarketplaceLocations } from '@/hooks/useMarketplaceLocations'
 
 const { Title, Paragraph, Text } = Typography
 
@@ -135,12 +137,12 @@ const TypingText: React.FC<{
     // Use colors array if provided, otherwise use bullet-based coloring
     const textColor = colors.length > 0 ? colors[currentTextIndex] : ''
 
-    const parts = text.split('•')
+    const parts = text.split('â€¢')
     return parts.map((part, index) => (
       <span key={index} className="inline-block">
         {index > 0 && (
           <span className="text-purple-400 mx-3 text-4xl md:text-6xl font-bold animate-pulse-slow transform transition-all duration-300 drop-shadow-lg">
-            •
+            â€¢
           </span>
         )}
         <span
@@ -186,6 +188,7 @@ export const LandingPage: React.FC = () => {
     redirectOnAuth: true, // Automatically redirect authenticated users to their dashboard
     redirectOnSignOut: true // Redirect to landing page on sign-out
   })
+  const { locations: marketplaceLocations, loading: locationsLoading, error: locationsError } = useMarketplaceLocations()
 
   // Inject professional animations styles
   useEffect(() => {
@@ -890,6 +893,12 @@ export const LandingPage: React.FC = () => {
             </div>
           </motion.div>
         </div>
+
+        <MarketplaceMapSection
+          locations={marketplaceLocations}
+          loading={locationsLoading}
+          error={locationsError}
+        />
       </main>
 
       {/* Footer */}
@@ -1041,7 +1050,7 @@ export const LandingPage: React.FC = () => {
           {/* Footer Bottom */}
           <div className="pt-6 sm:pt-8 border-t border-gray-200 dark:border-white/10 text-center">
             <div className="text-xs sm:text-sm text-text-tertiary dark:text-slate-500 theme-transition">
-              © {new Date().getFullYear()} AutoCare • All rights reserved
+              Â© {new Date().getFullYear()} AutoCare â€¢ All rights reserved
             </div>
           </div>
         </div>
@@ -1059,3 +1068,6 @@ export const LandingPage: React.FC = () => {
     </div>
   )
 }
+
+
+
